@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Auth;
+
+use App\Click;
+use App\News;
 
 class HomeController extends Controller
 {
@@ -23,6 +27,15 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $data          = [
+            'title'              => 'Home',
+            'breadcrumb'         => [
+                ['url' => url('/'), 'text' => '<i class="fa fa-dashboard"></i> Dashboard']
+            ],
+            'header_title'       => 'Dashboard',
+            'header_description' => '',
+        ];
+        return view('home', $data);
     }
+
 }
