@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Feb 17, 2019 at 04:01 PM
+-- Generation Time: Feb 18, 2019 at 05:16 PM
 -- Server version: 10.1.31-MariaDB
 -- PHP Version: 7.1.16
 
@@ -25,6 +25,139 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `customer`
+--
+
+CREATE TABLE `customer` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `nama` varchar(255) NOT NULL DEFAULT '',
+  `alamat` varchar(255) NOT NULL DEFAULT '',
+  `telepon` varchar(15) NOT NULL DEFAULT '',
+  `jk` varchar(15) NOT NULL DEFAULT '',
+  `tgl_lahir` date NOT NULL,
+  `pekerjaan` varchar(50) NOT NULL DEFAULT '',
+  `email` varchar(255) NOT NULL DEFAULT '',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `dokter`
+--
+
+CREATE TABLE `dokter` (
+  `id` int(11) NOT NULL,
+  `nama` varchar(255) NOT NULL,
+  `alamat` text NOT NULL,
+  `telepon` varchar(191) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `kategori`
+--
+
+CREATE TABLE `kategori` (
+  `id` int(11) NOT NULL,
+  `nama` varchar(191) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `obat`
+--
+
+CREATE TABLE `obat` (
+  `id` int(11) NOT NULL,
+  `kode` varchar(191) NOT NULL,
+  `nama` varchar(191) NOT NULL,
+  `kategori` varchar(191) NOT NULL,
+  `tgl_kadaluarsa` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `harga_jual_satuan` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `harga_jual_resep` varchar(191) NOT NULL,
+  `harga_jual_grosir` varchar(191) NOT NULL,
+  `stok` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pembelian`
+--
+
+CREATE TABLE `pembelian` (
+  `id` int(11) NOT NULL,
+  `id_obat` int(11) NOT NULL,
+  `id_supplier` int(11) NOT NULL,
+  `id_surat_pesanan` int(11) NOT NULL,
+  `type` varchar(191) NOT NULL,
+  `jumlah` int(11) NOT NULL,
+  `tanggal` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `penjualan`
+--
+
+CREATE TABLE `penjualan` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `id_obat` int(11) NOT NULL,
+  `id_konsumen` int(11) NOT NULL,
+  `type` varchar(25) NOT NULL DEFAULT '',
+  `jumlah` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `supplier`
+--
+
+CREATE TABLE `supplier` (
+  `id` int(11) NOT NULL,
+  `nama` varchar(255) NOT NULL,
+  `alamat` text NOT NULL,
+  `kota` varchar(191) NOT NULL,
+  `telepon` varchar(191) NOT NULL,
+  `no_rekening` varchar(191) NOT NULL,
+  `email` varchar(191) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `surat_pesanan`
+--
+
+CREATE TABLE `surat_pesanan` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `path_surat` varchar(255) NOT NULL DEFAULT '',
+  `tanggal` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -37,8 +170,8 @@ CREATE TABLE `users` (
   `password` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `level` int(11) NOT NULL DEFAULT '2',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -53,6 +186,54 @@ INSERT INTO `users` (`id`, `name`, `username`, `email`, `email_verified_at`, `pa
 --
 
 --
+-- Indexes for table `customer`
+--
+ALTER TABLE `customer`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `dokter`
+--
+ALTER TABLE `dokter`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `kategori`
+--
+ALTER TABLE `kategori`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `obat`
+--
+ALTER TABLE `obat`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `pembelian`
+--
+ALTER TABLE `pembelian`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `penjualan`
+--
+ALTER TABLE `penjualan`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `supplier`
+--
+ALTER TABLE `supplier`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `surat_pesanan`
+--
+ALTER TABLE `surat_pesanan`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -62,6 +243,54 @@ ALTER TABLE `users`
 --
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `customer`
+--
+ALTER TABLE `customer`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `dokter`
+--
+ALTER TABLE `dokter`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `kategori`
+--
+ALTER TABLE `kategori`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `obat`
+--
+ALTER TABLE `obat`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `pembelian`
+--
+ALTER TABLE `pembelian`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `penjualan`
+--
+ALTER TABLE `penjualan`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `supplier`
+--
+ALTER TABLE `supplier`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `surat_pesanan`
+--
+ALTER TABLE `surat_pesanan`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
