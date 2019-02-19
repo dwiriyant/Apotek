@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.0
+-- version 4.7.9
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Feb 18, 2019 at 05:16 PM
+-- Host: 127.0.0.1
+-- Generation Time: Feb 19, 2019 at 04:11 PM
 -- Server version: 10.1.31-MariaDB
--- PHP Version: 7.1.16
+-- PHP Version: 7.2.3
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -166,10 +166,12 @@ CREATE TABLE `users` (
   `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `username` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
   `password` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `level` int(11) NOT NULL DEFAULT '2',
+  `status` int(11) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -178,8 +180,9 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `username`, `email`, `email_verified_at`, `password`, `remember_token`, `level`, `created_at`, `updated_at`) VALUES
-(1, 'admin', 'admin', 'admin@admin.com', NULL, '$2y$12$uW0P/VD0BPkc7ENdw2AwzuF2o0JtV8uCTqtZvF.AXpI47MBO4z1i6', 'Go7c11nyggoHcn3pwwlGqjjpmhnNG5bnv2wVBsCk6OHqxJDeLhdc5h0FEEc9', 1, '2019-02-12 17:00:00', '2019-02-12 17:00:00');
+INSERT INTO `users` (`id`, `name`, `username`, `email`, `phone`, `email_verified_at`, `password`, `remember_token`, `level`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'admin', 'admin', 'admin@admin.com', '', NULL, '$2y$12$uW0P/VD0BPkc7ENdw2AwzuF2o0JtV8uCTqtZvF.AXpI47MBO4z1i6', 'Go7c11nyggoHcn3pwwlGqjjpmhnNG5bnv2wVBsCk6OHqxJDeLhdc5h0FEEc9', 1, 1, '2019-02-12 17:00:00', '2019-02-12 17:00:00'),
+(2, 'kasir', 'kasir', 'kasir@kasir.com', '123123123', NULL, '$2y$10$TAh4C1kWkif/x4zif3cX2.mlkoyj33FJP163hP6qmHmyG3l1QHKtK', NULL, 2, 1, '2019-02-19 04:44:38', '2019-02-19 04:44:38');
 
 --
 -- Indexes for dumped tables
@@ -296,7 +299,7 @@ ALTER TABLE `surat_pesanan`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

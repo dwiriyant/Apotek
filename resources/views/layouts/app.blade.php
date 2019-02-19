@@ -79,7 +79,7 @@
       <!-- mini logo for sidebar mini 50x50 pixels -->
       <span class="logo-mini"><b>B</b>S</span>
       <!-- logo for regular state and mobile devices -->
-      <span class="logo-lg" style="    margin: 0px;"><img style="width: 15%;" src="{{ asset('img/logo.png') }}"><b>Batu Sehat</b> Apotek</span>
+      <span class="logo-lg" style="    margin: 0px;"><img style="width: 15%;margin-left: -15px;margin-right: 5px;" src="{{ asset('img/logo.png') }}"><b>Batu Sehat</b> Apotek</span>
     </a>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top">
@@ -157,12 +157,12 @@
           </a>
 
           <ul class="treeview-menu">
-            <li {{ in_array(Route::currentRouteName(), ['obat']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Obat</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['obat']) ? 'class=active' : '' }}><a href="{{ route('obat') }}"><i class="fa fa-circle-o"></i> Obat</a></li>
             <li {{ in_array(Route::currentRouteName(), ['obat']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Kategori</a></li>
             <li {{ in_array(Route::currentRouteName(), ['obat']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Supplier</a></li>
             <li {{ in_array(Route::currentRouteName(), ['obat']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Customer</a></li>
             <li {{ in_array(Route::currentRouteName(), ['obat']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Dokter</a></li>
-            <li {{ in_array(Route::currentRouteName(), ['obat']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Pengguna</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['user']) ? 'class=active' : '' }}><a href="{{ route('user') }}"><i class="fa fa-circle-o"></i> Pengguna</a></li>
           </ul>
         </li>
         <?php endif; ?>
@@ -320,6 +320,8 @@
 <script src="{{ asset('plugins/colorbox/jquery.colorbox-min.js') }}"></script>
 <script src="{{ asset('plugins/clipboard/clipboard.min.js') }}"></script>
 <script src="{{ asset('plugins/cropper/cropper.min.js') }}"></script>
+
+<script src="{{ asset('bower_components/jquery-maskmoney/jquery.maskMoney.min.js') }}"></script>
 
 <!-- App -->
 <script src="{{ asset('js/adminlte.min.js') }}"></script>

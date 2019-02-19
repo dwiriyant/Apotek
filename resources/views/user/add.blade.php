@@ -73,24 +73,25 @@
                         </div>
                     </div>
 
-                    <div class="form-group{{ $errors->has('birthdate') ? ' has-error' : '' }}">
+                    <div class="form-group{{ $errors->has('phone') ? ' has-error' : '' }}">
+                        <label for="level" class="col-md-4 control-label">User Level</label>
 
-                        <input type="hidden" name="birthdate" class="dt-value" value="<?= date('Y-m-d') ?>">
+                        <div class="col-md-6">
 
-                        <label for="birthdate" class="col-md-4 control-label">Birthdate</label>
+                            <select id="level" class="form-control" name="level"  required autofocus>
+                                <option value="2" <?= old('level') == 2 ? 'selected' : ''?> >Kasir</option>
+                                <option value="1" <?= old('level') == 1 ? 'selected' : ''?> >Admin</option>
+                            </select>
 
-                        <div class=" col-md-6 input-group date2" style="padding-left: 15px;padding-right: 15px;">
-                            <input type="text" autocomplete="off" class="form-control" placeholder="Birthdate" value="<?= time()?>">
-                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                         </div>
-
                     </div>
 
                     <div class="form-group">
-                        <div class="col-md-8 col-md-offset-4">
-                            <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
-                                Save
-                            </button>
+                        <div class="col-md-3 col-md-offset-7">
+                            <div class="btn-group pull-right">
+                            <button type="button" class="btn btn-default" onclick="window.location.href='{{route('user')}}'"><i class="fa fa-arrow-left"></i> Back</button>
+                            <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> Save</button>
+                            </div>
                         </div>
                     </div>
 

@@ -375,3 +375,14 @@ $(document).on('click', '.confirm_delete', function(e){
         }
     });
 }
+
+$('.currency').maskMoney({prefix: 'Rp. ', 
+                            thousands: '.', 
+                            decimal: ',',
+                            precision: 0
+                          });
+    $(".currency").keyup(function() {
+      var clone = $(this).val();
+      var cloned = clone.replace(/[A-Za-z$. ,-]/g, "")
+      $('#'+$(this).data('currency')).val(cloned);
+    });

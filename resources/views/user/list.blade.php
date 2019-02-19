@@ -51,13 +51,13 @@
               </div>
               <div class="col-lg-4 col-md-6 col-sm-12">
                   <div class="form-group">
-                      <label for="birthdate" class="col-sm-3 control-label">Birthdate</label>
+                      <label for="email" class="col-sm-3 control-label">User Level</label>
                       <div class="col-sm-9">
-                        <div class="input-group">
-                          <input type="text" id="fdate" name="start" class="input-sm form-control date" rel="start" value="{{ $search['start'] }}"/>
-                          <span class="input-group-addon">to</span>
-                          <input type="text" id="tdate" name="end" class="input-sm form-control date" rel="end" value="{{ $search['end'] }}" />
-                        </div>
+                        <select id="level" class="form-control" name="level"  required autofocus>
+                              <option value=""> All</option>
+                              <option value="2" <?= $search['level'] == 2 ? 'selected' : ''?> >Kasir</option>
+                              <option value="1" <?= $search['level'] == 1 ? 'selected' : ''?> >Admin</option>
+                          </select>
                       </div>
                   </div>
                   <div class="pull-right text-center">
@@ -86,7 +86,6 @@
                     <th>Username</th>
                     <th>Email</th>
                     <th>Phone</th>
-                    <th>Birthdate</th>
                     <th>Level</th>
                     <th>Action</th>
                   </tr>
@@ -101,8 +100,7 @@
                     <td>{{ $datas->username }}</td>
                     <td>{{ $datas->email }}</td>
                     <td>{{ $datas->phone }}</td>
-                    <td>{{ \Carbon\Carbon::parse($datas->birthdate)->format('d M Y') }}</td>
-                    <td>@if($datas->level==1) Super User @else Editor @endif</td>
+                    <td>@if($datas->level==1) Admin @else Kasir @endif</td>
                     <td>
                       <div class="btn-group">
                         <a href="{{ url('edituser',$datas->id) }}">

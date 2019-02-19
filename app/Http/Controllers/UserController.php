@@ -23,8 +23,7 @@ class UserController extends Controller
             'username'    => trim(request()->username),
             'email'    => trim(request()->email),
             'phone'    => trim(request()->phone),
-            'start'    => trim(request()->start),
-            'end'    => trim(request()->end),
+            'level'    => trim(request()->level),
         ];
     }
     
@@ -48,11 +47,9 @@ class UserController extends Controller
         if ($search['phone']!='') {
             $data = $data->where('phone','like', '%' .$search['phone']. '%');
         }
-        if ($search['start']!='')
-            $data = $data->whereRaw('DATE(birthdate) >= ?', [$search['start']]);
-        if ($search['end']!='')
-            $data = $data->whereRaw('DATE(birthdate) <= ?', [$search['end']]);
-
+        if ($search['level']!='') {
+            $data = $data->where('level',(int)$search['level']);
+        }
         $count = clone $data;
         $count = $count->count();
 
@@ -124,8 +121,8 @@ class UserController extends Controller
             'username' => 'required',
             'email' => 'required|unique:users',
             'password' => 'required|confirmed',
-            'birthdate' => 'required',
-            'phone' => 'required'
+            'phone' => 'required',
+            'level' => 'required'
         ]);
 
 		$add = new User();
@@ -133,8 +130,8 @@ class UserController extends Controller
 		$add->username = $request['username'];
 		$add->email = $request['email'];
 		$add->password = Hash::make($request['password']);
-		$add->birthdate = date("Y-m-d", strtotime($request['birthdate']));
 		$add->phone = $request['phone'];
+        $add->level = (int)$request['level'];
 
 		$add->save();
 
@@ -167,8 +164,8 @@ class UserController extends Controller
             'username' => 'required',
             'email' => 'required',
             'password' => $pass_val,
-            'birthdate' => 'required',
             'phone' => 'required',
+            'level' => 'required'
         ]);
 		
 		$add = User::where('id',$id)->first();
@@ -177,8 +174,8 @@ class UserController extends Controller
 		$add->email = $request['email'];
 		if($request['password'])
 			$add->password = Hash::make($request['password']);
-		$add->birthdate = date("Y-m-d", strtotime($request['birthdate']));
 		$add->phone = $request['phone'];
+        $add->level = (int)$request['level'];
 
 		$add->update();
 
@@ -200,7 +197,7 @@ class UserController extends Controller
             abort(403);
         if ($request->isMethod('post')) {
             $param     = [];
-            $paramable = ['name','username','email','phone','start','end'];
+            $paramable = ['name','username','email','phone','level'];
 
             foreach ($paramable as $key => $value) {
                 $post = $request[$value];

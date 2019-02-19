@@ -119,30 +119,6 @@ $(function() {
         $('#datetimepicker01').data("DateTimePicker").maxDate(endDate);
 
 
-    $("#datetimepicker03").on("dp.change", function (e) {
-        $('#datetimepicker04').data("DateTimePicker").minDate(e.date);
-        var value = '';
-        if (e.date)
-            value = e.date.format('YYYY-MM-DD');
-        var obj = $(this).prev().val(value);
-    });
-
-    $("#datetimepicker04").on("dp.change", function (e) {
-        $('#datetimepicker03').data("DateTimePicker").maxDate(e.date);
-        var value = '';
-        if (e.date)
-            value = e.date.format('YYYY-MM-DD');
-        var obj = $(this).prev().val(value);
-    });
-
-    var startDate2 = $('#datetimepicker03').data("DateTimePicker").date();
-    if (startDate2)
-        $('#datetimepicker04').data("DateTimePicker").minDate(startDate2);
-    var endDate2 = $('#datetimepicker04').data("DateTimePicker").date();
-    if (endDate2)
-        $('#datetimepicker03').data("DateTimePicker").maxDate(endDate2);
-
-
     $(document).on('click', '#upload-local', function(e){
         e.preventDefault();
         $('#form-file').click();

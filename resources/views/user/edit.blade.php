@@ -74,14 +74,16 @@
                         </div>
                     </div>
 
-                    <div class="form-group{{ $errors->has('birthdate') ? ' has-error' : '' }}">
-                        <input type="hidden" name="birthdate" class="dt-value" value="<?= isset($data->birthdate) ? date('Y-m-d',strtotime($data->birthdate)) : date('Y-m-d') ;?>">
+                    <div class="form-group{{ $errors->has('phone') ? ' has-error' : '' }}">
+                        <label for="level" class="col-md-4 control-label">User Level</label>
 
-                        <label for="birthdate" class="col-md-4 control-label">Birthdate</label>
+                        <div class="col-md-6">
 
-                        <div class=" col-md-6 input-group date2" style="padding-left: 15px;padding-right: 15px;">
-                            <input type="text" autocomplete="off" class="form-control" placeholder="Birthdate" value="<?= date('D, j M Y', (isset($data->birthdate) ? strtotime($data->birthdate) : time()))?>">
-                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            <select id="level" class="form-control" name="level"  required autofocus>
+                                <option value="2" <?= $data->level == 2 ? 'selected' : ''?> >Kasir</option>
+                                <option value="1" <?= $data->level == 1 ? 'selected' : ''?> >Admin</option>
+                            </select>
+
                         </div>
                     </div>
 

@@ -16,7 +16,7 @@
             <div class="icon">
                 <i class="fa fa-newspaper-o"></i>
             </div>
-            <a href="<?php echo route('news', ['start' => date('Y-m-d'), 'end' => date('Y-m-d')]) ?>"
+            <a href="<?php echo route('/') ?>"
                class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
         </div>
     </div>
@@ -30,7 +30,7 @@
             <div class="icon">
                 <i class="fa fa-bar-chart"></i>
             </div>
-            <a href="<?php echo route('report-kpi', ['start' => date('Y-m-d'), 'end' => date('Y-m-d')]) ?>"
+            <a href="<?php echo route('/') ?>"
                class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
         </div>
     </div>
