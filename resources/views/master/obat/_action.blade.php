@@ -3,9 +3,9 @@ switch ($column) {
     case 'action': ?>
 
 		<div class="btn-group btn-action-3">
-		    <a title="Edit" href="<?php echo route('obat', array_merge($param, ['page' => get('page', 1), 'id' => $campaign['id']])) ?>"  class="btn btn-sm btn-default <?= $campaign['can_edit'] == 0 ? 'disabled' : 'button-edit'?>"><i class="fa fa-pencil"></i></a>
+		    <a title="Edit" href="<?php echo route('obat', array_merge($param, ['page' => get('page', 1), 'id' => $obat['id']])) ?>"  class="btn btn-sm btn-default"><i class="fa fa-pencil"></i></a>
 		    
-		    <a title="Delete" href="<?php echo route('campaign-delete', ['id' => $campaign['id']]) ?>" class="btn btn-sm btn-danger <?= $campaign['can_delete'] == 0 ? 'disabled' : 'confirm'?>"><i class="fa fa-trash"></i></a>
+		    <a title="Delete" href="<?php echo route('obat-delete', ['id' => $obat['id']]) ?>" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></a>
 		</div>
 
 <?php

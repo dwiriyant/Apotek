@@ -5,17 +5,12 @@
 <div class="box box-success collapsed-box">
     <div class="box-header no-shadow no-padding nav-tabs-custom" style="margin-bottom: 0px; min-height: 45px;">
     	<h3 class="box-title" style="padding:10px;"><?php echo (@$obat['id']) ? 'Update Obat' : 'Tambah Obat Baru'; ?></h3>
-
-
-        <div class='box-tools'>
-			<button class='btn btn-xs btn-primary' data-widget='collapse'><i class='fa fa-plus'></i></button> 
-		</div>
+		<button style="margin-top: -5px;" class='btn btn-xs btn-primary' data-widget='collapse'><i class='fa fa-plus'></i></button> 
 
     </div>
     <div class="box-body" style="display: none;">
         <form method="post" id="obat-form" action="<?php echo route('obat', $param)?>" enctype="multipart/form-data">
         	{{ csrf_field() }}
-        	<input type="hidden" name="referer" value="<?php echo $referer?>">
             <input type="hidden" name="id" id="form-id" value="<?php echo htmlEncode(@$obat['id'])?>" />
 
             <div class="col-xs-6 col-md-6">
@@ -41,18 +36,20 @@
 					<label for="kategori" class="control-label">Kategori Obat</label>
 					<div>
 					   <select class="form-control" name="kategori">
+					   		@foreach($kategori as $kat)
                        		<option value="0" <?=@$obat['kategori']=='1' ? 'selected' : ''?> >Obat Bebas</option>
+					   		@endforeach
                         </select>
 					</div>
 
 					<small class="help-block" style="<?php echo (isset($errors['kategori'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['kategori'])) ? $errors['kategori'][0] : '' ;?></small>
 				</div>
 				<div id="schedule" class="form-group <?php echo isset($errors['tgl_kadaluarsa']) ? 'has-error' : '' ; ?>">
-	                <input type="hidden" class="dt-value" value="<?= isset($obat['tgl_kadaluarsa']) ? date('Y-m-d H:i:s',$obat['tgl_kadaluarsa']) : date('Y-m-d H:i:s',strtotime('+3 year')) ;?>">
+	                <input type="hidden" name="tgl_kadaluarsa" class="dt-value" value="<?= isset($obat['tgl_kadaluarsa']) ? date('Y-m-d H:i:s',$obat['tgl_kadaluarsa']) : date('Y-m-d H:i:s',strtotime('+3 year')) ;?>">
 	                <label for="news-schedule" class="control-label">Tanggal Kadaluarsa</label>
 	                
 	                <div class="input-group date2">
-	                    <input type="text" name="tgl_kadaluarsa" autocomplete="off" class="form-control" id="news-schedule" placeholder="Schedule" value="<?= date('D, j M Y H:i', (isset($obat['tgl_kadaluarsa']) ? $obat['tgl_kadaluarsa'] : strtotime('+3 year')))?>">
+	                    <input type="text" autocomplete="off" class="form-control" id="news-schedule" placeholder="Schedule" value="<?= date('D, j M Y H:i', (isset($obat['tgl_kadaluarsa']) ? $obat['tgl_kadaluarsa'] : strtotime('+3 year')))?>">
 	                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
 	                </div>
 	                <?php if (isset($errors['tgl_kadaluarsa'])) {?>
@@ -90,7 +87,7 @@
 				<div class="form-group <?php echo isset($errors['harga_grosir']) ? 'has-error' : '' ; ?>">
 					<label for="harga_grosir" class="control-label">Harga Jual Grosir</label>
 					<div>
-					   <input type="text" data-currency="harga_grosir" name="harga_grosir" id="harga_grosir" class="form-control currency" value="<?=isset($obat['harga_grosir']) ? $obat['harga_grosir']: ""?>" placeholder="Harga Jual Grosir">
+					   <input type="text" data-currency="harga_grosir" class="form-control currency" value="<?=isset($obat['harga_grosir']) ? $obat['harga_grosir']: ""?>" placeholder="Harga Jual Grosir">
 					   <input id="harga_grosir" type="hidden" class="form-control" name="harga_grosir" value="<?=isset($obat['harga_grosir']) ? $obat['harga_grosir']: ""?>">
 					</div>
 

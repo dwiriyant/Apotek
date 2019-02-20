@@ -12,13 +12,13 @@ use PHPExcel_Style_Alignment;
 use PHPExcel_Style_Border;
 use PHPExcel_Style_Fill;
 use App\Obat;
+use App\Kategori;
 use Auth;
 
 class ObatController extends Controller
 {
     private $_page   = 1;
     private $_limit  = 25;
-    private $_limit2  = 50;
     private $_search = [];
     private $_route  = 'obat';
     
@@ -46,7 +46,7 @@ class ObatController extends Controller
      */
     public function index()
     {
-        $campaign      = false;
+        $obat      = false;
         $this->_page = request()->page;
 
         if (isPost()) {
@@ -59,7 +59,7 @@ class ObatController extends Controller
         }
 
         if (request('id')) {
-            $campaign = Obat::where('id',(int)request('id'))->first();
+            $obat = Obat::where('id',(int)request('id'))->first();
         }
 
         if (isAjax()) {
@@ -68,10 +68,10 @@ class ObatController extends Controller
 
             $param = array_filter($param);
 
-            if($campaign)
-                $campaign = $campaign->toArray();
+            if($obat)
+                $obat = $obat->toArray();
 
-            echo $this->_form($campaign, $param);
+            echo $this->_form($obat, $param);
 
             return;
         }
@@ -79,56 +79,16 @@ class ObatController extends Controller
 
         $param   = [];
 
-        $campaign = new Obat();
+        $obat = Obat::where('status','!=',9);
 
-        $where['level'] = ['$ne'=>9];
         if ($search['name']!='') {
             $where['name'] = ['$regex' => $search['name'],'$options' => 'i'];
             $param   = [
                 'name'   => $this->_search['name'],
             ];
         }
-        if ($search['start'] && !$search['end']){
-            $where['start_date'] = ['$gte' => strtotime($search['start'])];
-            $param   = [
-                'start'   => $this->_search['start'],
-            ];
-        }
-        if ($search['end'] && !$search['start']){
-            $search['end'] = strtotime("+1 day", strtotime($search['end']));
-            $where['end_date'] = ['$lte' => $search['end']];
-            $param   = [
-                'end'   => $this->_search['end'],
-            ];
-        }
-        if ($search['start'] && $search['end']){
-            $search['end'] = strtotime("+1 day", strtotime($search['end']));
-            $where['start_date'] = ['$gte' => strtotime($search['start'])];
-            $where['end_date'] = ['$lte' => $search['end']];
 
-            $param   = [
-                'start' => $this->_search['start'],
-                'end'   => $this->_search['end'],
-            ];
-        }
-        if ($search['status']!='') {
-            if($search['status']=='D') 
-            {
-                $where['end_date'] = ['$lt' => strtotime(date('Y-m-d'))];
-            } else if ($search['status']=='NY') 
-            {
-                $where['start_date'] = ['$gt' => strtotime(date('Y-m-d'))];
-            } else if ($search['status']=='OG') 
-            {
-                $where['start_date'] = ['$lte' => strtotime(date('Y-m-d'))];
-                $where['end_date'] = ['$gte' => strtotime(date('Y-m-d'))];
-            }
-            $param   = [
-                'status'   => $this->_search['status'],
-            ];
-        }
-
-        $count = $campaign->count();
+        $count = $obat->count();
 
         $this->_page = get('page', 1);
        // var_dump($data);die();
@@ -144,63 +104,48 @@ class ObatController extends Controller
         if (get('export', false)) {
             if($this->_page == 1)
             {
-                $datas = $campaign->whereRaw($where)->orderBy('created_at', 'desc')->get();
+                $datas = $obat->whereRaw($where)->orderBy('created_at', 'desc')->get();
             }
             else
             {
-                $datas = $campaign->whereRaw($where)->skip($offset)->take($this->_limit)->orderBy('created_at', 'desc')->get();
+                $datas = $obat->whereRaw($where)->skip($offset)->take($this->_limit)->orderBy('created_at', 'desc')->get();
             }
             $datas = $datas->toArray();
             $this->export_content($datas,get());
             return;
         }
 
-        $data = $campaign->skip($offset)->take($this->_limit)->orderBy('created_at', 'desc')->get();
+        $obat = $obat->skip($offset)->take($this->_limit)->orderBy('created_at', 'desc')->get();
         
-        $rows = $data->toArray();
-
+        $obat = $obat->toArray();
 
         $data = [];
         $i    = $offset;
-        foreach ($rows as $key => $value) {
-            $now = strtotime(date('Y-m-d'));
-            if($now >= $value['start_date'] && $now <= $value['end_date'])
-            {
-                $status = '<small class="label label-primary">On Going</small>';
-                $value['can_delete'] = 0;
-                $value['can_edit'] = 1;
-            }
-            else if ($now < $value['start_date'])
-            {
-                $status = '<small class="label label-danger">Not Yet</small>';
-                $value['can_delete'] = 1;
-                $value['can_edit'] = 1;
-            }
-            else
-            {
-                $status = '<small class="label label-success">Done</small>';
-                $value['can_delete'] = 0;
-                $value['can_edit'] = 0;
-            }
-
+        foreach ($obat as $key => $value) {
             $data[] = [
-                'number'         => ++$i,
-                'tr_class'       => ($now < $value['start_date']) ? 'warning' : '',
-                'name'           => '<label style="color: #428bca;text-decoration: none;font-weight: 600;">'.$value['name'].'</a>',
-                'start_date'     => date('d M Y',$value['start_date']),
-                'end_date'       => date('d M Y',$value['end_date']),
-                'status'         => $status,
-                
-                'action'         => view('master/obat/_action', ['param' => $param, 'campaign' => $value, 'route' => $this->_route, 'column' => 'action'])
+                'number'             => ++$i,
+                'kode'               => $value['kode'],
+                'nama'               => $value['nama'],
+                'kategori'           => $value['kategori'],
+                'tgl_kadaluarsa'     => $value['tgl_kadaluarsa'],
+                'harga_jual_satuan'  => $value['harga_jual_satuan'],
+                'harga_jual_resep'   => $value['harga_jual_resep'],
+                'harga_jual_grosir'  => $value['harga_jual_grosir'],
+                'stok'               => $value['stok'],
+                'action'             => view('master/obat/_action', ['param' => $param, 'obat' => $value, 'route' => $this->_route, 'column' => 'action'])
             ];
         }
 
         $column = array(
             array('header' => 'No', 'data' => 'number', 'width' => '30px', 'class' => 'text-center'),
-            array('header' => 'Campaign Name', 'data' => 'name', 'width' => '250px'),
-            array('header' => 'Start Date', 'data' => 'start_date', 'width' => '250px'),
-            array('header' => 'End Date', 'data' => 'end_date', 'width' => '250px'),
-            array('header' => 'Status', 'data' => 'status', 'width' => '250px'),
+            array('header' => 'Kode Obat', 'data' => 'kode', 'width' => '250px'),
+            array('header' => 'Nama Obat', 'data' => 'nama', 'width' => '250px'),
+            array('header' => 'Kategori', 'data' => 'kategori', 'width' => '250px'),
+            array('header' => 'Tanggal Kadaluarsa', 'tgl_kadaluarsa' => 'nama', 'width' => '250px'),
+            array('header' => 'Harga Jual Satuan', 'harga_jual_satuan' => 'nama', 'width' => '250px'),
+            array('header' => 'Harga Jual Resep', 'harga_jual_resep' => 'nama', 'width' => '250px'),
+            array('header' => 'Harga Jual Grosir', 'harga_jual_grosir' => 'nama', 'width' => '250px'),
+            array('header' => 'Stok', 'data' => 'stok', 'width' => '250px'),
             
             array('header' => 'Action', 'data' => 'action', 'width' => '120px')
         );
@@ -220,13 +165,13 @@ class ObatController extends Controller
 
         $param['page'] = $this->_page;
         $data          = [
-            'title'              => 'Campaign Schedule',
+            'title'              => 'obat Schedule',
             'breadcrumb'         => [
                 ['url' => url('/'), 'text' => '<i class="fa fa-dashboard"></i> Dashboard'],
-                ['url' => '#', 'text' => '<i class="fa fa-tag"></i> Campaign Schedule'],
+                ['url' => '#', 'text' => '<i class="fa fa-tag"></i> obat Schedule'],
             ],
             'header_title'       => 'Content',
-            'header_description' => 'Campaign Schedule',
+            'header_description' => 'obat Schedule',
             'table'              => $table,
             'route'              => $this->_route,
             'total'              => $count,
@@ -236,7 +181,7 @@ class ObatController extends Controller
             'pagination'         => $pagination,
             'flash_message'      => view('_flash_message', []),
             'param'              => $param,
-            'form'               => $this->_form($campaign, $param),
+            'form'               => $this->_form($obat, $param),
         ];
         
         return view("master/obat/index", $data);
@@ -250,38 +195,19 @@ class ObatController extends Controller
         if (isPost()) {
             // start validation
             $v = $this->validator(post());
-            $v->rule('required', ['nama','kode','kategori']);
+            $v->rule('required', ['nama','kode','kategori','harga_satuan']);
 
             // end validation
             if ($v->validate()) {
-                $referer = post('referer') ? removeQsKey(post('referer'), 'id') : referer($this->_route);
-
-                if(strtotime(post('start_date')) > strtotime(post('end_date')))
-                    return redirect($referer)->with('error','Error <strong>' . (post('id') ? 'UPDATE' : 'ADD NEW') . '</strong> Campaign. Start Date must be smaller than End Date');
-
-                $check_exist = Campaign::orWhere(function($query)
-                    {
-                        $query->where('start_date', '<=', strtotime(post('start_date')))
-                              ->where('end_date', '>=', strtotime(post('start_date')));
-                    })->orWhere(function($query)
-                    {
-                        $query->where('start_date', '<=', strtotime(post('end_date')))
-                              ->where('end_date', '>=', strtotime(post('end_date')));
-                    })->where('id','<>',(int)post('id'))->where('level',1)->first();
-
-                if($check_exist)
-                    return redirect($referer)->with('error','Error <strong>' . (post('id') ? 'UPDATE' : 'ADD NEW') . '</strong> Campaign. There are still campaigns active between these dates');
 
                 $data = $this->_save(post());
 
                 if (isset($data['id'])) {
 
-                    $this->writeLog($data,(post('id') ? 'UPDATE' : 'ADD NEW').' Campaign','Campaign');
-
-                    return redirect($referer)->with('success','Success <strong>' . (post('id') ? 'UPDATE' : 'ADD NEW') . '</strong> Campaign.');
+                    return redirect($this->_route)->with('success','Success <strong>' . (post('id') ? 'UPDATE' : 'ADD NEW') . '</strong> obat.');
 
                 } else {
-                    set_flash('Failed to save campaign.');
+                    set_flash('Failed to save obat.');
                     set_flash('error', 'status');
                 }
             }
@@ -293,11 +219,11 @@ class ObatController extends Controller
 
         // prepare form data
         $data = [
-            'referer'       => removeQsKey(post('referer', url()->full()), 'id'),
-            'campaign'      => $row,
+            'obat'      => $row,
             'errors'        => $errors,
             'route'         => $this->_route,
             'param'         => $param,
+            'kategori'      => Kategori::where('status','!=',9)->get()->toArray()
         ];
 
         return view('master/obat/_form', $data);
@@ -322,25 +248,23 @@ class ObatController extends Controller
     }
 
     /**
-     * delete Campaign
+     * delete obat
      * @return redirect to referer page
      */
     function delete()
     {
         $id = get('id');
         if ($id) {
-            $campaign = Campaign::where('id',(int)$id)->first();
-            $campaign->level = 9;
-            $campaign->save();
+            $obat = obat::where('id',(int)$id)->first();
+            $obat->level = 9;
+            $obat->save();
 
-            if ($campaign) {
-                $this->writeLog($campaign->toArray(),'Delete Campaign','Campaign');
-
-                 return redirect(removeQsKey(referer($this->_route), 'id'))->with('success','Success <strong>DELETE</strong> Campaign.');
+            if ($obat) {
+                 return redirect($this->_route)->with('success','Success <strong>DELETE</strong> obat.');
             }
         } else
         {
-            return redirect(removeQsKey(referer($this->_route), 'id'))->with('error','Failes <strong>DELETE</strong> Campaign.');
+            return redirect($this->_route)->with('error','Failes <strong>DELETE</strong> obat.');
         }
         
     }
@@ -364,45 +288,35 @@ class ObatController extends Controller
         if(empty($post))
             return;
 
-        $campaign = Campaign::where('id',(int)@$post['id'])->first();
+        $obat = Obat::where('id',(int)@$post['id'])->first();
 
-        if($campaign)
+        if($obat)
         {
-            $campaign->name = $post['name'];
-            $campaign->updated_at = strtotime('now');
-            $campaign->start_date = strtotime($post['start_date']);
-            $campaign->end_date = strtotime($post['end_date']);
+            $obat->nama = $post['nama'];
+            $obat->kode = $post['kode'];
+            $obat->kategori = $post['kategori'];
+            $obat->tgl_kadaluarsa = $post['tgl_kadaluarsa'];
+            $obat->harga_jual_satuan = $post['harga_satuan'] == '' ? 0 : $post['harga_satuan'];
+            $obat->harga_jual_resep = $post['harga_resep'] == '' ? 0 : $post['harga_resep'];
+            $obat->harga_jual_grosir = $post['harga_grosir'] == '' ? 0 : $post['harga_grosir'];
+            $obat->stok = (int)$post['stok'];
         } else {
 
-            $campaign = new Campaign();
-            $campaign->id = Campaign::max('id') +1;
-            $campaign->name = $post['name'];
-            $campaign->start_date = strtotime($post['start_date']);
-            $campaign->end_date = strtotime($post['end_date']);
-            $campaign->createby_id = Auth::user()->id;
-            $campaign->createby_name = Auth::user()->name;
-            $campaign->created_at = strtotime('now');
-            $campaign->updated_at = strtotime('now');
-            $campaign->level = 1;
+            $obat = new Obat();
+            $obat->nama = $post['nama'];
+            $obat->kode = $post['kode'];
+            $obat->kategori = $post['kategori'];
+            $obat->tgl_kadaluarsa = $post['tgl_kadaluarsa'];
+            $obat->harga_jual_satuan = $post['harga_satuan'] == '' ? 0 : $post['harga_satuan'];
+            $obat->harga_jual_resep = $post['harga_resep'] == '' ? 0 : $post['harga_resep'];
+            $obat->harga_jual_grosir = $post['harga_grosir'] == '' ? 0 : $post['harga_grosir'];
+            $obat->stok = (int)$post['stok'];
         }
         
         
-        $campaign->save();
+        $obat->save();
 
-        return $campaign->toArray();
-    }
-
-
-    function writeLog($data,$action,$message)
-    {
-        $data = [ 'user_id'       => Auth::user()->id,
-                  'user_name'     => Auth::user()->username,
-                  'campaign_id'      => $data['id'],
-                  'action'          => $action,
-                  'message'        => $message,
-                  'created_at'      => date('Y-m-d H:i:s')];
-                  
-        Log::create($data);
+        return $obat->toArray();
     }
 
     function export_content($data,$get)
@@ -416,7 +330,7 @@ class ObatController extends Controller
         else
             $_title = '';
 
-        $report_title = 'Report Content Campaign';
+        $report_title = 'Report Content obat';
         // Create new PHPExcel object
         $objPHPExcel = new PHPExcelces();
         // Set properties
@@ -482,7 +396,7 @@ class ObatController extends Controller
 
         $abj = 'A';
         
-        $objPHPExcel->getActiveSheet()->setTitle('Report Content Campaign');
+        $objPHPExcel->getActiveSheet()->setTitle('Report Content obat');
 
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'No.');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);

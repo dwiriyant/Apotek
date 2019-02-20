@@ -33,4 +33,9 @@ Route::post('/searchuser', 'UserController@FUNC_SEARCH');
 Route::any('/obat', 'Master\ObatController@index')->name('obat');
 Route::post('/obat/search', 'Master\ObatController@search');
 Route::post('/obat/remote', 'Master\ObatController@remote');
-Route::post('/obat/delete', 'Master\ObatController@delete');
+Route::get('/obat/delete', 'Master\ObatController@delete')->name('obat-delete');
+
+Route::any('/kategori', 'Master\KategoriController@index')->name('kategori');
+Route::post('/kategori/search', 'Master\KategoriController@search');
+Route::post('/kategori/remote', 'Master\KategoriController@remote');
+Route::get('/kategori/delete', 'Master\KategoriController@delete')->name('kategori-delete');
