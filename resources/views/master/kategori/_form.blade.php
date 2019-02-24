@@ -1,15 +1,14 @@
-<script type="text/javascript">
-    var community = 'exist';
-</script>
-
-<div class="box box-success collapsed-box">
+<div class="box box-success <?= !isset($kategori['id']) ? 'collapsed-box' : '' ?>">
     <div class="box-header no-shadow no-padding nav-tabs-custom" style="margin-bottom: 0px; min-height: 45px;">
     	<h3 class="box-title" style="padding:10px;"><?php echo (@$kategori['id']) ? 'Update kategori' : 'Tambah kategori Baru'; ?></h3>
-
-		<button style="margin-top: -5px;" class='btn btn-xs btn-primary' data-widget='collapse'><i class='fa fa-plus'></i></button> 
+    	<?php if(!isset($kategori['id'])): ?>
+    	<div class="box-tools">
+			<button style="margin-top: -5px;" class='btn btn-xs btn-primary' data-widget='collapse'><i class='fa fa-plus'></i></button> 
+		</div>
+	<?php endif; ?>
 		
     </div>
-    <div class="box-body" style="display: none;">
+    <div class="box-body" <?= !isset($kategori['id']) ? 'style="display: none;"' : '' ?>>
         <form method="post" id="kategori-form" action="<?php echo route('kategori', $param)?>" enctype="multipart/form-data">
         	{{ csrf_field() }}
             <input type="hidden" name="id" id="form-id" value="<?php echo htmlEncode(@$kategori['id'])?>" />

@@ -158,15 +158,15 @@
 
           <ul class="treeview-menu">
             <li {{ in_array(Route::currentRouteName(), ['obat']) ? 'class=active' : '' }}><a href="{{ route('obat') }}"><i class="fa fa-circle-o"></i> Obat</a></li>
-            <li {{ in_array(Route::currentRouteName(), ['obat']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Kategori</a></li>
-            <li {{ in_array(Route::currentRouteName(), ['obat']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Supplier</a></li>
-            <li {{ in_array(Route::currentRouteName(), ['obat']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Customer</a></li>
-            <li {{ in_array(Route::currentRouteName(), ['obat']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Dokter</a></li>
-            <li {{ in_array(Route::currentRouteName(), ['user']) ? 'class=active' : '' }}><a href="{{ route('user') }}"><i class="fa fa-circle-o"></i> Pengguna</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['kategori']) ? 'class=active' : '' }}><a href="{{ route('kategori') }}"><i class="fa fa-circle-o"></i> Kategori</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['supplier']) ? 'class=active' : '' }}><a href="{{ route('supplier') }}"><i class="fa fa-circle-o"></i> Supplier</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['customer']) ? 'class=active' : '' }}><a href="{{ route('customer') }}"><i class="fa fa-circle-o"></i> Customer</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['dokter']) ? 'class=active' : '' }}><a href="{{ route('dokter') }}"><i class="fa fa-circle-o"></i> Dokter</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['pengguna']) ? 'class=active' : '' }}><a href="{{ route('user') }}"><i class="fa fa-circle-o"></i> Pengguna</a></li>
           </ul>
         </li>
         <?php endif; ?>
-        <li class="treeview {{ (str_replace(['obat','kategori','supplier','customer','dokter','pengguna'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
+        <li class="treeview {{ (str_replace([''], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
           <a href="#">
             <i class="fa fa-tasks"></i> <span>Transaksi</span>
             <span class="pull-right-container">
@@ -200,11 +200,11 @@
               </ul>
             </li>
 
-            <li {{ in_array(Route::currentRouteName(), ['obat']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Retur Penjualan</a></li>
-            <li {{ in_array(Route::currentRouteName(), ['obat']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Retur Pembelian</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Retur Penjualan</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Retur Pembelian</a></li>
           </ul>
         </li>
-        <li class="treeview {{ (str_replace(['obat','kategori','supplier','customer','dokter','pengguna'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
+        <li class="treeview {{ (str_replace([''], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
           <a href="#">
             <i class="fa fa-tasks"></i> <span>Report</span>
             <span class="pull-right-container">
@@ -213,9 +213,9 @@
           </a>
 
           <ul class="treeview-menu">
-            <li {{ in_array(Route::currentRouteName(), ['obat']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Penjualan</a></li>
-            <li {{ in_array(Route::currentRouteName(), ['obat']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Pembelian</a></li>
-            <li {{ in_array(Route::currentRouteName(), ['obat']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Stok Opname</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Penjualan</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Pembelian</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Stok Opname</a></li>
           </ul>
         </li>
         
@@ -325,7 +325,6 @@
 
 <!-- App -->
 <script src="{{ asset('js/adminlte.min.js') }}"></script>
-<script src="{{ asset('js/app.js') }}"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="{{ asset('js/demo.js') }}"></script>
 

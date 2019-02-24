@@ -2,6 +2,22 @@ var d = new Date();
 d.setHours(0,0,0,0);
 
 function callbackForm(){
+
+    $('.currency').maskMoney({prefix: 'Rp. ', 
+                            thousands: '.', 
+                            decimal: ',',
+                            precision: 0
+                          });
+    $(".currency").keyup(function() {
+      var clone = $(this).val();
+      var cloned = clone.replace(/[A-Za-z$. ,-]/g, "")
+      $('#'+$(this).data('currency')).val(cloned);
+    });
+    
+    $('.currency').each(function(){ // function to apply mask on load!
+        $(this).maskMoney('mask', $(this).val());
+    })
+
     $('.counter').each(function(dom, index){
         var obj = $(this);
         $('#'+obj.attr('id')).simplyCountable({
@@ -24,33 +40,17 @@ function callbackForm(){
 
 
     var rules = {
-        name : 'required',
-        start_date_tmp : 'required',
-        end_date_tmp : 'required',
+        nama : 'required',
+        kode : 'required',
+        harga_satuan : 'required',
     };
 
     var rule = rules;
-    $('#socmed-form').validate({
+    $('#obat-form').validate({
         rules : rule,
         submitHandler: function(form) {
                 form.submit();
         }
-    });
-
-    $('.date').datetimepicker({
-        format: "D MMM YYYY",
-        showClear : true,
-        showTodayButton : true,
-        useCurrent : false,
-        allowInputToggle : true,
-    });
-
-    $(".date").on("dp.change", function (e) {
-        var value = '';
-        if (e.date)
-            value = e.date.format('YYYY-MM-DD');
-        var obj = $(this).parents('.form-group:eq(0)').find('input.dt-value:eq(0)');
-        obj.val(value);
     });
 
     $('.date2').datetimepicker({
@@ -78,14 +78,6 @@ $(function() {
     Holder.run();
     callbackForm();
 
-    $('.date').datetimepicker({
-        format: "DD MMM YYYY",
-        showClear : true,
-        showTodayButton : true,
-        useCurrent : false,
-        allowInputToggle : true,
-    });
-
     $('.date2').datetimepicker({
         format: "DD MMM YYYY",
         showClear : true,
@@ -94,30 +86,6 @@ $(function() {
         allowInputToggle : true,
         minDate:d
     });
-
-    $("#datetimepicker01").on("dp.change", function (e) {
-        $('#datetimepicker02').data("DateTimePicker").minDate(e.date);
-        var value = '';
-        if (e.date)
-            value = e.date.format('YYYY-MM-DD');
-        var obj = $(this).prev().val(value);
-    });
-
-    $("#datetimepicker02").on("dp.change", function (e) {
-        $('#datetimepicker01').data("DateTimePicker").maxDate(e.date);
-        var value = '';
-        if (e.date)
-            value = e.date.format('YYYY-MM-DD');
-        var obj = $(this).prev().val(value);
-    });
-
-    var startDate = $('#datetimepicker01').data("DateTimePicker").date();
-    if (startDate)
-        $('#datetimepicker02').data("DateTimePicker").minDate(startDate);
-    var endDate = $('#datetimepicker02').data("DateTimePicker").date();
-    if (endDate)
-        $('#datetimepicker01').data("DateTimePicker").maxDate(endDate);
-
 
     $(document).on('click', '#upload-local', function(e){
         e.preventDefault();

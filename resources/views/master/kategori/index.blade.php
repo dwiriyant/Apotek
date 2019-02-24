@@ -22,9 +22,9 @@
                     <div class="col-lg-6 col-md-6 col-sm-12">
 
                         <div class="form-group">
-                            <label for="name" class="col-sm-3 control-label">Campaign name</label>
+                            <label for="name" class="col-sm-3 control-label">Nama Kategori</label>
                             <div class="col-sm-9">
-                                <input type="text" name="name" id="name" class="form-control input-sm" value="{{ $search['name'] }}" placeholder="Campaign name">
+                                <input type="text" name="name" id="name" class="form-control input-sm" value="{{ $search['name'] }}" placeholder="Nama Kategori">
                             </div>
                         </div>
 
@@ -74,5 +74,5 @@
 
 @endsection
 @section('js')
-<script src="{{ asset('js/master/obat.js') }}"></script>
+<script src="{{ asset('js/master/kategori.js') }}"></script>
 @stop

@@ -22,9 +22,9 @@
                     <div class="col-lg-4 col-md-6 col-sm-12">
 
                         <div class="form-group">
-                            <label for="name" class="col-sm-3 control-label">Campaign name</label>
+                            <label for="name" class="col-sm-3 control-label">Kode Obat</label>
                             <div class="col-sm-9">
-                                <input type="text" name="name" id="name" class="form-control input-sm" value="{{ $search['name'] }}" placeholder="Campaign name">
+                                <input type="text" name="kode" id="kode" class="form-control input-sm" value="{{ $search['kode'] }}" placeholder="Kode Obat">
                             </div>
                         </div>
 
@@ -33,33 +33,23 @@
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         
                         <div class="form-group">
-                            <label for="input_start" class="col-sm-3 control-label" style="    padding-top: 0px;">Campaign Date</label>
-                            <div class="col-sm-9" id="form-search-range">
-                                
-                                <div class="input-group">
-                                    <input type="hidden" name="start" id="input_dStart" class="dt-value" value="<?=$search['start']?>">
-                                    <input type="text" placeholder="Start Date" name="input_start" class="form-control input-sm date" id="datetimepicker01" value="<?php echo (isset($search['start']) && $search['start']) ? getFormattedDate($search['start'], 'd M Y', 'Y-m-d') : '' ;?>">
-                                    <span class="input-group-addon">to</span>
-                                    <input type="hidden" name="end" id="input_dEnd" class="dt-value" value="<?=$search['end']?>">
-                                    <input type="text" placeholder="End Date" name="input_end" class="form-control input-sm date" id="datetimepicker02" value="<?php echo (isset($search['end']) && $search['end']) ? getFormattedDate($search['end'], 'd M Y', 'Y-m-d') : '' ;?>">
-                                </div>
-                                
+                            <label for="name" class="col-sm-3 control-label">Nama Obat</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="name" id="name" class="form-control input-sm" value="{{ $search['name'] }}" placeholder="Nama Obat">
                             </div>
                         </div>
-
-                        
 
                     </div>
 
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="form-group">
-                            <label for="status" class="col-sm-3 control-label">Status</label>
+                            <label for="kategori" class="col-sm-3 control-label">Kategori Obat</label>
                             <div class="col-sm-9">
-                                <select class="form-control" name="status">
-                                    <option value="" <?=@$search['status']=='' ? 'selected': ""?> >All</option>
-                                    <option value="NY" <?=@$search['status']=='NY' ? 'selected': ""?> >Not Yet</option>
-                                    <option value="OG" <?=@$search['status']=='OG' ? 'selected': ""?> >On Going</option>
-                                    <option value="D" <?=@$search['status']=='D' ? 'selected': ""?> >Done</option>
+                                <select class="form-control" name="kategori">
+                                    <option value="" >All</option>
+                                    @foreach($kategori as $kat)
+                                    <option value="<?= $kat['id'] ?>" <?=@$search['kategori']=='1' ? 'selected' : ''?> ><?= $kat['nama']?></option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>

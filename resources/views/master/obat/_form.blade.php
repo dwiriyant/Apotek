@@ -1,14 +1,14 @@
-<script type="text/javascript">
-    var community = 'exist';
-</script>
-
-<div class="box box-success collapsed-box">
+<div class="box box-success <?= !isset($obat['id']) ? 'collapsed-box' : '' ?>">
     <div class="box-header no-shadow no-padding nav-tabs-custom" style="margin-bottom: 0px; min-height: 45px;">
-    	<h3 class="box-title" style="padding:10px;"><?php echo (@$obat['id']) ? 'Update Obat' : 'Tambah Obat Baru'; ?></h3>
-		<button style="margin-top: -5px;" class='btn btn-xs btn-primary' data-widget='collapse'><i class='fa fa-plus'></i></button> 
-
+    	<h3 class="box-title" style="padding:10px;"><?php echo (@$obat['id']) ? 'Update obat' : 'Tambah obat Baru'; ?></h3>
+    	<?php if(!isset($obat['id'])): ?>
+    	<div class="box-tools">
+			<button style="margin-top: -5px;" class='btn btn-xs btn-primary' data-widget='collapse'><i class='fa fa-plus'></i></button> 
+		</div>
+	<?php endif; ?>
+		
     </div>
-    <div class="box-body" style="display: none;">
+    <div class="box-body" <?= !isset($obat['id']) ? 'style="display: none;"' : '' ?>>
         <form method="post" id="obat-form" action="<?php echo route('obat', $param)?>" enctype="multipart/form-data">
         	{{ csrf_field() }}
             <input type="hidden" name="id" id="form-id" value="<?php echo htmlEncode(@$obat['id'])?>" />
@@ -27,7 +27,7 @@
 				<div class="form-group <?php echo isset($errors['name']) ? 'has-error' : '' ; ?>">
 					<label for="nama" class="control-label">Nama Obat</label>
 					<div>
-					   <input type="text" name="nama" id="nama" class="form-control" value="<?=isset($obat['name']) ? $obat['name']: ""?>" placeholder="Nama Obat">
+					   <input type="text" name="nama" id="nama" class="form-control" value="<?=isset($obat['nama']) ? $obat['nama']: ""?>" placeholder="Nama Obat">
 					</div>
 
 					<small class="help-block" style="<?php echo (isset($errors['nama'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['nama'])) ? $errors['nama'][0] : '' ;?></small>
@@ -37,19 +37,19 @@
 					<div>
 					   <select class="form-control" name="kategori">
 					   		@foreach($kategori as $kat)
-                       		<option value="0" <?=@$obat['kategori']=='1' ? 'selected' : ''?> >Obat Bebas</option>
+                       		<option value="<?= $kat['id'] ?>" <?=@$obat['obat']=='1' ? 'selected' : ''?> ><?= $kat['nama']?></option>
 					   		@endforeach
                         </select>
 					</div>
 
-					<small class="help-block" style="<?php echo (isset($errors['kategori'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['kategori'])) ? $errors['kategori'][0] : '' ;?></small>
+					<small class="help-block" style="<?php echo (isset($errors['obat'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['obat'])) ? $errors['obat'][0] : '' ;?></small>
 				</div>
-				<div id="schedule" class="form-group <?php echo isset($errors['tgl_kadaluarsa']) ? 'has-error' : '' ; ?>">
-	                <input type="hidden" name="tgl_kadaluarsa" class="dt-value" value="<?= isset($obat['tgl_kadaluarsa']) ? date('Y-m-d H:i:s',$obat['tgl_kadaluarsa']) : date('Y-m-d H:i:s',strtotime('+3 year')) ;?>">
-	                <label for="news-schedule" class="control-label">Tanggal Kadaluarsa</label>
+				<div class="form-group <?php echo isset($errors['tgl_kadaluarsa']) ? 'has-error' : '' ; ?>">
+	                <input type="hidden" name="tgl_kadaluarsa" class="dt-value" value="<?= isset($obat['tgl_kadaluarsa']) ? $obat['tgl_kadaluarsa'] : date('Y-m-d',strtotime('+3 year')) ;?>">
+	                <label for="tgl_kadaluarsa" class="control-label">Tanggal Kadaluarsa</label>
 	                
 	                <div class="input-group date2">
-	                    <input type="text" autocomplete="off" class="form-control" id="news-schedule" placeholder="Schedule" value="<?= date('D, j M Y H:i', (isset($obat['tgl_kadaluarsa']) ? $obat['tgl_kadaluarsa'] : strtotime('+3 year')))?>">
+	                    <input type="text" autocomplete="off" class="form-control" placeholder="Schedule" value="<?= date('D, j M Y', (isset($obat['tgl_kadaluarsa']) ? strtotime($obat['tgl_kadaluarsa']) : strtotime('+3 year')))?>">
 	                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
 	                </div>
 	                <?php if (isset($errors['tgl_kadaluarsa'])) {?>
@@ -69,8 +69,8 @@
 				<div class="form-group <?php echo isset($errors['harga_satuan']) ? 'has-error' : '' ; ?>">
 					<label for="harga_satuan" class="control-label">Harga Jual Satuan</label>
 					<div>
-					   <input data-currency="harga_satuan" type="text" class="form-control currency" value="<?=isset($obat['harga_satuan']) ? $obat['harga_satuan']: ""?>" placeholder="Harga Jual Satuan">
-                       <input id="harga_satuan" type="hidden" class="form-control" name="harga_satuan" value="<?=isset($obat['harga_satuan']) ? $obat['harga_satuan']: ""?>">
+					   <input data-currency="harga_satuan" type="text" class="form-control currency" value="<?=isset($obat['harga_jual_satuan']) ? $obat['harga_jual_satuan']: ""?>" placeholder="Harga Jual Satuan">
+                       <input id="harga_satuan" type="hidden" class="form-control" name="harga_satuan" value="<?=isset($obat['harga_jual_satuan']) ? $obat['harga_jual_satuan']: ""?>">
 					</div>
 
 					<small class="help-block" style="<?php echo (isset($errors['harga_satuan'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['harga_satuan'])) ? $errors['harga_satuan'][0] : '' ;?></small>
@@ -78,8 +78,8 @@
 				<div class="form-group <?php echo isset($errors['harga_resep']) ? 'has-error' : '' ; ?>">
 					<label for="harga_resep" class="control-label">Harga Jual Resep</label>
 					<div>
-					   <input type="text" data-currency="harga_resep" class="form-control currency" value="<?=isset($obat['harga_resep']) ? $obat['harga_resep']: ""?>" placeholder="Harga Jual Resep">
-					   <input id="harga_resep" type="hidden" class="form-control" name="harga_resep" value="<?=isset($obat['harga_resep']) ? $obat['harga_resep']: ""?>">
+					   <input type="text" data-currency="harga_resep" class="form-control currency" value="<?=isset($obat['harga_jual_resep']) ? $obat['harga_jual_resep']: ""?>" placeholder="Harga Jual Resep">
+					   <input id="harga_resep" type="hidden" class="form-control" name="harga_resep" value="<?=isset($obat['harga_jual_resep']) ? $obat['harga_jual_resep']: ""?>">
 					</div>
 
 					<small class="help-block" style="<?php echo (isset($errors['harga_resep'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['harga_resep'])) ? $errors['harga_resep'][0] : '' ;?></small>
@@ -87,8 +87,8 @@
 				<div class="form-group <?php echo isset($errors['harga_grosir']) ? 'has-error' : '' ; ?>">
 					<label for="harga_grosir" class="control-label">Harga Jual Grosir</label>
 					<div>
-					   <input type="text" data-currency="harga_grosir" class="form-control currency" value="<?=isset($obat['harga_grosir']) ? $obat['harga_grosir']: ""?>" placeholder="Harga Jual Grosir">
-					   <input id="harga_grosir" type="hidden" class="form-control" name="harga_grosir" value="<?=isset($obat['harga_grosir']) ? $obat['harga_grosir']: ""?>">
+					   <input type="text" data-currency="harga_grosir" class="form-control currency" value="<?=isset($obat['harga_jual_grosir']) ? $obat['harga_jual_grosir']: ""?>" placeholder="Harga Jual Grosir">
+					   <input id="harga_grosir" type="hidden" class="form-control" name="harga_grosir" value="<?=isset($obat['harga_jual_grosir']) ? $obat['harga_jual_grosir']: ""?>">
 					</div>
 
 					<small class="help-block" style="<?php echo (isset($errors['harga_grosir'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['harga_grosir'])) ? $errors['harga_grosir'][0] : '' ;?></small>

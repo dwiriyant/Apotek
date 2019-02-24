@@ -42,7 +42,7 @@ class KategoriController extends Controller
 
         if (isPost()) {
             $v = $this->validator(post());
-            $v->rule('required', ['name','start_date','end_date']);
+            $v->rule('required', ['nama']);
 
             // end validation
             if ($v->validate()) 
@@ -129,17 +129,17 @@ class KategoriController extends Controller
 
         $param['page'] = $this->_page;
         $data          = [
-            'title'              => 'kategori Schedule',
+            'title'              => 'Kategori',
             'breadcrumb'         => [
                 ['url' => url('/'), 'text' => '<i class="fa fa-dashboard"></i> Dashboard'],
-                ['url' => '#', 'text' => '<i class="fa fa-tag"></i> kategori Schedule'],
+                ['url' => '#', 'text' => '<i class="fa fa-tag"></i> Kategori'],
             ],
-            'header_title'       => 'Content',
-            'header_description' => 'kategori Schedule',
+            'header_title'       => 'Master',
+            'header_description' => 'Kategori',
             'table'              => $table,
             'route'              => $this->_route,
             'total'              => $count,
-            'offset'             => $offset == 0 ? $offset = -1 : $offset,
+            'offset'             => $count == 0 ? -1 : $offset,
             'search'             => $this->_search,
             'limit'              => $this->_limit,
             'pagination'         => $pagination,
@@ -170,8 +170,7 @@ class KategoriController extends Controller
                     return redirect($this->_route)->with('success','Success <strong>' . (post('id') ? 'UPDATE' : 'ADD NEW') . '</strong> kategori.');
 
                 } else {
-                    set_flash('Failed to save kategori.');
-                    set_flash('error', 'status');
+                    return redirect($this->_route)->with('error','Failed to save obat.');
                 }
             }
             $row = post();
@@ -179,7 +178,7 @@ class KategoriController extends Controller
             // set error
             $errors = $v->errors();
         }
-
+        
         // prepare form data
         $data = [
             'kategori'      => $row,
@@ -252,14 +251,10 @@ class KategoriController extends Controller
 
         $kategori = kategori::where('id',(int)@$post['id'])->first();
 
-        if($kategori)
-        {
-            $kategori->nama = $post['nama'];
-        } else {
-
+        if(!$kategori)
             $kategori = new kategori();
-            $kategori->nama = $post['nama'];
-        }
+        
+        $kategori->nama = $post['nama'];
         
         $kategori->save();
 

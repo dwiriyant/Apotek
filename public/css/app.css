@@ -1,3 +1,9 @@
+.box-header>.box-tools {
+    position: relative !important;
+    display: inline-block;
+    right: 0px !important;
+    top: 2px !important;
+}
 .my-group {
     width: 100%;
 }
