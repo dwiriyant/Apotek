@@ -321,7 +321,7 @@ class ObatController extends Controller
         $obat->tgl_kadaluarsa = $post['tgl_kadaluarsa'];
         $obat->harga_jual_satuan = $post['harga_satuan'] == '' ? 0 : (int)$post['harga_satuan'];
         $obat->harga_jual_resep = $post['harga_resep'] == '' ? 0 : (int)$post['harga_resep'];
-        $obat->satuan = $post['satuan'] == '' ? 0 : (int)$post['satuan'];
+        $obat->satuan = $post['satuan'];
         $obat->stok = $post['stok'] == '' ? 0 : (int)$post['stok'];
         
         $obat->save();
