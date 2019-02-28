@@ -28,6 +28,25 @@
                             </div>
                         </div>
 
+                        <div class="form-group">
+                            <label for="kategori" class="col-sm-3 control-label">Satuan Obat</label>
+                            <div class="col-sm-9">
+                                <select class="form-control" name="satuan">
+                                    <option value="" >All</option>
+                                    <option value="tablet" <?=@$obat['satuan']=='tablet' ? 'selected' : ''?> >Tablet</option>
+                                    <option value="kapsul" <?=@$obat['satuan']=='kapsul' ? 'selected' : ''?> >Kapsul</option>
+                                    <option value="botol" <?=@$obat['satuan']=='botol' ? 'selected' : ''?> >Botol</option>
+                                    <option value="kotak" <?=@$obat['satuan']=='kotak' ? 'selected' : ''?> >Kotak</option>
+                                    <option value="ml" <?=@$obat['satuan']=='ml' ? 'selected' : ''?> >ML</option>
+                                    <option value="vial" <?=@$obat['satuan']=='vial' ? 'selected' : ''?> >Vial</option>
+                                    <option value="tube" <?=@$obat['satuan']=='tube' ? 'selected' : ''?> >Tube</option>
+                                    <option value="pot" <?=@$obat['satuan']=='pot' ? 'selected' : ''?> >Pot</option>
+                                    <option value="supp" <?=@$obat['satuan']=='supp' ? 'selected' : ''?> >Supp</option>
+                                    <option value="ampul" <?=@$obat['satuan']=='ampul' ? 'selected' : ''?> >Ampul</option>
+                                </select>
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="col-lg-4 col-md-6 col-sm-12">
