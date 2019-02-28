@@ -36,10 +36,10 @@
 					<label for="kategori" class="control-label">Kategori Obat</label>
 					<div>
 					   <select class="form-control" name="kategori">
-					   		@foreach($kategori as $kat)
-                       		<option value="<?= $kat['id'] ?>" <?=@$obat['obat']=='1' ? 'selected' : ''?> ><?= $kat['nama']?></option>
-					   		@endforeach
-                        </select>
+							@foreach($kategori as $kat)
+								<option value="<?= $kat['id'] ?>" <?=@$obat['obat']=='1' ? 'selected' : ''?> ><?= $kat['nama']?></option>
+							@endforeach
+                  </select>
 					</div>
 
 					<small class="help-block" style="<?php echo (isset($errors['obat'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['obat'])) ? $errors['obat'][0] : '' ;?></small>
@@ -84,14 +84,24 @@
 
 					<small class="help-block" style="<?php echo (isset($errors['harga_resep'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['harga_resep'])) ? $errors['harga_resep'][0] : '' ;?></small>
 				</div>
-				<div class="form-group <?php echo isset($errors['harga_grosir']) ? 'has-error' : '' ; ?>">
-					<label for="harga_grosir" class="control-label">Harga Jual Grosir</label>
+				<div class="form-group <?php echo isset($errors['satuan']) ? 'has-error' : '' ; ?>">
+					<label for="satuan" class="control-label">Satuan</label>
 					<div>
-					   <input type="text" data-currency="harga_grosir" class="form-control currency" value="<?=isset($obat['harga_jual_grosir']) ? $obat['harga_jual_grosir']: ""?>" placeholder="Harga Jual Grosir">
-					   <input id="harga_grosir" type="hidden" class="form-control" name="harga_grosir" value="<?=isset($obat['harga_jual_grosir']) ? $obat['harga_jual_grosir']: ""?>">
+						<select class="form-control" name="satuan">
+							<option value="tablet" <?=@$obat['satuan']=='tablet' ? 'selected' : ''?> >Tablet</option>
+							<option value="kapsul" <?=@$obat['satuan']=='kapsul' ? 'selected' : ''?> >Kapsul</option>
+							<option value="botol" <?=@$obat['satuan']=='botol' ? 'selected' : ''?> >Botol</option>
+							<option value="kotak" <?=@$obat['satuan']=='kotak' ? 'selected' : ''?> >Kotak</option>
+							<option value="ml" <?=@$obat['satuan']=='ml' ? 'selected' : ''?> >ML</option>
+							<option value="vial" <?=@$obat['satuan']=='vial' ? 'selected' : ''?> >Vial</option>
+							<option value="tube" <?=@$obat['satuan']=='tube' ? 'selected' : ''?> >Tube</option>
+							<option value="pot" <?=@$obat['satuan']=='pot' ? 'selected' : ''?> >Pot</option>
+							<option value="supp" <?=@$obat['satuan']=='supp' ? 'selected' : ''?> >Supp</option>
+							<option value="ampul" <?=@$obat['satuan']=='ampul' ? 'selected' : ''?> >Ampul</option>
+                  </select>
 					</div>
 
-					<small class="help-block" style="<?php echo (isset($errors['harga_grosir'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['harga_grosir'])) ? $errors['harga_grosir'][0] : '' ;?></small>
+					<small class="help-block" style="<?php echo (isset($errors['satuan'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['satuan'])) ? $errors['satuan'][0] : '' ;?></small>
 				</div>
 				<div class="form-group <?php echo isset($errors['stok']) ? 'has-error' : '' ; ?>">
 					<label for="stok" class="control-label">Stok Obat</label>

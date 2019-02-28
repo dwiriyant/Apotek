@@ -34,6 +34,7 @@ class ObatController extends Controller
         $this->_search = [
             'name'     => trim(get('name')),
             'kode'   => trim(get('kode')),
+            'satuan'   => trim(get('satuan')),
             'kategori'   => trim(get('kategori')),
         ];
     }
@@ -87,6 +88,13 @@ class ObatController extends Controller
             ];
         }
 
+        if ($search['satuan']!='') {
+            $obat = $obat->where('satuan',$this->_search['satuan']);
+            $param   = [
+                'satuan'   => $this->_search['satuan'],
+            ];
+        }
+
         if ($search['name']!='') {
             $obat = $obat->where('nama','like', '%' . $this->_search['name'] . '%');
             $param   = [
@@ -104,7 +112,7 @@ class ObatController extends Controller
         $count = $obat->count();
 
         $this->_page = get('page', 1);
-       // var_dump($data);die();
+       
         $maxPage = ceil($count / $this->_limit);
             if ($maxPage < $this->_page)
                 $this->_page = $maxPage;
@@ -145,7 +153,7 @@ class ObatController extends Controller
                 'tgl_kadaluarsa'     => date('d-m-Y', strtotime($value['tgl_kadaluarsa'])),
                 'harga_jual_satuan'  => 'Rp.'. number_format($value['harga_jual_satuan'],0,'.','.'),
                 'harga_jual_resep'   => 'Rp.'. number_format($value['harga_jual_resep'],0,'.','.'),
-                'harga_jual_grosir'  => 'Rp.'. number_format($value['harga_jual_grosir'],0,'.','.'),
+                'satuan'  => $value['satuan'],
                 'stok'               => $value['stok'],
                 'action'             => view('master/obat/_action', ['param' => $param, 'obat' => $value, 'route' => $this->_route, 'column' => 'action'])
             ];
@@ -159,7 +167,7 @@ class ObatController extends Controller
             array('header' => 'Tanggal Kadaluarsa', 'data' => 'tgl_kadaluarsa', 'width' => '250px'),
             array('header' => 'Harga Jual Satuan', 'data' => 'harga_jual_satuan', 'width' => '250px'),
             array('header' => 'Harga Jual Resep', 'data' => 'harga_jual_resep', 'width' => '250px'),
-            array('header' => 'Harga Jual Grosir', 'data' => 'harga_jual_grosir', 'width' => '250px'),
+            array('header' => 'Satuan', 'data' => 'satuan', 'width' => '250px'),
             array('header' => 'Stok', 'data' => 'stok', 'width' => '250px'),
             
             array('header' => 'Action', 'data' => 'action', 'width' => '120px')
@@ -252,7 +260,7 @@ class ObatController extends Controller
     {
         if (isPost()) {
             $param     = [];
-            $paramable = ['name','kode','kategori'];
+            $paramable = ['name','kode','kategori','satuan'];
             foreach ($paramable as $key => $value) {
                 $post = post($value);
                 if ($post!='')
@@ -313,7 +321,7 @@ class ObatController extends Controller
         $obat->tgl_kadaluarsa = $post['tgl_kadaluarsa'];
         $obat->harga_jual_satuan = $post['harga_satuan'] == '' ? 0 : (int)$post['harga_satuan'];
         $obat->harga_jual_resep = $post['harga_resep'] == '' ? 0 : (int)$post['harga_resep'];
-        $obat->harga_jual_grosir = $post['harga_grosir'] == '' ? 0 : (int)$post['harga_grosir'];
+        $obat->satuan = $post['satuan'] == '' ? 0 : (int)$post['satuan'];
         $obat->stok = $post['stok'] == '' ? 0 : (int)$post['stok'];
         
         $obat->save();
@@ -421,7 +429,7 @@ class ObatController extends Controller
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Harga Jual Resep');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
-        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Harga Jual Grosir');
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Satuan');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Stok');
@@ -453,10 +461,10 @@ class ObatController extends Controller
             $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Rp.'. number_format($value['harga_jual_satuan'],0,'.','.'));
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
-            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Rp.'. number_format($value['harga_jual_satuan'],0,'.','.'));
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Rp.'. number_format($value['harga_jual_resep'],0,'.','.'));
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
-            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Rp.'. number_format($value['harga_jual_satuan'],0,'.','.'));
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['satuan']);
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
             $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['stok']);
