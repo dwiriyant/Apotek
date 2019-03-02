@@ -55,18 +55,9 @@ function callLoader(text) {
         text         : '<div class="activity-item"> <i class="fa fa-refresh fa-spin"></i> <div class="activity" style="font-size: 14px;font-weight: bold;"> '+text+' </div> </div>',
         type         : type,
         layout       : 'topRight',
-        closeWith    : [],
-        modal        : true,
-        theme        : 'relax',
         dismissQueue : true,
         killer       : true,
         maxVisible   : 1,
-        animation: {
-            open: {height: 'toggle'}, // jQuery animate function property object
-            close: {height: 'toggle'}, // jQuery animate function property object
-            easing: 'swing', // easing
-            speed: 200 // opening & closing animation speed
-        }
     });
 }
 
@@ -86,18 +77,9 @@ function callNoty(type, text) {
         text: notification_html[type],
         type: type,
         layout: 'topRight',
-        closeWith: ['click'],
-        theme: 'relax',
-        dismissQueue: true,
-        killer      : true,
-        maxVisible: 1,
-        timeout: 5000,
-        animation: {
-            open: 'animated bounceInRight',
-            close: 'animated bounceOutRight',
-            easing: 'swing',
-            speed: 500
-        }
+        dismissQueue : true,
+        killer       : true,
+        maxVisible   : 1,
     });
 }
 
@@ -376,6 +358,11 @@ $(document).on('click', '.confirm_delete', function(e){
     });
 }
 
+$('.currency2').maskMoney({prefix: '', 
+                        thousands: '.', 
+                        decimal: ',',
+                        precision: 0
+                      });
 $('.currency').maskMoney({prefix: 'Rp. ', 
                         thousands: '.', 
                         decimal: ',',
@@ -390,3 +377,24 @@ $(".currency").keyup(function() {
 $('.currency').each(function(){ // function to apply mask on load!
     $(this).maskMoney('mask', $(this).val());
 })
+
+Number.prototype.format = function(n, x) {
+    var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\.' : '$') + ')';
+    return this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+};
+
+function formatMoney(n, c, d, t) {
+    var c = isNaN(c = Math.abs(c)) ? 0 : c,
+      d = d == undefined ? "," : d,
+      t = t == undefined ? "." : t,
+      s = n < 0 ? "-" : "",
+      i = String(parseInt(n = Math.abs(Number(n) || 0).toFixed(c))),
+      j = (j = i.length) > 3 ? j % 3 : 0;
+  
+    return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+  };
+
+function getNumber(txt) {
+    var numb = txt.match(/\d/g);
+    return numb.join("");
+}

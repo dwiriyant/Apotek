@@ -52,3 +52,8 @@ Route::group(['middleware' => 'admin'], function () {
 	Route::post('/dokter/search', 'Master\DokterController@search');
 	Route::get('/dokter/delete', 'Master\DokterController@delete')->name('dokter-delete');
 });
+
+Route::any('/penjualan-reguler', 'Transaksi\PenjualanController@index')->name('penjualan-reguler');
+Route::post('/penjualan-reguler/search', 'Transaksi\PenjualanController@search');
+Route::post('/penjualan-reguler/remote', 'Transaksi\PenjualanController@remote');
+Route::get('/penjualan-reguler/delete', 'Transaksi\PenjualanController@delete')->name('penjualan-reguler-delete');
