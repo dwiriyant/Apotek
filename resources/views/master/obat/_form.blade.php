@@ -5,9 +5,19 @@
     	<div class="box-tools">
 			<button style="margin-top: -5px;" class='btn btn-xs btn-primary' data-widget='collapse'><i class='fa fa-plus'></i></button> 
 		</div>
-	<?php endif; ?>
-		
-    </div>
+		<div class="pull-right text-center">
+			<form style="margin-top: 5px;" id="form_import_obat" action="<?php echo url($route.'/import') ?>" method="post" enctype="multipart/form-data">
+				{{ csrf_field() }}
+				<div class="col-lg-8">
+					<input type="file" style="margin-top: 5px;" required name="file" class="form-input-file"/>
+				</div>
+				<div class="col-lg-4">
+					<button  class="btn btn-success btn-sm"><i class="fa fa-upload"></i> Import</button>
+				</div>
+			</form>
+		</div>
+		<?php endif; ?>
+	</div>
     <div class="box-body" <?= !isset($obat['id']) ? 'style="display: none;"' : '' ?>>
         <form method="post" id="obat-form" action="<?php echo route('obat', $param)?>" enctype="multipart/form-data">
         	{{ csrf_field() }}

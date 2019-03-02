@@ -33,6 +33,7 @@ Route::group(['middleware' => 'admin'], function () {
 
 	Route::any('/obat', 'Master\ObatController@index')->name('obat');
 	Route::post('/obat/search', 'Master\ObatController@search');
+	Route::post('/obat/import', 'Master\ObatController@import');
 	Route::post('/obat/remote', 'Master\ObatController@remote');
 	Route::get('/obat/delete', 'Master\ObatController@delete')->name('obat-delete');
 
