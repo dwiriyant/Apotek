@@ -300,6 +300,12 @@ class ObatController extends Controller
     {
         if (isPost() && isAjax()) {
             switch (post('action')) {
+                case 'getObatByKode':
+                    $kode = post('kode');
+                    $result = Obat::where('kode', $kode)->first();
+                    return json_encode($result);
+                    break;
+
                 default:
                     break;
             }
