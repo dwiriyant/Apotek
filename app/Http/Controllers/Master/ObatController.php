@@ -14,6 +14,9 @@ use PHPExcel_Style_Fill;
 use App\Obat;
 use App\Kategori;
 use Auth;
+use App\Imports\ObatImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
 
 class ObatController extends Controller
 {
@@ -514,6 +517,21 @@ class ObatController extends Controller
         $objWriter->save('php://output');
         $this->end();
         
+    }
+
+    public function import(Request $request)
+    {
+        $uploadedFile = $request->file('file');
+        $filename = time() . '-' . $uploadedFile->getClientOriginalName();
+        $path = Storage::disk('local')->putFileAs(
+            'files/Obat',
+            $uploadedFile,
+            $filename
+          );
+        $filepath = storage_path('app') . '/' . $path;
+        Excel::import(new ObatImport, $filepath);
+        
+        return redirect('/obat')->with('success', 'All good!');
     }
 
 }
