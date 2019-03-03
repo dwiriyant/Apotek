@@ -1,24 +1,34 @@
-<div class="box box-success <?= !isset($obat['id']) ? 'collapsed-box' : '' ?>">
+<div id="box-obat" class="box box-success <?= !isset($obat['id']) ? 'collapsed-box' : '' ?>">
     <div class="box-header no-shadow no-padding nav-tabs-custom" style="margin-bottom: 0px; min-height: 45px;">
     	<h3 class="box-title" style="padding:10px;"><?php echo (@$obat['id']) ? 'Update obat' : 'Tambah obat Baru'; ?></h3>
     	<?php if(!isset($obat['id'])): ?>
     	<div class="box-tools">
-			<button style="margin-top: -5px;" class='btn btn-xs btn-primary' data-widget='collapse'><i class='fa fa-plus'></i></button> 
+			<button style="margin-top: -5px;" id="btnAddObat" class='btn btn-xs btn-primary' data-widget='collapse'><i class='fa fa-plus'></i></button> 
 		</div>
-	<?php endif; ?>
-		
-    </div>
+		<div class="pull-right text-center">
+			<form style="margin-top: 5px;" id="form_import_obat" action="<?php echo url($route.'/import') ?>" method="post" enctype="multipart/form-data">
+				{{ csrf_field() }}
+				<div class="col-lg-8">
+					<input type="file" style="margin-top: 5px;" required name="file" class="form-input-file"/>
+				</div>
+				<div class="col-lg-4">
+					<button  class="btn btn-success btn-sm"><i class="fa fa-upload"></i> Import</button>
+				</div>
+			</form>
+		</div>
+		<?php endif; ?>
+	</div>
     <div class="box-body" <?= !isset($obat['id']) ? 'style="display: none;"' : '' ?>>
         <form method="post" id="obat-form" action="<?php echo route('obat', $param)?>" enctype="multipart/form-data">
         	{{ csrf_field() }}
             <input type="hidden" name="id" id="form-id" value="<?php echo htmlEncode(@$obat['id'])?>" />
 
             <div class="col-xs-6 col-md-6">
-	           	
+				
 				<div class="form-group <?php echo isset($errors['kode']) ? 'has-error' : '' ; ?>">
-					<label for="kode" class="control-label">Kode Obat</label>
+					<label for="kode" class="control-label">Kodes Obat</label>
 					<div>
-					   <input type="text" name="kode" id="kode" class="form-control" value="<?=isset($obat['kode']) ? $obat['kode']: ""?>" placeholder="Kode Obat">
+					   <input type="number" name="kode" id="kodeObat" class="form-control" value="<?=isset($obat['kode']) ? $obat['kode']: ""?>" placeholder="Kode Obat">
 					</div>
 
 					<small class="help-block" style="<?php echo (isset($errors['kode'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['kode'])) ? $errors['kode'][0] : '' ;?></small>
@@ -36,10 +46,10 @@
 					<label for="kategori" class="control-label">Kategori Obat</label>
 					<div>
 					   <select class="form-control" name="kategori">
-							@foreach($kategori as $kat)
-								<option value="<?= $kat['id'] ?>" <?=@$obat['obat']=='1' ? 'selected' : ''?> ><?= $kat['nama']?></option>
-							@endforeach
-                  </select>
+					   		@foreach($kategori as $kat)
+                       		<option value="<?= $kat['id'] ?>" <?=@$obat['obat']=='1' ? 'selected' : ''?> ><?= $kat['nama']?></option>
+					   		@endforeach
+                        </select>
 					</div>
 
 					<small class="help-block" style="<?php echo (isset($errors['obat'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['obat'])) ? $errors['obat'][0] : '' ;?></small>
@@ -98,7 +108,7 @@
 							<option value="pot" <?=@$obat['satuan']=='pot' ? 'selected' : ''?> >Pot</option>
 							<option value="supp" <?=@$obat['satuan']=='supp' ? 'selected' : ''?> >Supp</option>
 							<option value="ampul" <?=@$obat['satuan']=='ampul' ? 'selected' : ''?> >Ampul</option>
-                  </select>
+						</select>
 					</div>
 
 					<small class="help-block" style="<?php echo (isset($errors['satuan'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['satuan'])) ? $errors['satuan'][0] : '' ;?></small>

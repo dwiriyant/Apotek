@@ -14,6 +14,9 @@ use PHPExcel_Style_Fill;
 use App\Obat;
 use App\Kategori;
 use Auth;
+use App\Imports\ObatImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
 
 class ObatController extends Controller
 {
@@ -300,6 +303,12 @@ class ObatController extends Controller
     {
         if (isPost() && isAjax()) {
             switch (post('action')) {
+                case 'getObatByKode':
+                    $kode = post('kode');
+                    $result = Obat::where('kode', $kode)->first();
+                    return json_encode($result);
+                    break;
+
                 default:
                     break;
             }
@@ -321,7 +330,7 @@ class ObatController extends Controller
         $obat->tgl_kadaluarsa = $post['tgl_kadaluarsa'];
         $obat->harga_jual_satuan = $post['harga_satuan'] == '' ? 0 : (int)$post['harga_satuan'];
         $obat->harga_jual_resep = $post['harga_resep'] == '' ? 0 : (int)$post['harga_resep'];
-        $obat->satuan = $post['satuan'] == '' ? 0 : (int)$post['satuan'];
+        $obat->satuan = $post['satuan'];
         $obat->stok = $post['stok'] == '' ? 0 : (int)$post['stok'];
         
         $obat->save();
@@ -508,6 +517,21 @@ class ObatController extends Controller
         $objWriter->save('php://output');
         $this->end();
         
+    }
+
+    public function import(Request $request)
+    {
+        $uploadedFile = $request->file('file');
+        $filename = time() . '-' . $uploadedFile->getClientOriginalName();
+        $path = Storage::disk('local')->putFileAs(
+            'files/Obat',
+            $uploadedFile,
+            $filename
+          );
+        $filepath = storage_path('app') . '/' . $path;
+        Excel::import(new ObatImport, $filepath);
+        
+        return redirect('/obat')->with('success', 'All good!');
     }
 
 }

@@ -33,6 +33,7 @@ Route::group(['middleware' => 'admin'], function () {
 
 	Route::any('/obat', 'Master\ObatController@index')->name('obat');
 	Route::post('/obat/search', 'Master\ObatController@search');
+	Route::post('/obat/import', 'Master\ObatController@import');
 	Route::post('/obat/remote', 'Master\ObatController@remote');
 	Route::get('/obat/delete', 'Master\ObatController@delete')->name('obat-delete');
 
@@ -52,3 +53,18 @@ Route::group(['middleware' => 'admin'], function () {
 	Route::post('/dokter/search', 'Master\DokterController@search');
 	Route::get('/dokter/delete', 'Master\DokterController@delete')->name('dokter-delete');
 });
+
+Route::any('/penjualan-reguler', 'Transaksi\PenjualanController@index')->name('penjualan-reguler');
+Route::post('/penjualan-reguler/remote', 'Transaksi\PenjualanController@remote');
+
+Route::any('/penjualan-reguler/{grosir}', 'Transaksi\PenjualanController@index')->name('penjualan-resep');
+Route::post('/penjualan-reguler/{grosir}/remote', 'Transaksi\PenjualanController@remote');
+
+Route::any('/pembelian-reguler', 'Transaksi\PembelianController@index')->name('pembelian-reguler');
+Route::post('/pembelian-reguler/remote', 'Transaksi\PembelianController@remote');
+
+Route::any('/report-penjualan', 'Report\PenjualanController@index')->name('report-penjualan');
+Route::any('/report-penjualan/search', 'Report\PenjualanController@search');
+
+Route::any('/report-pembelian', 'Report\PembelianController@index')->name('report-pembelian');
+Route::any('/report-pembelian/search', 'Report\PembelianController@search');
