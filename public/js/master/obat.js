@@ -1,3 +1,57 @@
+$(document).scannerDetection({
+    timeBeforeScanTest: 200, // wait for the next character for upto 200ms
+    avgTimeByChar: 40, // it's not a barcode if a character takes longer than 100ms
+
+    endChar: [13],
+    onComplete: function(barcode, qty){
+        // callLoader();
+        showForm();
+        alidScan = true;
+        $('#kodeObat').val (barcode);
+        cekObatByKode(barcode);
+        // endLoader();
+    },
+    onError: function(string, qty) {
+    }
+    
+});
+
+function showForm() {
+    if ($('#box-obat').hasClass('collapsed-box')) {
+        $('#btnAddObat').click();
+    }
+};
+
+function cekObatByKode(param) {
+    $.ajax({
+        url : base_url + 'obat/remote',
+        method : 'post',
+        data : {
+            action : 'getObatByKode',
+            kode : param
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        beforeSend : function(){
+            callLoader();
+        }
+    }).always(function(){
+        endLoader();
+    }).done(function(data){
+        if(data !== 'null'){
+            data = JSON.parse(data);	
+            var url = base_url + 'obat?id	=' + data.id;
+            ajaxLoadForm(url, callbackForm);
+        }
+    }).fail(function(jqXHR, textStatus, errorThrown){
+        if (jqXHR.status == 444)
+            sessionExpireHandler();
+        else
+            callNoty('warning');
+    });
+}
+
 var d = new Date();
 d.setHours(0,0,0,0);
 

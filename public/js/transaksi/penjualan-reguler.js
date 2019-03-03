@@ -1,26 +1,36 @@
+$(document).scannerDetection({
+    timeBeforeScanTest: 200, // wait for the next character for upto 200ms
+    avgTimeByChar: 40, // it's not a barcode if a character takes longer than 100ms
+
+    endChar: [13],
+    onComplete: function (barcode, qty) {
+        $(document).focus();
+        cariObat(barcode);
+    },
+    onError: function (string, qty) {
+    }
+
+});
+
 $('#kode-obat').focus();
 $('#simpan').prop('disabled', true);
 var d = new Date();
-d.setHours(0,0,0,0);
+d.setHours(0, 0, 0, 0);
 var total_obat = 0;
 var total_harga = 0;
 var diskon = 0;
 var harga_diskon = 0;
 
-function checkButton()
-{
-    if($('#data-obat').html()=='')
-    {
+function checkButton() {
+    if ($('#data-obat').html() == '') {
         $('#simpan').prop('disabled', true);
         $('#simpan-cetak').prop('disabled', true);
-    } else
-    {
+    } else {
         $('#simpan').prop('disabled', false);
         $('#simpan-cetak').prop('disabled', false);
     }
 }
-function hapusObat(id)
-{
+function hapusObat(id) {
     swal({
         title: "hapus data?",
         type: "warning",
@@ -29,11 +39,10 @@ function hapusObat(id)
         confirmButtonText: "Yes",
         showLoaderOnConfirm: true,
         closeOnConfirm: true
-    },function(isConfirm){
-        $('#list-'+id).remove();
+    }, function (isConfirm) {
+        $('#list-' + id).remove();
         reorderNomor();
-        if($('#data-obat').html()=='')
-        {
+        if ($('#data-obat').html() == '') {
             $("#data-kosong").show();
             total_obat = 0;
         }
@@ -41,48 +50,43 @@ function hapusObat(id)
     });
 }
 
-function reorderNomor()
-{
+function reorderNomor() {
     $(".nomor").html('');
     var table = document.getElementsByTagName('table')[0],
         rows = table.getElementsByTagName('tr'),
         text = 'textContent' in document ? 'textContent' : 'innerText';
 
-    for (var i = 1, len = rows.length; i < len; i++){
-        rows[i].children[0][text] = i-1 + '.' + rows[i].children[0][text];
+    for (var i = 1, len = rows.length; i < len; i++) {
+        rows[i].children[0][text] = i - 1 + '.' + rows[i].children[0][text];
     }
 }
 
 function checkTotal() {
-    int_jumlah_obat = parseInt(getNumber($("#jumlah-"+total_obat).val()));
-    int_total_obat = parseInt(getNumber($("#harga-"+total_obat).text()));
+    int_jumlah_obat = parseInt(getNumber($("#jumlah-" + total_obat).val()));
+    int_total_obat = parseInt(getNumber($("#harga-" + total_obat).text()));
 
-    if(isNaN(int_jumlah_obat))
+    if (isNaN(int_jumlah_obat))
         return false;
-    
-    if(int_jumlah_obat <= 0)
-    {
+
+    if (int_jumlah_obat <= 0) {
         int_jumlah_obat = 1;
-        $("#jumlah-"+total_obat).val('1');
+        $("#jumlah-" + total_obat).val('1');
     }
-    
-    $("#total-"+total_obat).html(int_jumlah_obat * int_total_obat);
+
+    $("#total-" + total_obat).html(int_jumlah_obat * int_total_obat);
     total_harga = 0;
-    for(i=1;i<=total_obat;i++)
-    {
-        if($("#total-"+i).length > 0)
-            total_harga += parseInt($("#total-"+i).html());
+    for (i = 1; i <= total_obat; i++) {
+        if ($("#total-" + i).length > 0)
+            total_harga += parseInt($("#total-" + i).html());
     }
 
     $('#total').val(total_harga);
 
-    if(isNaN(diskon))
-    {
+    if (isNaN(diskon)) {
         diskon = 0;
     }
 
-    if(diskon<0 || diskon > 100)
-    {
+    if (diskon < 0 || diskon > 100) {
         $('#diskon').val('0');
         diskon = 0;
     }
@@ -93,52 +97,53 @@ function checkTotal() {
 
     uang = $('#uang').val().length > 0 ? $('#uang').val() : '0';
     uang = parseInt(getNumber(uang));
-    if(isNaN(uang))
+    if (isNaN(uang))
         uang = 0;
-    if(uang<0)
-    {
+    if (uang < 0) {
         $('#uang').val('0');
         uang = 0;
     }
     kembali = uang - harga_diskon;
-    
+
     $('#uang-kembali').val(kembali.format());
 
-    $('.currency2').each(function(){ 
+    $('.currency2').each(function () {
         $(this).maskMoney('mask', $(this).val());
     })
 
     checkButton();
 }
 
-function cariObat() {
-    id_obat = $('#kode-obat').val();
+function cariObat(kode_obat = '') {
+    if (kode_obat == '')
+        id_obat = $('#kode-obat').val();
+    else
+        id_obat = kode_obat;
+
+    if (id_obat == '')
+        return false;
 
     $.ajax({
-        url : base_url + 'penjualan-reguler/remote',
-        method : 'post',
-        data: {action:'cari-obat',id:id_obat},
+        url: base_url + 'penjualan-reguler/remote',
+        method: 'post',
+        data: { action: 'cari-obat', id: id_obat },
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
-        beforeSend : function(){
+        beforeSend: function () {
             callLoader();
         }
-    }).always(function(){
+    }).always(function () {
         endLoader();
-    }).done(function(data){
+    }).done(function (data) {
         data = JSON.parse(data);
-        if(data.data != null)
-        {
+        if (data.data != null) {
             data = data.data;
 
-            for(i=1;i<=total_obat;i++)
-            {
-                if($("#total-"+i).length > 0)
-                {
-                    if($("#kode-"+i).text() == data.kode)
-                    {
-                        $("#jumlah-"+i).val(parseInt($("#jumlah-"+i).val())+1);
+            for (i = 1; i <= total_obat; i++) {
+                if ($("#total-" + i).length > 0) {
+                    if ($("#kode-" + i).text() == data.kode) {
+                        $("#jumlah-" + i).val(parseInt($("#jumlah-" + i).val()) + 1);
                         checkTotal();
                         return false;
                     }
@@ -146,25 +151,25 @@ function cariObat() {
             }
             
             total_obat++;
-            result = '<tr id="list-'+ total_obat+'"> ' +
+            result = '<tr id="list-' + total_obat + '"> ' +
                 '<td class="nomor"></td>' +
-                '<td id="kode-'+ total_obat+'">' + (data.kode) +'</td>' +
-                '<td>' + (data.nama) +'</td>' +
-                '<td>' + (data.kategori.nama) +'</td>' +
-                '<td>' + (data.satuan) +'</td>' +
-                '<td id="harga-'+ total_obat+'"> Rp. ' + formatMoney(data.harga_jual_satuan) +'</td>' +
-                '<td><input style="max-width: 55px;" id="jumlah-'+ total_obat+'" class="jumlah-obat" style="border: 0;" type="number" value="1"></td>' +
-                '<td id="total-'+ total_obat+'"> Rp. ' + formatMoney(data.harga_jual_satuan) +'</td>' +
-                '<td onclick="hapusObat('+total_obat+')" style="cursor:pointer;" data-id="'+ total_obat+'" class="hapus-data"><i style="color:red" class="fa fa-times"></i> </td>' +
-            '</tr>';
+                '<td id="kode-' + total_obat + '">' + (data.kode) + '</td>' +
+                '<td>' + (data.nama) + '</td>' +
+                '<td>' + (data.kategori.nama) + '</td>' +
+                '<td>' + (data.satuan) + '</td>' +
+                '<td id="harga-' + total_obat + '"> Rp. ' + formatMoney(jenis == 'resep' ? data.harga_jual_resep: data.harga_jual_satuan) + '</td>' +
+                '<td><input style="max-width: 55px;" id="jumlah-' + total_obat + '" class="jumlah-obat" style="border: 0;" type="number" value="1"></td>' +
+                '<td id="total-' + total_obat + '"> Rp. ' + formatMoney(jenis == 'resep' ? data.harga_jual_resep : data.harga_jual_satuan) + '</td>' +
+                '<td onclick="hapusObat(' + total_obat + ')" style="cursor:pointer;" data-id="' + total_obat + '" class="hapus-data"><i style="color:red" class="fa fa-times"></i> </td>' +
+                '</tr>';
             $("#data-kosong").hide();
             $("#data-obat").append(result);
             checkTotal();
             reorderNomor();
         }
         else
-            callNoty('error','Maaf data tidak ditemukan.');
-    }).fail(function(jqXHR, textStatus, errorThrown){
+            callNoty('error', 'Maaf data tidak ditemukan.');
+    }).fail(function (jqXHR, textStatus, errorThrown) {
         if (jqXHR.status == 444)
             sessionExpireHandler();
         else
@@ -172,113 +177,116 @@ function cariObat() {
     });
 }
 
-$(function() {
+$(function () {
     $('.date2').datetimepicker({
         format: "DD MMM YYYY HH:mm",
-        showClear : false,
-        showTodayButton : true,
-        useCurrent : false,
-        allowInputToggle : true,
-        minDate:d
+        showClear: false,
+        showTodayButton: true,
+        useCurrent: false,
+        allowInputToggle: true,
+        minDate: d
     });
 
     $('body').on("propertychange input", '.table-responsive input', function (e) {
         checkTotal();
-        return false;  
-    });  
+        return false;
+    });
 
     $('#kode-obat').keypress(function (e) {
         var key = e.which;
-        if(key == 13)  // the enter key code
+        if (key == 13)  // the enter key code
         {
-           cariObat();
-           return false;  
+            cariObat();
+            return false;
         }
-    });  
+    });
 
     $('#diskon').on('propertychange input', function (e) {
-        
+
         diskon = parseInt($('#diskon').val());
-        
-        checkTotal();
-    });  
 
-    $('#uang').maskMoney({prefix: '', thousands: '.', decimal: ',',precision: 0}).on('keyup.maskMoney', function () {
-        
         checkTotal();
-    });  
+    });
 
-    $("#cari-obat").click(function(){
+    $('#uang').maskMoney({ prefix: '', thousands: '.', decimal: ',', precision: 0 }).on('keyup.maskMoney', function () {
+
+        checkTotal();
+    });
+
+    $("#cari-obat").click(function () {
         cariObat();
     });
 
-    $("#simpan").click(function(){
-        if(!$("#simpan").is(":disabled"))
-        {
+    $("#simpan").click(function () {
+        if (!$("#simpan").is(":disabled")) {
             callLoader();
 
-            jumlah = getNumber($('#total-harga').val());
+            jumlah = 0;
+            for (i = 1; i <= total_obat; i++) {
+                jumlah += parseInt($("#jumlah-" + i).val());
+            }
             uang = getNumber($('#uang').val());
             diskon = $('#diskon').val().length > 0 ? getNumber($('#diskon').val().toString()) : 0;
-            total = getNumber($('#total').val());
             total_harga = getNumber($('#total-harga').val());
             tgl_transaksi = $('#tgl_transaksi').val();
+            customer = $('#customer').val();
+            dokter = $('#dokter').length > 0 ? $('#dokter').val() : '';
+            jenis = jenis;
 
             $.ajax({
-                url : base_url + 'penjualan-reguler/remote',
-                method : 'post',
+                url: base_url + 'penjualan-reguler/remote',
+                method: 'post',
                 data: {
-                    action:'simpan-penjualan',
-                    jumlah:jumlah,
-                    uang:uang,
-                    diskon:diskon,
-                    total:total,
-                    total_harga:total_harga,
-                    tanggal:tgl_transaksi,
+                    action: 'simpan-penjualan',
+                    jumlah: jumlah,
+                    uang: uang,
+                    diskon: diskon,
+                    total_harga: total_harga,
+                    tanggal: tgl_transaksi,
+                    jenis:jenis,
+                    customer: customer,
+                    dokter: dokter,
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-            }).done(function(data){
+            }).done(function (data) {
                 data = JSON.parse(data);
-                if(data.status == 'sukses')
-                {
+                if (data.status == 'sukses') {
                     id_penjualan = data.id;
-                    if(id_penjualan.length !== 'undefined')
-                    for(i=1;i<=total_obat;i++)
-                    {
-                        if($("#total-"+i).length > 0)
-                        {
-                            $.ajax({
-                                url : base_url + 'penjualan-reguler/remote',
-                                method : 'post',
-                                data: {
-                                    action:'simpan-transaksi',
-                                    id_penjualan:id_penjualan,
-                                    kode_obat:$('#kode-'+i).html(),
-                                    harga: getNumber($('#harga-'+i).html()),
-                                    total: getNumber($('#total-'+i).html()),
-                                    jumlah_obat:$('#jumlah-'+i).val(),
-                                },
-                                headers: {
-                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                },
-                            }).done(function(data){
-                                data = JSON.parse(data);
-                                if(data.status != 'sukses')
-                                    callNoty('error','Simpan error.');
-                            }).fail(function(jqXHR, textStatus, errorThrown){
-                                if (jqXHR.status == 444)
-                                    sessionExpireHandler();
-                                else
-                                    callNoty('warning');
-                            });
+                    if (id_penjualan.length !== 'undefined')
+                        for (i = 1; i <= total_obat; i++) {
+                            if ($("#total-" + i).length > 0) {
+                                $.ajax({
+                                    url: base_url + 'penjualan-reguler/remote',
+                                    method: 'post',
+                                    data: {
+                                        action: 'simpan-transaksi',
+                                        id_penjualan: id_penjualan,
+                                        kode_obat: $('#kode-' + i).html(),
+                                        harga: getNumber($('#harga-' + i).html()),
+                                        total: getNumber($('#total-' + i).html()),
+                                        jumlah_obat: $('#jumlah-' + i).val(),
+                                    },
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                }).done(function (data) {
+                                    data = JSON.parse(data);
+                                    if (data.status != 'sukses')
+                                        callNoty('error', 'Simpan error.');
+                                }).fail(function (jqXHR, textStatus, errorThrown) {
+                                    if (jqXHR.status == 444)
+                                        sessionExpireHandler();
+                                    else
+                                        callNoty('warning');
+                                });
+                            }
                         }
-                    }
                 }
                 else
-                    callNoty('error','Simpan error.');
-            }).fail(function(jqXHR, textStatus, errorThrown){
+                    callNoty('error', 'Simpan error.');
+            }).fail(function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status == 444)
                     sessionExpireHandler();
                 else
@@ -286,7 +294,18 @@ $(function() {
             });
 
             endLoader();
-            callNoty('success','Berhasil Simpan Penjualan.');
+            callNoty('success', 'Berhasil Simpan Penjualan.');
+            swal({
+                title: "Berhasil Simpan Penjualan.",
+                type: "success",
+                showCancelButton: false,
+                confirmButtonClass: "btn-success",
+                confirmButtonText: "Oke",
+                showLoaderOnConfirm: true,
+                closeOnConfirm: false
+            }, function (isConfirm) {
+                location.reload();
+            });
         }
     });
 

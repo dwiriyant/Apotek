@@ -163,7 +163,7 @@
           </ul>
         </li>
         <?php endif; ?>
-        <li class="treeview {{ (str_replace([''], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
+        <li class="treeview {{ (str_replace(['penjualan-reguler','pembelian-reguler'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
           <a href="#">
             <i class="fa fa-tasks"></i> <span>Transaksi</span>
             <span class="pull-right-container">
@@ -173,35 +173,36 @@
 
           <ul class="treeview-menu">
 
-            <li class="treeview">
+            <li class="treeview {{ (str_replace(['penjualan-reguler'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
               <a href="#"><i class="fa fa-circle-o"></i> Penjualan
                 <span class="pull-right-container">
                   <i class="fa fa-angle-left pull-right"></i>
                 </span>
               </a>
               <ul class="treeview-menu">
-                <li><a href="#"><i class="fa fa-circle-o"></i> Reguler</a></li>
-                <li><a href="#"><i class="fa fa-circle-o"></i> Resep</a></li>
+                <li {{ in_array(Route::currentRouteName(), ['penjualan-reguler']) ? 'class=active' : '' }}><a href="{{ route('penjualan-reguler') }}"><i class="fa fa-circle-o"></i> Reguler</a></li>
+                <li {{ in_array(Route::currentRouteName(), ['penjualan-reguler']) ? 'class=active' : '' }}><a href="{{ url('penjualan-reguler','resep') }}"><i class="fa fa-circle-o"></i> Resep</a></li>
               </ul>
             </li>
 
-            <li class="treeview">
+            <li class="treeview {{ (str_replace(['pembelian-reguler'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
               <a href="#"><i class="fa fa-circle-o"></i> Pembelian
                 <span class="pull-right-container">
                   <i class="fa fa-angle-left pull-right"></i>
                 </span>
               </a>
               <ul class="treeview-menu">
+                <li {{ in_array(Route::currentRouteName(), ['pembelian-reguler']) ? 'class=active' : '' }}><a href="{{ route('pembelian-reguler') }}"><i class="fa fa-circle-o"></i> Langsung</a></li>
                 <li><a href="#"><i class="fa fa-circle-o"></i> PO (Surat Pesanan)</a></li>
-              <li><a href="#"><i class="fa fa-circle-o"></i> Langsung</a></li>
               </ul>
             </li>
 
-            <li {{ in_array(Route::currentRouteName(), ['']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Retur Penjualan</a></li>
             <li {{ in_array(Route::currentRouteName(), ['']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Retur Pembelian</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Retur Penjualan</a></li>
+            
           </ul>
         </li>
-        <li class="treeview {{ (str_replace([''], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
+        <li class="treeview {{ (str_replace(['report-penjualan'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
           <a href="#">
             <i class="fa fa-tasks"></i> <span>Report</span>
             <span class="pull-right-container">
@@ -210,8 +211,8 @@
           </a>
 
           <ul class="treeview-menu">
-            <li {{ in_array(Route::currentRouteName(), ['']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Penjualan</a></li>
-            <li {{ in_array(Route::currentRouteName(), ['']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Pembelian</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['report-penjualan']) ? 'class=active' : '' }}><a href="{{ route('report-penjualan') }}"><i class="fa fa-circle-o"></i> Penjualan</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['report-pembelian']) ? 'class=active' : '' }}><a href="{{ route('report-pembelian') }}"><i class="fa fa-circle-o"></i> Pembelian</a></li>
             <li {{ in_array(Route::currentRouteName(), ['']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Stok Opname</a></li>
           </ul>
         </li>
@@ -318,6 +319,7 @@
 <script src="{{ asset('plugins/clipboard/clipboard.min.js') }}"></script>
 <script src="{{ asset('plugins/cropper/cropper.min.js') }}"></script>
 
+<script src="{{ asset('plugins/jquery.scannerdetection/jquery.scannerdetection.js') }}"></script>
 <script src="{{ asset('bower_components/jquery-maskmoney/jquery.maskMoney.min.js') }}"></script>
 
 <!-- Scripts -->

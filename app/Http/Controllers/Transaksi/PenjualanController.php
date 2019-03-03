@@ -5,15 +5,11 @@ namespace App\Http\Controllers\Transaksi;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
-use App\Libraries\Table;
-use PHPExcel as PHPExcelces; 
-use PHPExcel_IOFactory;
-use PHPExcel_Style_Alignment;
-use PHPExcel_Style_Border;
-use PHPExcel_Style_Fill;
 use App\Obat;
 use App\Penjualan;
-use App\Transaksi;
+use App\Customer;
+use App\Dokter;
+use App\TransaksiPenjualan;
 use Auth;
 
 class PenjualanController extends Controller
@@ -35,8 +31,12 @@ class PenjualanController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index($resep = '')
     {
+        if($resep == 'resep')
+            $resep = true;
+        else if($resep != '')
+            abort(404);
         $last_id = (string)Penjualan::max('id');
         $len = strlen($last_id);
         if($len>4)
@@ -61,7 +61,10 @@ class PenjualanController extends Controller
             'nomor_transaksi'    => $nomor_transaksi,
             'header_description' => 'Penjualan Reguler',
             'route'              => $this->_route,
+            'jenis'              => $resep ? 'resep' : 'langsung',
             'flash_message'      => view('_flash_message', []),
+            'customer'           => Customer::where('status','!=',9)->get()->toArray(),
+            'dokter'           => Dokter::where('status','!=',9)->get()->toArray(),
         ];
         
         return view("transaksi/penjualan_reguler", $data);
@@ -126,17 +129,20 @@ class PenjualanController extends Controller
                     break;
                 case 'simpan-penjualan':
                         $penjualan = new Penjualan();
-                        $penjualan->total = post('total');
+                        $penjualan->jumlah = post('jumlah');
+                        post('jenis') == 'resep' ? $penjualan->id_dokter = post('dokter') : null;
+                        $penjualan->id_konsumen = post('customer') ? post('customer') : null;
                         $penjualan->uang = post('uang');
                         $penjualan->diskon = post('diskon');
                         $penjualan->total_harga = post('total_harga');
                         $penjualan->tanggal = post('tanggal');
+                        $penjualan->jenis = post('jenis');
                         $penjualan->save();
 
                         return json_encode(['status'=>'sukses','id'=>$penjualan->id]);
                     break;
                 case 'simpan-transaksi':
-                        $transaksi = new Transaksi();
+                        $transaksi = new TransaksiPenjualan();
                         $transaksi->id_penjualan = post('id_penjualan');
                         $transaksi->kode_obat = post('kode_obat');
                         $transaksi->total = post('total');
@@ -157,29 +163,6 @@ class PenjualanController extends Controller
                     break;
             }
         }
-    }
-
-    function _save($post = [])
-    {
-        if(empty($post))
-            return;
-
-        $obat = Obat::where('id',(int)@$post['id'])->first();
-
-        if(!$obat)
-            $obat = new Obat();
-        $obat->nama = $post['nama'];
-        $obat->kode = $post['kode'];
-        $obat->kategori = $post['kategori'] == '' ? 0 : (int)$post['kategori'];
-        $obat->tgl_kadaluarsa = $post['tgl_kadaluarsa'];
-        $obat->harga_jual_satuan = $post['harga_satuan'] == '' ? 0 : (int)$post['harga_satuan'];
-        $obat->harga_jual_resep = $post['harga_resep'] == '' ? 0 : (int)$post['harga_resep'];
-        $obat->satuan = $post['satuan'];
-        $obat->stok = $post['stok'] == '' ? 0 : (int)$post['stok'];
-        
-        $obat->save();
-
-        return $obat->toArray();
     }
 
 }

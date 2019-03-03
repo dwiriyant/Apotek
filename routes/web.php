@@ -55,6 +55,16 @@ Route::group(['middleware' => 'admin'], function () {
 });
 
 Route::any('/penjualan-reguler', 'Transaksi\PenjualanController@index')->name('penjualan-reguler');
-Route::post('/penjualan-reguler/search', 'Transaksi\PenjualanController@search');
 Route::post('/penjualan-reguler/remote', 'Transaksi\PenjualanController@remote');
-Route::get('/penjualan-reguler/delete', 'Transaksi\PenjualanController@delete')->name('penjualan-reguler-delete');
+
+Route::any('/penjualan-reguler/{grosir}', 'Transaksi\PenjualanController@index')->name('penjualan-resep');
+Route::post('/penjualan-reguler/{grosir}/remote', 'Transaksi\PenjualanController@remote');
+
+Route::any('/pembelian-reguler', 'Transaksi\PembelianController@index')->name('pembelian-reguler');
+Route::post('/pembelian-reguler/remote', 'Transaksi\PembelianController@remote');
+
+Route::any('/report-penjualan', 'Report\PenjualanController@index')->name('report-penjualan');
+Route::any('/report-penjualan/search', 'Report\PenjualanController@search');
+
+Route::any('/report-pembelian', 'Report\PembelianController@index')->name('report-pembelian');
+Route::any('/report-pembelian/search', 'Report\PembelianController@search');
