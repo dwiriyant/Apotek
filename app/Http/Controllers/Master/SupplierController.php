@@ -290,7 +290,7 @@ class SupplierController extends Controller
         $id = get('id');
         if ($id) {
             $supplier = Supplier::where('id',(int)$id)->first();
-            $supplier->level = 9;
+            $supplier->status = 9;
             $supplier->save();
 
             if ($supplier) {

@@ -290,7 +290,7 @@ class CustomerController extends Controller
         $id = get('id');
         if ($id) {
             $customer = Customer::where('id',(int)$id)->first();
-            $customer->level = 9;
+            $customer->status = 9;
             $customer->save();
 
             if ($customer) {

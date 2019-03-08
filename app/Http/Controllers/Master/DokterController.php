@@ -290,7 +290,7 @@ class DokterController extends Controller
         $id = get('id');
         if ($id) {
             $dokter = Dokter::where('id',(int)$id)->first();
-            $dokter->level = 9;
+            $dokter->status = 9;
             $dokter->save();
 
             if ($dokter) {

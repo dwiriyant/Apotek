@@ -120,7 +120,7 @@ class PenjualanController extends Controller
         if (isPost() && isAjax()) {
             switch (post('action')) {
                 case 'cari-obat':
-                    $obat = Obat::where('kode',(int)post('id'))->with('kategori')->first();
+                    $obat = Obat::where('kode',post('id'))->with('kategori')->first();
 
                     if(!$obat)
                         echo json_encode(['data' => null]);
@@ -150,7 +150,7 @@ class PenjualanController extends Controller
                         $transaksi->total_harga = post('total_harga');
                         $transaksi->save();
 
-                        $obat = Obat::where('kode',(int)post('kode_obat'))->first();
+                        $obat = Obat::where('kode',post('kode_obat'))->first();
                         if($obat)
                         {
                             $obat->stok = $obat->stok - post('jumlah');

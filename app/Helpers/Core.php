@@ -185,21 +185,13 @@ if ( !function_exists('url_title') ) {
 
 }
 
-if ( !function_exists('community_get_level') ) {
-    function community_get_level () {
-        return array(0=> array( 0=>0,1=>"Draft",2=>"primary"),
-                     1=> array( 0=>1,1=>"Review",2=>"info"),
-                     2=> array( 0=>2,1=>"Publish",2=>"success"),
-                     3=> array( 0=>8,1=>"Reject",2=>"danger"));
-
+function transformDate($value, $format = 'Y-m-d')
+{
+    try {
+        return \Carbon\Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value));
+    } catch (\ErrorException $e) {
+        return \Carbon\Carbon::createFromFormat($format, $value);
     }
 }
 
-if ( !function_exists('community_get_category') ) {
-    function community_get_category() {
-        $category_community = ['news' => 'News', 'life' => 'Life', 'ngakak' => 'Ngakak!', 'selebritis' => 'Selebritis', 'sosok' => 'Sosok', 'komunitas' => 'Komunitas', 'jorok' => 'Jorok', 'global' => 'Global', 'duh' => 'Duh!', 'binatang' => 'Binatang', 'cinta' => 'Cinta', 'musik' => 'Musik', 'gadget' => 'Gadget', 'wow' => 'Wow!', 'kesehatan' => 'Kesehatan', 'olahraga' => 'Olahraga', 'serem' => 'Serem', 'cewek' => 'Cewek', 'cowok' => 'Cowok', 'jalan-jalan' => 'Jalan-Jalan', 'ekonomi' => 'Ekonomi', 'politik' => 'Politik', 'orangtua' => 'Orangtua', 'musik' => 'Musik', 'ilmiah' => 'Ilmiah', 'serius' => 'Serius', 'kepribadian' => 'Kepribadian', 'sosialita' => 'Sosialita', 'rumah' => 'Rumah', 'film' => 'Film', 'bayi' => 'Bayi', 'n/a' => 'N/A'];
-        
-        return $category_community;
-    }
-}
 /* eof */
