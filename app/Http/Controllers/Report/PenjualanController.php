@@ -11,7 +11,7 @@ use PHPExcel_IOFactory;
 use PHPExcel_Style_Alignment;
 use PHPExcel_Style_Border;
 use PHPExcel_Style_Fill;
-use App\penjualan;
+use App\Penjualan;
 use App\Kategori;
 use Auth;
 use Maatwebsite\Excel\Facades\Excel;

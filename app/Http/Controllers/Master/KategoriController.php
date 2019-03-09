@@ -103,7 +103,7 @@ class KategoriController extends Controller
             $data[] = [
                 'number'         => ++$i,
                 'name'           => $value['nama'],
-                'action'         => view('master/Kategori/_action', ['param' => $param, 'kategori' => $value, 'route' => $this->_route, 'column' => 'action'])
+                'action'         => view('master/kategori/_action', ['param' => $param, 'kategori' => $value, 'route' => $this->_route, 'column' => 'action'])
             ];
         }
 

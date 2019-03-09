@@ -282,7 +282,7 @@ class ObatController extends Controller
         $id = get('id');
         if ($id) {
             $obat = obat::where('id',(int)$id)->first();
-            $obat->level = 9;
+            $obat->status = 9;
             $obat->save();
 
             if ($obat) {
@@ -531,7 +531,7 @@ class ObatController extends Controller
         $filepath = storage_path('app') . '/' . $path;
         Excel::import(new ObatImport, $filepath);
         
-        return redirect('/obat')->with('success', 'All good!');
+        return redirect('/obat')->with('success', 'Data berhasil diimport!');
     }
 
 }

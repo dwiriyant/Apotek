@@ -31,14 +31,14 @@ class ObatImport implements ToCollection, WithHeadingRow
             }
 
             $kode = $this->getObatByKode($row['Kode'], (int) $row['Stok']);
-
+            
             if ($kode)
             {
                 Obat::create([
                     'kode' => $row['Kode'],
                     'nama' => $row['Nama'],
                     'kategori' => (int) $this->getKategoriByNama($row['Kategori']),
-                    'tgl_kadaluarsa' => date('Y-m-d', strtotime($row['Tanggal Kadaluarsa'])),
+                    'tgl_kadaluarsa' => transformDate($row['Tanggal Kadaluarsa']),
                     'harga_jual_satuan' => (int) $row['Harga Jual Satuan'],
                     'harga_jual_resep'  => (int) $row['Harga Jual Resep'],
                     'satuan' => strtolower($row['Satuan']),
@@ -63,7 +63,7 @@ class ObatImport implements ToCollection, WithHeadingRow
 
     function getObatByKode($kode, $stok)
     {
-        $get = Obat::where('kode', $kode)->first();
+        $get = Obat::where('kode', $kode)->where('status','!=',9)->first();
 
         if ($get != null) {
             $get->stok += $stok;
