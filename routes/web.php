@@ -52,6 +52,10 @@ Route::group(['middleware' => 'admin'], function () {
 	Route::any('/dokter', 'Master\DokterController@index')->name('dokter');
 	Route::post('/dokter/search', 'Master\DokterController@search');
 	Route::get('/dokter/delete', 'Master\DokterController@delete')->name('dokter-delete');
+
+	Route::any('/setting-biaya', 'Transaksi\SettingBiayaController@index')->name('setting-biaya');
+	Route::post('/setting-biaya/search', 'Transaksi\SettingBiayaController@search');
+	Route::get('/setting-biaya/delete', 'Transaksi\SettingBiayaController@delete')->name('setting-biaya-delete');
 });
 
 Route::any('/penjualan-reguler', 'Transaksi\PenjualanController@index')->name('penjualan-reguler');
