@@ -41,6 +41,8 @@ class ObatImport implements ToCollection, WithHeadingRow
                     'tgl_kadaluarsa' => transformDate($row['Tanggal Kadaluarsa']),
                     'harga_jual_satuan' => (int) $row['Harga Jual Satuan'],
                     'harga_jual_resep'  => (int) $row['Harga Jual Resep'],
+                    'harga_jual_pack'  => (int) $row['Harga Jual Pack'],
+                    'type' => strtolower($row['Status']) == 'konsinyasi' ? 2 : 1,
                     'satuan' => strtolower($row['Satuan']),
                     'stok' => (int) $row['Stok']
                 ]);

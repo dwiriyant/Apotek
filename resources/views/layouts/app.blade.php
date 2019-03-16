@@ -163,9 +163,9 @@
           </ul>
         </li>
         <?php endif; ?>
-        <li class="treeview {{ (str_replace(['penjualan-reguler','pembelian-reguler'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
+        <li class="treeview {{ (str_replace(['penjualan-reguler','pembelian-reguler','penjualan-resep'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
           <a href="#">
-            <i class="fa fa-tasks"></i> <span>Transaksi</span>
+            <i class="fa fa-shopping-cart"></i> <span>Transaksi</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
@@ -173,7 +173,7 @@
 
           <ul class="treeview-menu">
 
-            <li class="treeview {{ (str_replace(['penjualan-reguler'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
+            <li class="treeview {{ (str_replace(['penjualan-reguler','penjualan-resep'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
               <a href="#"><i class="fa fa-circle-o"></i> Penjualan
                 <span class="pull-right-container">
                   <i class="fa fa-angle-left pull-right"></i>
@@ -181,7 +181,7 @@
               </a>
               <ul class="treeview-menu">
                 <li {{ in_array(Route::currentRouteName(), ['penjualan-reguler']) ? 'class=active' : '' }}><a href="{{ route('penjualan-reguler') }}"><i class="fa fa-circle-o"></i> Reguler</a></li>
-                <li {{ in_array(Route::currentRouteName(), ['penjualan-reguler']) ? 'class=active' : '' }}><a href="{{ url('penjualan-reguler','resep') }}"><i class="fa fa-circle-o"></i> Resep</a></li>
+                <li {{ in_array(Route::currentRouteName(), ['penjualan-resep']) ? 'class=active' : '' }}><a href="{{ url('penjualan-reguler','resep') }}"><i class="fa fa-circle-o"></i> Resep</a></li>
               </ul>
             </li>
 
@@ -204,7 +204,7 @@
         </li>
         <li class="treeview {{ (str_replace(['report-penjualan'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
           <a href="#">
-            <i class="fa fa-tasks"></i> <span>Report</span>
+            <i class="fa fa-book"></i> <span>Report</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>

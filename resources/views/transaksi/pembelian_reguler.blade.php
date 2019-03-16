@@ -83,6 +83,9 @@
                     <div class="form-group">
                         <label class="control-label">Cari Kode Obat</label>
                         <div class="input-group">
+                            <div id="button-popup" class="input-group-addon">
+                                <span style="cursor:pointer;" ><i class="fa fa-folder-open"></i></span>
+                            </div>
                             <input id="kode-obat" type="number" autocomplete="off" class="form-control" placeholder="Masukkan Kode Obat" autofocus>
                             <span id="cari-obat" style="cursor:pointer;" class="input-group-addon"><i class="fa fa-search"></i></span>
                         </div>
@@ -106,6 +109,56 @@
             </div>
         </div>
     </div>
+</div>
+
+<style>
+    @media screen and (min-width: 768px) {
+    .modals-class {
+        width: 70%; /* either % (e.g. 60%) or px (400px) */
+    }
+}
+</style>
+<!-- Modal -->
+<div id="popup-obat" class="modal fade" role="dialog">
+  <div class="modal-dialog modals-class">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Data Barang</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+
+                        <div class="box-tools">
+                            <div class="input-group input-group-sm" style="width: 250px;">
+                            <input type="text" id="obat-keyword" class="form-control pull-right" placeholder="Cari Nama / Kode Obat">
+
+                            <div class="input-group-btn">
+                                <button id="obat-search" type="button" class="btn btn-default"><i class="fa fa-search"></i></button>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-body table-responsive no-padding">
+                        <div id="table-obat"></div>
+                    </div>
+            
+                </div>
+            </div>
+            
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 @endsection

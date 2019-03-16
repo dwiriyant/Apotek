@@ -105,6 +105,7 @@ class PembelianController extends Controller
         foreach ($pembelian as $key => $value) {
             $data[] = [
                 'number'             => ++$i,
+                'no_transaksi'           => isset($value['supplier']['nama']) ? $value['supplier']['nama'] : '-',
                 'supplier'           => isset($value['supplier']['nama']) ? $value['supplier']['nama'] : '-',
                 'nomor_faktur'           => $value['nomor_faktur'] ? $value['nomor_faktur'] : '-',
                 'jumlah'            => $value['jumlah'],
@@ -158,7 +159,7 @@ class PembelianController extends Controller
             'param'              => $param,
         ];
         
-        return view("report/pembelian/index", $data);
+        return view("report/pembelian", $data);
 
     }
 

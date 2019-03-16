@@ -12,6 +12,49 @@ $(document).scannerDetection({
     
 });
 
+$("#button-popup").click(function () {
+    cariObatPopup();
+    $("#popup-obat").modal('show');
+});
+
+$("#obat-search").click(function () {
+    cariObatPopup();
+});
+
+$('#obat-keyword').keypress(function (e) {
+    var key = e.which;
+    if (key == 13)  // the enter key code
+    {
+        cariObatPopup();
+        return false;
+    }
+});
+
+function cariObatPopup() {
+    keyword = $("#obat-keyword").val();
+    $.ajax({
+        url: base_url + 'penjualan-reguler/remote',
+        method: 'post',
+        data: { action: 'cari-obat-popup', keyword: keyword },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        beforeSend: function () {
+            callLoader();
+        }
+    }).always(function () {
+        endLoader();
+    }).done(function (html) {
+        $('#table-obat').html(html);
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        if (jqXHR.status == 444)
+            sessionExpireHandler();
+        else
+            callNoty('warning');
+    });
+}
+
+
 $('#kode-obat').focus();
 $('#simpan').prop('disabled', true);
 var d = new Date();
@@ -307,6 +350,7 @@ $(function() {
             total = getNumber($('#total').val());
             tgl_transaksi = $('#tgl_transaksi').val();
             jenis = $('#jenis').val();
+            no_transaksi = $('#nomor-transaksi').val();
 
             $.ajax({
                 url : base_url + 'pembelian-reguler/remote',
@@ -318,6 +362,7 @@ $(function() {
                     total_harga: total,
                     tanggal:tgl_transaksi,
                     jenis:jenis,
+                    no_transaksi: no_transaksi,
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
