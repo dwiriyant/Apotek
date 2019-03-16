@@ -196,6 +196,8 @@
                 <li><a href="#"><i class="fa fa-circle-o"></i> PO (Surat Pesanan)</a></li>
               </ul>
             </li>
+            
+            <li {{ in_array(Route::currentRouteName(), ['setting-biaya']) ? 'class=active' : '' }}><a href="{{ route('setting-biaya') }}"><i class="fa fa-circle-o"></i> Setting Biaya</a></li>
 
             <li {{ in_array(Route::currentRouteName(), ['']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Retur Pembelian</a></li>
             <li {{ in_array(Route::currentRouteName(), ['']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Retur Penjualan</a></li>
