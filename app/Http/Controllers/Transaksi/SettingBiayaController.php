@@ -8,6 +8,11 @@ use Illuminate\Http\Request;
 use App\Libraries\Table;
 use App\SettingBiaya;
 use Auth;
+use PHPExcel as PHPExcelces; 
+use PHPExcel_IOFactory;
+use PHPExcel_Style_Alignment;
+use PHPExcel_Style_Border;
+use PHPExcel_Style_Fill;
 
 class SettingBiayaController extends Controller
 {
@@ -26,7 +31,8 @@ class SettingBiayaController extends Controller
         $this->middleware('auth');
         $this->table = $table;
         $this->_search = [
-            'name'     => trim(get('name')),
+            'start'   => trim(get('start')),
+            'end'   => trim(get('end'))
         ];
     }
 
@@ -71,10 +77,11 @@ class SettingBiayaController extends Controller
 
         $setting_biaya = SettingBiaya::where('status','!=',9);
 
-        if ($this->_search['name']!='') {
-            $setting_biaya = $setting_biaya->where('nama','like', '%' . $this->_search['name'] . '%');
+        if ($this->_search['start'] !='' || $this->_search['end'] !='') {
+            $setting_biaya = $setting_biaya->whereBetween('periode', [$this->_search['start'], date('Y-m-d', strtotime($this->_search['end'] . '+1day'))]);
             $param   = [
-                'name'   => $this->_search['name'],
+                'start'   => $this->_search['start'],
+                'end'   => $this->_search['end'],
             ];
         }
 
@@ -90,6 +97,20 @@ class SettingBiayaController extends Controller
             $this->_page = 1;
 
         $offset = offset((int)$this->_page, $this->_limit); 
+
+        if (get('export', false)) {
+            if($this->_page == 1)
+            {
+                $datas = $setting_biaya->orderBy('created_at', 'desc')->get();
+            }
+            else
+            {
+                $datas = $setting_biaya->skip($offset)->take($this->_limit)->orderBy('created_at', 'desc')->get();
+            }
+            $datas = $datas->toArray();
+            $this->export_content($datas,get());
+            return;
+        }
 
         $setting_biaya = $setting_biaya->skip($offset)->take($this->_limit)->orderBy('created_at', 'desc')->get();
         
@@ -204,7 +225,7 @@ class SettingBiayaController extends Controller
     {
         if (isPost()) {
             $param     = [];
-            $paramable = ['name'];
+            $paramable = ['start','end'];
             foreach ($paramable as $key => $value) {
                 $post = post($value);
                 if ($post!='')
@@ -270,4 +291,151 @@ class SettingBiayaController extends Controller
         return $setting_biaya->toArray();
     }
 
+    function export_content($data,$get)
+    {
+        if(@$get['start'] && @$get['end'])
+            $_title = $get['start'].' - '.$get['end'];
+        elseif(@$get['start'])
+            $_title = $get['start'].' - '.date('d M Y');
+        elseif(@$get['end'])
+            $_title = 'Sampai tgl '.$get['end'];
+        else
+            $_title = '';
+
+        $report_title = 'Report Data Biaya '. $_title;
+        // Create new PHPExcel object
+        $objPHPExcel = new PHPExcelces();
+        // Set properties
+        $objPHPExcel->getProperties()->setCreator("Brilio.net");
+        $objPHPExcel->getProperties()->setLastModifiedBy("Brilio.net");
+        $objPHPExcel->getProperties()->setTitle("Office XLS");
+        $objPHPExcel->getProperties()->setSubject("Office XLS");
+        $objPHPExcel->getProperties()->setDescription($report_title.", generated using PHP classes.");
+
+        // Add some data
+        // set header
+        $objPHPExcel->setActiveSheetIndex(0);
+        // config
+        $style_center = array(
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+            ),
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                ),
+            ),
+        );
+        
+        $styleHeader = array(
+                'borders' => array(
+                    'allborders' => array(
+                        'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    ),
+                ),
+                'fill' => array(
+                    'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                    'color' => array('rgb' => 'D3D3D3')
+                ),
+            );
+        //set border
+        $style = array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                ),
+            ),
+        );
+        $link_style_array = array(
+            'font'  => array(
+                'color' => ['rgb' => '0000FF'],
+                'underline' => 'single'
+            ),
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                ),
+            ),
+        );
+        
+        $abj = 'A';
+        $i   = 1;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $report_title);
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->getFont()->setBold(true);
+        $i++;$i++;
+
+        $columns = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+
+        $abj = 'A';
+        
+        $objPHPExcel->getActiveSheet()->setTitle('Report Biaya Pengeluaran');
+
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'No.');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Nama Biaya');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Deskripsi');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Biaya');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Periode');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        // Rename sheet
+        $i++;
+        foreach ($data as $key => $value) 
+        {     
+            $abj = 'A';
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $key+1);
+            $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+            $abj++;
+
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['nama']);
+            $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+            $abj++;
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['deskripsi']);
+            $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+            $abj++;
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['biaya']);
+            $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+            $abj++;
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['periode']);
+            $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+            $abj++;
+            
+            $i++;
+        }
+        $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(5);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setAutoSize(true);
+
+
+        //End Sheet User Agent        
+
+        // Set active sheet index to the first sheet, so Excel opens this as the first sheet
+        $objPHPExcel->setActiveSheetIndex(0);
+        // Redirect output to a client’s web browser (Excel5)
+
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="'.$report_title.'.xls"');
+        header('Cache-Control: max-age=0');
+        // If you're serving to IE 9, then the following may be needed
+        header('Cache-Control: max-age=1');
+        // If you're serving to IE over SSL, then the following may be needed
+        header ('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
+        header ('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT'); // always modified
+        header ('Cache-Control: cache, must-revalidate'); // HTTP/1.1
+        header ('Pragma: public'); // HTTP/1.0
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        $objWriter->save('php://output');
+        $this->end();
+        
+    }
 }
