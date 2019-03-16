@@ -156,7 +156,9 @@ class ObatController extends Controller
                 'tgl_kadaluarsa'     => date('d-m-Y', strtotime($value['tgl_kadaluarsa'])),
                 'harga_jual_satuan'  => 'Rp.'. number_format($value['harga_jual_satuan'],0,'.','.'),
                 'harga_jual_resep'   => 'Rp.'. number_format($value['harga_jual_resep'],0,'.','.'),
-                'satuan'  => $value['satuan'],
+                'harga_jual_pack'   => 'Rp.'. number_format($value['harga_jual_pack'],0,'.','.'),
+                'type'             => $value['type'] == 1 ? 'Sendiri' : 'Konsinyasi',
+                'satuan'             => $value['satuan'],
                 'stok'               => $value['stok'],
                 'action'             => view('master/obat/_action', ['param' => $param, 'obat' => $value, 'route' => $this->_route, 'column' => 'action'])
             ];
@@ -170,6 +172,8 @@ class ObatController extends Controller
             array('header' => 'Tanggal Kadaluarsa', 'data' => 'tgl_kadaluarsa', 'width' => '250px'),
             array('header' => 'Harga Jual Satuan', 'data' => 'harga_jual_satuan', 'width' => '250px'),
             array('header' => 'Harga Jual Resep', 'data' => 'harga_jual_resep', 'width' => '250px'),
+            array('header' => 'Harga Jual Pack', 'data' => 'harga_jual_pack', 'width' => '250px'),
+            array('header' => 'Status', 'data' => 'type', 'width' => '250px'),
             array('header' => 'Satuan', 'data' => 'satuan', 'width' => '250px'),
             array('header' => 'Stok', 'data' => 'stok', 'width' => '250px'),
             
@@ -304,7 +308,7 @@ class ObatController extends Controller
         if (isPost() && isAjax()) {
             switch (post('action')) {
                 case 'getObatByKode':
-                    $kode = post('kode');
+                    $kode = (int)post('kode');
                     $result = Obat::where('kode', $kode)->first();
                     return json_encode($result);
                     break;
@@ -321,20 +325,38 @@ class ObatController extends Controller
             return;
 
         $obat = Obat::where('id',(int)@$post['id'])->first();
+        $obat2 = Obat::where('kode',$post['kode'])->first();
 
-        if(!$obat)
-            $obat = new Obat();
-        $obat->nama = $post['nama'];
-        $obat->kode = $post['kode'];
-        $obat->kategori = $post['kategori'] == '' ? 0 : (int)$post['kategori'];
-        $obat->tgl_kadaluarsa = $post['tgl_kadaluarsa'];
-        $obat->harga_jual_satuan = $post['harga_satuan'] == '' ? 0 : (int)$post['harga_satuan'];
-        $obat->harga_jual_resep = $post['harga_resep'] == '' ? 0 : (int)$post['harga_resep'];
-        $obat->satuan = $post['satuan'];
-        $obat->stok = $post['stok'] == '' ? 0 : (int)$post['stok'];
-        
-        $obat->save();
-
+        if($obat2)
+        {
+            $obat->nama = $post['nama'];
+            $obat->kode = $post['kode'];
+            $obat->kategori = $post['kategori'] == '' ? 0 : (int)$post['kategori'];
+            $obat->tgl_kadaluarsa = $post['tgl_kadaluarsa'];
+            $obat->harga_jual_satuan = $post['harga_satuan'] == '' ? 0 : (int)$post['harga_satuan'];
+            $obat->harga_jual_resep = $post['harga_resep'] == '' ? 0 : (int)$post['harga_resep'];
+            $obat->harga_jual_pack = $post['harga_pack'] == '' ? 0 : (int)$post['harga_pack'];
+            $obat->satuan = $post['satuan'];
+            $obat->type = $post['type'];
+            $obat2->stok = $obat2->stok + ($post['stok'] == '' ? 0 : (int)$post['stok']);
+            $obat2->update();
+        } else 
+        {
+            if(!$obat)
+                $obat = new Obat();
+            $obat->nama = $post['nama'];
+            $obat->kode = $post['kode'];
+            $obat->kategori = $post['kategori'] == '' ? 0 : (int)$post['kategori'];
+            $obat->tgl_kadaluarsa = $post['tgl_kadaluarsa'];
+            $obat->harga_jual_satuan = $post['harga_satuan'] == '' ? 0 : (int)$post['harga_satuan'];
+            $obat->harga_jual_resep = $post['harga_resep'] == '' ? 0 : (int)$post['harga_resep'];
+            $obat->harga_jual_pack = $post['harga_pack'] == '' ? 0 : (int)$post['harga_pack'];
+            $obat->satuan = $post['satuan'];
+            $obat->type = $post['type'];
+            $obat->stok = $post['stok'] == '' ? 0 : (int)$post['stok'];
+            
+            $obat->save();
+        }
         return $obat->toArray();
     }
 
@@ -438,6 +460,9 @@ class ObatController extends Controller
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Harga Jual Resep');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Harga Jual Pack');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Satuan');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
@@ -471,6 +496,9 @@ class ObatController extends Controller
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
             $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Rp.'. number_format($value['harga_jual_resep'],0,'.','.'));
+            $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+            $abj++;
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Rp.'. number_format($value['harga_jual_pack'],0,'.','.'));
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
             $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['satuan']);

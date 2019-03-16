@@ -158,7 +158,7 @@ class PenjualanController extends Controller
             'param'              => $param,
         ];
         
-        return view("report/penjualan/index", $data);
+        return view("report/penjualan", $data);
 
     }
 

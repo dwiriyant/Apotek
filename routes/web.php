@@ -52,9 +52,14 @@ Route::group(['middleware' => 'admin'], function () {
 	Route::any('/dokter', 'Master\DokterController@index')->name('dokter');
 	Route::post('/dokter/search', 'Master\DokterController@search');
 	Route::get('/dokter/delete', 'Master\DokterController@delete')->name('dokter-delete');
+
+	Route::any('/setting-biaya', 'Transaksi\SettingBiayaController@index')->name('setting-biaya');
+	Route::post('/setting-biaya/search', 'Transaksi\SettingBiayaController@search');
+	Route::get('/setting-biaya/delete', 'Transaksi\SettingBiayaController@delete')->name('setting-biaya-delete');
 });
 
 Route::any('/penjualan-reguler', 'Transaksi\PenjualanController@index')->name('penjualan-reguler');
+Route::any('/penjualan-reguler/print', 'Transaksi\PenjualanController@print');
 Route::post('/penjualan-reguler/remote', 'Transaksi\PenjualanController@remote');
 
 Route::any('/penjualan-reguler/{grosir}', 'Transaksi\PenjualanController@index')->name('penjualan-resep');
@@ -68,3 +73,6 @@ Route::any('/report-penjualan/search', 'Report\PenjualanController@search');
 
 Route::any('/report-pembelian', 'Report\PembelianController@index')->name('report-pembelian');
 Route::any('/report-pembelian/search', 'Report\PembelianController@search');
+
+Route::any('/retur-penjualan', 'Retur\PenjualanController@index')->name('retur-penjualan');
+Route::any('/retur-penjualan/search', 'Retur\PenjualanController@search');
