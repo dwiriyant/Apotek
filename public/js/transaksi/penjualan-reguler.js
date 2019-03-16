@@ -12,6 +12,49 @@ $(document).scannerDetection({
 
 });
 
+$("#button-popup").click(function () {
+    cariObatPopup();
+    $("#popup-obat").modal('show');
+});
+
+$("#obat-search").click(function () {
+    cariObatPopup();
+});
+
+$('#obat-keyword').keypress(function (e) {
+    var key = e.which;
+    if (key == 13)  // the enter key code
+    {
+        cariObatPopup();
+        return false;
+    }
+});
+
+function cariObatPopup()
+{
+    keyword = $("#obat-keyword").val();
+    $.ajax({
+        url: base_url + 'penjualan-reguler/remote',
+        method: 'post',
+        data: { action: 'cari-obat-popup', keyword: keyword },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        beforeSend: function () {
+            callLoader();
+        }
+    }).always(function () {
+        endLoader();
+    }).done(function (html) {
+        $('#table-obat').html(html);
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        if (jqXHR.status == 444)
+            sessionExpireHandler();
+        else
+            callNoty('warning');
+    });
+}
+
 $('#kode-obat').focus();
 $('#simpan').prop('disabled', true);
 var d = new Date();
@@ -59,6 +102,23 @@ function reorderNomor() {
     for (var i = 1, len = rows.length; i < len; i++) {
         rows[i].children[0][text] = i - 1 + '.' + rows[i].children[0][text];
     }
+
+    $(".pack-obat").change(function () {
+        ids = $(this).data('id');
+        
+        if (this.checked) {
+            $(this).val('1');
+            $('#text-'+ids).text('Ya');
+
+            $('#harga-' + ids).text('Rp. '+formatMoney($('#harga-pack-'+ids).val()));
+        } else{
+            $(this).val('0');
+            $('#text-' + ids).text('Tidak');
+            $('#harga-' + ids).text('Rp. ' +formatMoney($('#harga-satuan-' + ids).val()));
+        }
+        checkTotal();
+    });
+
 }
 
 function checkTotal() {
@@ -157,15 +217,30 @@ function cariObat(kode_obat = '') {
                 '<td>' + (data.nama) + '</td>' +
                 '<td>' + (data.kategori.nama) + '</td>' +
                 '<td>' + (data.satuan) + '</td>' +
+                '<td>' + (data.type == 1 ? 'Sendiri' : 'Konsinyasi') + '</td>' +
                 '<td id="harga-' + total_obat + '"> Rp. ' + formatMoney(jenis == 'resep' ? data.harga_jual_resep: data.harga_jual_satuan) + '</td>' +
                 '<td><input style="max-width: 55px;" id="jumlah-' + total_obat + '" class="jumlah-obat" style="border: 0;" type="number" value="1"></td>' +
-                '<td id="total-' + total_obat + '"> Rp. ' + formatMoney(jenis == 'resep' ? data.harga_jual_resep : data.harga_jual_satuan) + '</td>' +
-                '<td onclick="hapusObat(' + total_obat + ')" style="cursor:pointer;" data-id="' + total_obat + '" class="hapus-data"><i style="color:red" class="fa fa-times"></i> </td>' +
-                '</tr>';
+                '<td id="total-' + total_obat + '"> Rp. ' + formatMoney(jenis == 'resep' ? data.harga_jual_resep : data.harga_jual_satuan) + '</td>';
+            if(jenis == 'resep')
+            {
+                result +=
+                    '<td onclick="hapusObat(' + total_obat + ')" style="cursor:pointer;" data-id="' + total_obat + '" class="hapus-data"><i style="color:red" class="fa fa-times"></i> </td>' +
+                    '</tr>';
+            } else
+            {
+                result +=
+                    '<td><input  id="pack-' + total_obat + '" data-id="' + total_obat + '" class="pack-obat" type="checkbox" value="0"> <span id="text-' + total_obat + '">Tidak</span></td>' +
+                    '<td onclick="hapusObat(' + total_obat + ')" style="cursor:pointer;" data-id="' + total_obat + '" class="hapus-data"><i style="color:red" class="fa fa-times"></i> </td>' +
+                    '<td style="display: none;"><input style="display:none;" id="harga-satuan-' + total_obat + '" value="' + data.harga_jual_satuan + '" ></td>' +
+                    '<td style="display: none;"><input style="display:none;" id="harga-pack-' + total_obat + '" value="' + data.harga_jual_pack + '" ></td>' +
+                    '</tr>';
+            }
+            
             $("#data-kosong").hide();
             $("#data-obat").append(result);
             checkTotal();
             reorderNomor();
+            $("#popup-obat").modal('hide');
         }
         else
             callNoty('error', 'Maaf data tidak ditemukan.');
@@ -178,6 +253,7 @@ function cariObat(kode_obat = '') {
 }
 
 $(function () {
+
     $('.date2').datetimepicker({
         format: "DD MMM YYYY HH:mm",
         showClear: false,
@@ -232,6 +308,7 @@ $(function () {
             customer = $('#customer').val();
             dokter = $('#dokter').length > 0 ? $('#dokter').val() : '';
             jenis = jenis;
+            no_transaksi = $('#nomor-transaksi').val();
 
             $.ajax({
                 url: base_url + 'penjualan-reguler/remote',
@@ -246,6 +323,7 @@ $(function () {
                     jenis:jenis,
                     customer: customer,
                     dokter: dokter,
+                    no_transaksi: no_transaksi,
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
