@@ -56,6 +56,11 @@ Route::group(['middleware' => 'admin'], function () {
 	Route::any('/setting-biaya', 'Transaksi\SettingBiayaController@index')->name('setting-biaya');
 	Route::post('/setting-biaya/search', 'Transaksi\SettingBiayaController@search');
 	Route::get('/setting-biaya/delete', 'Transaksi\SettingBiayaController@delete')->name('setting-biaya-delete');
+
+	Route::any('/stok-opname', 'StokOpnameController@index')->name('stok-opname');
+	Route::any('/stok-opname/remote', 'StokOpnameController@remote');
+	Route::any('/stok-opname/search', 'StokOpnameController@search');
+
 });
 
 Route::any('/penjualan-reguler', 'Transaksi\PenjualanController@index')->name('penjualan-reguler');
