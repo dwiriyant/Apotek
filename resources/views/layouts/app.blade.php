@@ -193,7 +193,7 @@
               </a>
               <ul class="treeview-menu">
                 <li {{ in_array(Route::currentRouteName(), ['pembelian-reguler']) ? 'class=active' : '' }}><a href="{{ route('pembelian-reguler') }}"><i class="fa fa-circle-o"></i> Langsung</a></li>
-                <li><a href="#"><i class="fa fa-circle-o"></i> PO (Surat Pesanan)</a></li>
+                <li {{ in_array(Route::currentRouteName(), ['pembelian-po']) ? 'class=active' : '' }}><a href="{{ url('pembelian-reguler','po') }}"><i class="fa fa-circle-o"></i> PO (Surat Pesanan)</a></li>
               </ul>
             </li>
             
@@ -217,6 +217,12 @@
             <li {{ in_array(Route::currentRouteName(), ['report-pembelian']) ? 'class=active' : '' }}><a href="{{ route('report-pembelian') }}"><i class="fa fa-circle-o"></i> Pembelian</a></li>
             <li {{ in_array(Route::currentRouteName(), ['']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Stok Opname</a></li>
           </ul>
+        </li>
+
+        <li class="{{ Route::currentRouteName() == 'stok-opname' ? 'active' : '' }}">
+          <a href="{{ route('stok-opname') }}">
+            <i class="fa fa-dashboard"></i> <span>Stok Opname</span>
+          </a>
         </li>
         
       </ul>

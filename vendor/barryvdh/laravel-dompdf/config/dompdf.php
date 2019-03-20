@@ -1,5 +1,5 @@
 <?php
-
+define("DOMPDF_ENABLE_CSS_FLOAT", true);
 return array(
 
     /*

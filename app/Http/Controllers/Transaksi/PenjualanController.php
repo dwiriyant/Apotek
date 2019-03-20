@@ -62,7 +62,7 @@ class PenjualanController extends Controller
             ],
             'header_title'       => 'Transaksi',
             'nomor_transaksi'    => $nomor_transaksi,
-            'header_description' => 'Penjualan Reguler',
+            'header_description' => 'Penjualan '.$resep ? 'Resep' : 'Reguler',
             'route'              => $this->_route,
             'jenis'              => $resep ? 'resep' : 'langsung',
             'flash_message'      => view('_flash_message', []),
@@ -190,6 +190,7 @@ class PenjualanController extends Controller
                         post('jenis') == 'resep' ? $penjualan->id_dokter = post('dokter') : null;
                         $penjualan->id_konsumen = post('customer') ? post('customer') : null;
                         $penjualan->uang = post('uang');
+                        $penjualan->total = post('total');
                         $penjualan->diskon = post('diskon');
                         $penjualan->total_harga = post('total_harga');
                         $penjualan->tanggal = post('tanggal');
@@ -224,122 +225,57 @@ class PenjualanController extends Controller
     }
 
     function print()
-    {
-        $html =' <html>
-            <head><style>
-                .table { display: table; width: 100%; border-collapse: collapse; }
-                .table-row { display: table-row; }
-                .table-cell { display: table-cell; border: 1px solid black; padding: 1em; }
-            }
-            span {  display: block;  }
-            @page table {
-            size: 340px 650px;
-            margin: 0px;;
-            }
+    {        
+        $transaksi = get('transaksi');
+        if($transaksi=='')
+            abort(404);
 
-            .table {
-            page: table;
-            page-break-after: always;
-            font-size: 20px;
-            }
-            </style>
-            </head>
-            <body>
-            <div class="table">
-            <div class="table-row"><div class="table-cell" colspan="3" style="text-align: center"><img src="../../img/top-logo.png"></div></div>
-                <div class="table-row">
-                <div class="table-cell" ><span><b> Merchant: </b> '.@$parceldetails['company'].' </span><span><b> Pick Addr: </b> '.@$parceldetails['addr'].' </span><span><b> Mobile: </b> '.@$parceldetails['mobile'].' </span></div>
-                <div class="table-cell" style="padding: 0px">
-                <div class="" >Delivery Date:</div><br>
-                <div class="" style="border-bottom: 1px solid #000000"> '.@$parceldetails['r_delivery_time'].' at '.@$parceldetails['bytime'].'</div>
+        $penjualan = Penjualan::where('no_transaksi',$transaksi)->with('customer')->with('dokter')->first();
+        if($penjualan)
+            $penjualan = $penjualan->toArray();
+        else 
+            abort(404);
 
-                <div class="">Agent:</div><br>
-                <div class=""> '.@$parceldetails['name'].' </div>
-                </div>
-                </div>
-                <div class="table-row">
-                <div class="table-cell" colspan="3" style="text-align: center"> <b style="font-size: larger">'.@$ecr.'</b></div>
-                </div>
-                <div class="table-row">
-                <div class="table-cell" colspan="1"><span><b>Customer Name:</b> '.@$parceldetails['r_name'].'</span><span><b> Addr:</b> '.@$parceldetails['r_address'].' </span><span><b> Mobile: </b> '.@$parceldetails['r_mobile'].' </span></div>
-                <div class="table-cell" style="padding: 0px">
-                    <div class="" style="border-bottom: 2px solid #000000; text-align: center"><b> '.@$parceldetails['paymentmethod'].' </b></div>
-                    <div class="" style="text-align: center"><b> '.@$parceldetails['product_price'].' BDT </b></div>
-                </div>
-                </div>
-                <div class="table-row">
-                <div class="table-cell"  style="text-align: center"> zzzz </div>
-                    <div class="table-cell"  style="padding: 0px">
-                    <div class="" style="border-bottom: 2px solid #000000; text-align: center; height:63px"> Delivered </div>
-                    <div class="" style="text-align: center; min-height:63px"> Cancel </div>
-                </div>
-                    <div class="table-cell" style="padding: 0px">
-                    <div class="" style="border-bottom: 2px solid #000000; text-align: center; height:63px">&#160;</div>
-                    <div class="" style="text-align: center; min-height:63px""></div>
-                </div>
-                </div>
-                <div class="table-row">
-                <div class="table-cell" colspan="3">
-                <b style="margin-top:50px; margin-bottom:-10px; border-bottom: 1px solid #000000; font-size:10px; margin-left:10px">Agent signature</b>
-                <b style="margin-top:50px; margin-bottom:-10px; border-bottom: 1px solid #000000; font-size:10px; margin-left:50px">Receiver signature</b></div>
-                </div>
-            </div>';
-            $html .='<table class="table">
-            <tr>
-            <td colspan="3"><img src="../../img/top-logo.png"></td>
-            </tr>
-            <tr>
-                <td rowspan="2" colspan="2"><span><b> Merchant: </b> '.@$parceldetails['company'].' </span><span><b> Pick Addr: </b> '.@$parceldetails['addr'].' </span><span><b> Mobile: </b> '.@$parceldetails['mobile'].' </span></td>
-                <td>D. Date<span>'.@$parceldetails['r_delivery_time'].'</span></td>
-            </tr>
-            <tr>
-                <td>Agent<span>'.@$parceldetails['name'].'</span></td>
-            </tr>
-            <tr>
-                <td colspan="3">'.@$ecr.'</td>
-            </tr>
-                <tr>
-                <td rowspan="2" colspan="2"><span><b>Customer Name:</b> '.@$parceldetails['r_name'].'</span><span><b> Addr:</b> '.@$parceldetails['r_address'].' </span><span><b> Mobile: </b> '.@$parceldetails['r_mobile'].' </span></td>
-                <td><b>'.@$parceldetails['paymentmethod'].'</b></td>
-            </tr>
-            <tr>
-                <td><b>'.@$parceldetails['product_price'].' BDT</b></td>
-            </tr>
-            <tr>
-                <td rowspan="2" colspan="1">zzz</td>
-                <td>Delivered</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>Cancel</td>
-                <td></td>
-            </tr>
-                <tr>
-                <td colspan="3">&nbsp</td>
-            </tr>
-                <tr>
-                <td colspan="3">Agent Signature Receiver Signature</td>
-            </tr>
-            </table>
-            <script type="text/javascript"> 
-            this.print(true) 
-            </script> 
-            </body>
-            </html>';
-        
-        $dompdf = PDF::loadHTML($html);
-        $dompdf->setOptions(['defaultFont' =>'Courier']);
+        $transaksi = TransaksiPenjualan::where('id_penjualan',$penjualan['id'])->with('obat')->get();
+        if($transaksi)
+            $transaksi = $transaksi->toArray();
+        else 
+            abort(404);
 
-        $customPaper = array(0,0,340,650);
-        // $dompdf->set_paper($customPaper);
-        // $dompdf->setOptions('enable_css_float',true);
-        
-        //$dompdf->set_paper("A3", "portrait");
+        $data['penjualan'] = $penjualan;
+        $data['transaksi'] = $transaksi;
+        $data['data'] = $data;
 
+
+        $GLOBALS['bodyHeight'] = 0;
+
+        $dompdf = PDF::loadView('pdf.struk', $data);
         $dompdf->setPaper(array(0,0,204,650));
-        // $dompdf->set_option('dpi', 72);
-        // $dompdf->render();
-        return $dompdf->stream("dompdf_out.pdf", array('Attachment' => 0));
+        $dompdf->setOptions(['defaultFont' =>'Courier']);
+        $dompdf = $dompdf->getDomPDF();
+        $dompdf->setCallbacks(
+        array(
+            'myCallbacks' => array(
+            'event' => 'end_frame', 'f' => function ($infos) {
+                $frame = $infos["frame"];
+                if (strtolower($frame->get_node()->nodeName) === "body") {
+                    $padding_box = $frame->get_padding_box();
+                    $GLOBALS['bodyHeight'] += $padding_box['h'];
+                }
+            }
+            )
+        )
+        );
+        $dompdf->render();
+
+        unset($dompdf);
+
+        $dompdf = PDF::loadView('pdf.struk', $data);
+        $dompdf->setPaper(array(0,0,204,$GLOBALS['bodyHeight']+60));
+
+        $dompdf->setOptions(['dpi' => 72]);
+
+        return $dompdf->stream();
     }
 
 }
