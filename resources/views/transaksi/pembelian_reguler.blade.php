@@ -10,10 +10,12 @@
 <script type="text/javascript">
     var base_url = "{{url('/')}}/";
     var kategori = {!! $kategori !!};
+    var jenis = '{{$jenis}}';
+    
 </script>
 <div class="box box-success ">
     <div class="box-header no-shadow no-padding nav-tabs-custom" style="margin-bottom: 0px; min-height: 45px;">
-    	<h3 class="box-title" style="padding:10px;">Transaksi pembelian obat langsung</h3>
+    	<h3 class="box-title" style="padding:10px;">Transaksi pembelian obat {{$jenis}}</h3>
     </div>
     <div class="box-body">
         <div class="col-xs-12 col-md-6">
@@ -40,7 +42,7 @@
                 <label for="supplier" class="control-label">Supplier</label>
                 <div>
                     <select class="form-control" id="supplier">
-                        <option value="" >Langsung</option>
+                        {{ $jenis != 'po' ? '<option value="" >Langsung</option>' : '' }}
                         @foreach($supplier as $supp)
                         <option value="<?= $supp['id'] ?>"><?= $supp['nama']?></option>
                         @endforeach
@@ -65,9 +67,10 @@
                                 <th style="width:250px;">Nama Obat</th>
                                 <th style="width:250px;">Kategori</th>
                                 <th style="width:120px;">Satuan</th>
-                                <th style="width:250px;">Harga Beli</th>
+                                <th style="width:120px;">Type</th>
+                                {!!$jenis == 'po' ? '' : '<th style="width:250px;">Harga Beli</th>'!!}
                                 <th style="width:100px;">Jumlah</th>
-                                <th style="width:300px;">Total</th>
+                                {!!$jenis == 'po' ? '' : '<th style="width:300px;">Total</th>'!!}
                                 <th style="width:50px;">X</th>
                             </tr>
                         </thead>
@@ -92,6 +95,7 @@
                     </div>
                 </div>  
                 <div class="col-md-7 col-md-offset-1">
+                    @if($jenis != 'po')
                     <div class="form-group col-md-12 col-xs-6" style="display: inline-block;">
                         <label style="margin-top: 5px;font-size: 20px;" for="name" class="col-sm-3 control-label">Total Harga</label>
                         <div class="col-sm-9">
@@ -100,6 +104,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
                     <div class="form-group col-md-12 col-xs-6 col-md-offset-3" style="display: inline-block;">
                         <div class="pull-left text-center">
                             <button type="submit" class="btn btn-primary" id="simpan" disabled><i class="fa fa-save"></i> Simpan</button>

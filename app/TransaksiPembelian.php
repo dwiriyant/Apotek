@@ -12,4 +12,9 @@ class TransaksiPembelian extends Model
 
     protected $table = 'transaksi_pembelian';
 
+    public function obat_po()
+    {
+        return $this->hasOne('App\ObatPO','kode','kode_obat');
+    }
+
 }

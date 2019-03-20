@@ -62,11 +62,19 @@ Route::any('/penjualan-reguler', 'Transaksi\PenjualanController@index')->name('p
 Route::any('/penjualan-reguler/print', 'Transaksi\PenjualanController@print');
 Route::post('/penjualan-reguler/remote', 'Transaksi\PenjualanController@remote');
 
-Route::any('/penjualan-reguler/{grosir}', 'Transaksi\PenjualanController@index')->name('penjualan-resep');
-Route::post('/penjualan-reguler/{grosir}/remote', 'Transaksi\PenjualanController@remote');
+Route::any('/penjualan-reguler/{resep}', 'Transaksi\PenjualanController@index')->name('penjualan-resep');
+Route::post('/penjualan-reguler/{resep}/remote', 'Transaksi\PenjualanController@remote');
 
 Route::any('/pembelian-reguler', 'Transaksi\PembelianController@index')->name('pembelian-reguler');
+Route::any('/pembelian-reguler/print', 'Transaksi\PembelianController@print');
 Route::post('/pembelian-reguler/remote', 'Transaksi\PembelianController@remote');
+
+Route::any('/pembelian-reguler/{po}', 'Transaksi\PembelianController@index')->name('pembelian-po');
+Route::post('/pembelian-reguler/{po}/remote', 'Transaksi\PembelianController@remote');
+
+Route::any('/pembelian-reguler/po/dashboard', 'Transaksi\PembelianPOController@index')->name('dashboard-po');
+Route::any('/pembelian-reguler/po/dashboard/delete', 'Transaksi\PembelianPOController@delete')->name('dashboard-po-delete');
+Route::any('/pembelian-reguler/po/dashboard/remote', 'Transaksi\PembelianPOController@remote');
 
 Route::any('/report-penjualan', 'Report\PenjualanController@index')->name('report-penjualan');
 Route::any('/report-penjualan/search', 'Report\PenjualanController@search');

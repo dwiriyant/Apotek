@@ -193,7 +193,7 @@
               </a>
               <ul class="treeview-menu">
                 <li {{ in_array(Route::currentRouteName(), ['pembelian-reguler']) ? 'class=active' : '' }}><a href="{{ route('pembelian-reguler') }}"><i class="fa fa-circle-o"></i> Langsung</a></li>
-                <li><a href="#"><i class="fa fa-circle-o"></i> PO (Surat Pesanan)</a></li>
+                <li {{ in_array(Route::currentRouteName(), ['pembelian-po']) ? 'class=active' : '' }}><a href="{{ url('pembelian-reguler','po') }}"><i class="fa fa-circle-o"></i> PO (Surat Pesanan)</a></li>
               </ul>
             </li>
             

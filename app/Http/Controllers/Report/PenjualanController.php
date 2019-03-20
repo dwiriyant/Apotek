@@ -105,6 +105,7 @@ class PenjualanController extends Controller
         foreach ($penjualan as $key => $value) {
             $data[] = [
                 'number'             => ++$i,
+                'no'            => $value['no_transaksi'],
                 'customer'           => isset($value['customer']['nama']) ? $value['customer']['nama'] : '-',
                 'dokter'           => isset($value['dokter']['nama']) ? $value['dokter']['nama'] : '-',
                 'jumlah'            => $value['jumlah'],
@@ -116,6 +117,7 @@ class PenjualanController extends Controller
 
         $column = array(
             array('header' => 'No', 'data' => 'number', 'width' => '30px', 'class' => 'text-center'),
+            array('header' => 'No Transaksi', 'data' => 'no', 'width' => '250px'),
             array('header' => 'Tanggal Penjualan', 'data' => 'tanggal', 'width' => '250px'),
             array('header' => 'Jumlah', 'data' => 'jumlah', 'width' => '250px'),
             array('header' => 'Total Harga', 'data' => 'harga', 'width' => '250px'),

@@ -2,9 +2,9 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Invoice - #123</title>
-
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Transaksi</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
     <style type="text/css">
         @page {
             margin: 0px;
@@ -15,11 +15,12 @@
         }
 
         * {
-            font-family: Verdana, Arial, sans-serif;
+            /* font-family: Verdana, Arial, sans-serif; */
+            font-family: 'Open Sans', sans-serif;
         }
 
         a {
-            color: #fff;
+            color: #000;
             text-decoration: none;
         }
 
@@ -27,131 +28,190 @@
             font-size: x-small;
         }
 
-        tfoot tr td {
-            font-weight: bold;
-            font-size: x-small;
-        }
-
-        .invoice table {
-            margin: 15px;
-        }
-
-        .invoice h3 {
-            margin-left: 15px;
-        }
-
-        .information {
-            background-color: #60A7A6;
-            color: #FFF;
-        }
-
-        .information .logo {
-            margin: 5px;
+        h3 {
+            margin: 0px;
         }
 
         .information table {
-            padding: 10px;
+            padding: 5px;
         }
+
+        .fr {
+            float: right;
+        }
+
     </style>
+
 
 </head>
 
 <body>
 
-    <div class="information">
-        <table width="100%">
+<div class="information">
+    <table width="100%">
+        <tr>
+            <td align="center" >
+                <h3>APOTEK BATU SEHAT</h3>
+                <h3>Jl. Brantas 24 Batu</h3>
+                <h3>0341 - 511303 / 081234073427</h3>
+
+            </td>
+        </tr>
+
+    </table>
+
+    <table border="0" cellpadding="0" cellspacing="0" style="width:30%;float:left">
+        <tbody>
             <tr>
-                <td align="left" style="width: 40%;">
-                    <h3>John Doe</h3>
-                    <pre>
-Street 15
-123456 City
-United Kingdom
-<br /><br />
-Date: 2018-01-01
-Identifier: #uniquehash
-Status: Paid
-</pre>
-
-
-                </td>
-                <td align="center">
-                    <img src="/path/to/logo.png" alt="Logo" width="64" class="logo" />
-                </td>
-                <td align="right" style="width: 40%;">
-
-                    <h3>CompanyName</h3>
-                    <pre>
-                    https://company.com
-
-                    Street 26
-                    123456 City
-                    United Kingdom
-                </pre>
+                <td>
+                    <h3>TANGGAL</h3>
+                    <h3>Transaksi</h3>
+                    <h3>Jenis</h3>
+                    <h3>Nama Plg</h3>
+                    {{ $data['penjualan']['jenis'] == 'resep' ? '<h3>Nama Dokter</h3>' : '' }}
                 </td>
             </tr>
-
-        </table>
-    </div>
-
-
-    <br />
-
-    <div class="invoice">
-        <h3>Invoice specification #123</h3>
-        <table width="100%">
-            <thead>
-                <tr>
-                    <th>Description</th>
-                    <th>Quantity</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Item 1</td>
-                    <td>1</td>
-                    <td align="left">€15,-</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </tbody>
-
-            <tfoot>
-                <tr>
-                    <td colspan="1"></td>
-                    <td align="left">Total</td>
-                    <td align="left" class="gray">€15,-</td>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
-
-    <div class="information" style="position: absolute; bottom: 0;">
-        <table width="100%">
+        </tbody>
+    </table>
+    <table border="0" cellpadding="0" cellspacing="0" style="width:70%;float:left">
+        <tbody>
             <tr>
-                <td align="left" style="width: 50%;">
-                    &copy; {{ date('Y') }} {{ config('app.url') }} - All rights reserved.
-                </td>
-                <td align="right" style="width: 50%;">
-                    Company Slogan
+                <td>
+                    <h3>: {{ date('d / m / Y', strtotime($data['penjualan']['tanggal'])) }}</h3>
+                    <h3>: {{ $data['penjualan']['no_transaksi'] }}</h3>
+                    <h3>: {{ $data['penjualan']['jenis'] }}</h3>
+                    <h3>: {{ @$data['penjualan']['customer']['nama'] }}</h3>
+                    {{ $data['penjualan']['jenis'] == 'resep' ? '<h3>: '.@$data['penjualan']['dokter']['nama']. '</h3>' : '' }}
                 </td>
             </tr>
+        </tbody>
+    </table>
 
-        </table>
-    </div>
+    <table width="100%;" style="margin-left: -5px;">
+        <tr>
+            <td align="center">
+                <h3>====================================================================================</h3>
+            </td>
+        </tr>
+    </table>
+
+    <table border="0" cellpadding="0" cellspacing="0" style="width:70%;float:left;">
+        <tbody>
+            <tr>
+                <td>
+                    @foreach ($data['transaksi'] as $transaksi)
+                        <h3>{{$transaksi['obat']['nama']}}</h3>
+                        <h3 style="margin-left: 7px;">{{$transaksi['jumlah']}} x {{number_format($transaksi['total'],2,",",".")}}</h3>
+                    @endforeach
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table border="0" cellpadding="0" cellspacing="0" style="width:30%;float:right">
+        <tbody>
+            <tr>
+                <td class="fr">
+                    @foreach ($data['transaksi'] as $transaksi)
+                        <h3>{{$transaksi['obat']['satuan']}}</h3>
+                        <h3 style="text-align: right;">{{number_format($transaksi['total_harga'],2,",",".")}}</h3>
+                    @endforeach
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table width="100%;" style="margin-left: -10px;">
+        <tr>
+            <td align="center">
+                <h3>====================================================================================</h3>
+            </td>
+        </tr>
+    </table>
+
+    <table border="0" cellpadding="0" cellspacing="0" style="width:40%;float:left;">
+        <tbody>
+            <tr>
+                <td>
+                    <h3 style="margin-left: 10px;">{{ count($data['transaksi']) }} Item</h3>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <table border="0" cellpadding="0" cellspacing="0" style="width:28%;float:left">
+        <tbody>
+            <tr>
+                <td>
+                    <h3>Sub Total </h3>
+                    <h3>Diskon </h3>
+                    <h3>Total </h3>
+                    <h3>Bayar </h3>
+                    <h3>Kembali </h3>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table border="0" cellpadding="0" cellspacing="0" style="width:2%;float:left">
+        <tbody>
+            <tr>
+                <td>
+                    <h3> :</h3>
+                    <h3> :</h3>
+                    <h3> :</h3>
+                    <h3> :</h3>
+                    <h3> :</h3>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table border="0" cellpadding="0" cellspacing="0" style="width:30%;float:right">
+        <tbody>
+            <tr>
+                <td class="fr" style="float: right;">
+                    <div style="text-align: right;">
+                    <h3>{{ number_format($data['penjualan']['total'],2,",",".") }}</h3>
+                    <h3>{{ number_format(($data['penjualan']['total'] * $data['penjualan']['diskon'] / 100),2,",",".") }}</h3>
+                    <h3>{{ number_format($data['penjualan']['total_harga'],2,",",".") }}</h3>
+                    <h3>{{ number_format($data['penjualan']['uang'],2,",",".") }}</h3>
+                    <h3>{{ number_format(($data['penjualan']['uang'] - $data['penjualan']['total_harga']),2,",",".") }}</h3>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table width="100%;" style="margin-left: -10px;">
+        <tr>
+            <td align="center">
+                <h3>====================================================================================</h3>
+            </td>
+        </tr>
+    </table>
+
+    <table width="100%;">
+        <tr>
+            <td align="center">
+                <h3>Opr : {{ Auth::user()->name }} - {{ date('d / m / Y H:i:s', strtotime($data['penjualan']['tanggal'])) }}</h3>
+            </td>
+        </tr>
+    </table>
+
+    <table width="100%">
+        <tr>
+            <td align="center">
+                <h3>Terimakasih Atas Kunjungannya</h3>
+                <h3>Semoga Lekas Sembuh</h3>
+                <h3>---------------------------------</h3>
+    
+            </td>
+        </tr>
+    
+    </table>
+
+</div>
+<script type="text/javascript"> 
+    this.print(true) 
+</script> 
 </body>
 
 </html>

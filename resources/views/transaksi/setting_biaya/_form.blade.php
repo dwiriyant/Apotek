@@ -35,6 +35,9 @@
 
 				</div>
 				
+			</div>
+			<div class="col-xs-6 col-md-6">
+
 				<div class="form-group <?php echo isset($errors['harga_satuan']) ? 'has-error' : '' ; ?>">
 					<label for="biaya" class="control-label">Biaya</label>
 					<div>
@@ -44,7 +47,7 @@
 
 					<small class="help-block" style="<?php echo (isset($errors['biaya'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['biaya'])) ? $errors['biaya'][0] : '' ;?></small>
 				</div>
-
+				
 				<div class="form-group <?php echo isset($errors['periode']) ? 'has-error' : '' ; ?>">
 	                <input type="hidden" name="periode" class="dt-value" value="<?= isset($setting_biaya['periode']) ? $setting_biaya['periode'] : date('Y-m-d',strtotime('now')) ;?>">
 	                <label for="periode" class="control-label">Periode</label>
@@ -58,10 +61,8 @@
 	                <?php }?>
 
 	                <small class="help-block" style="<?php echo (isset($errors['periode'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['periode'])) ? $errors['periode'][0] : '' ;?></small>
-	            </div>
-
-			</div>
-			<div class="col-xs-6 col-md-6">
+				</div>
+				
 				<div class="form-group" style="margin-top: 25px;">
 	                <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> <?php echo @$setting_biaya['id'] ? 'Save Changes' : 'Save New'; ?></button>
 	                <a href="<?php echo route($route, $param)?>" class="btn btn-default button-reset">Reset</a>

@@ -285,7 +285,7 @@ class ObatController extends Controller
     {
         $id = get('id');
         if ($id) {
-            $obat = obat::where('id',(int)$id)->first();
+            $obat = Obat::where('id',(int)$id)->first();
             $obat->status = 9;
             $obat->save();
 

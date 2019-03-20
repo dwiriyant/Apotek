@@ -21,7 +21,7 @@ $("#obat-search").click(function () {
     cariObatPopup();
 });
 
-$('#obat-keyword').keypress(function (e) {
+$('#obat-keyword').keyup(function (e) {
     var key = e.which;
     if (key == 13)  // the enter key code
     {
@@ -122,22 +122,29 @@ function reorderNomor() {
 }
 
 function checkTotal() {
-    int_jumlah_obat = parseInt(getNumber($("#jumlah-" + total_obat).val()));
-    int_total_obat = parseInt(getNumber($("#harga-" + total_obat).text()));
-
-    if (isNaN(int_jumlah_obat))
-        return false;
-
-    if (int_jumlah_obat <= 0) {
-        int_jumlah_obat = 1;
-        $("#jumlah-" + total_obat).val('1');
-    }
-
-    $("#total-" + total_obat).html(int_jumlah_obat * int_total_obat);
+    
     total_harga = 0;
     for (i = 1; i <= total_obat; i++) {
         if ($("#total-" + i).length > 0)
             total_harga += parseInt($("#total-" + i).html());
+
+        if ($("#jumlah-" + i).length > 0) {
+            int_jumlah_obat = parseInt(getNumber($("#jumlah-" + i).val()));
+            if (isNaN(int_jumlah_obat))
+                return false;
+
+            if (int_jumlah_obat <= 0) {
+                int_jumlah_obat = 1;
+                $("#jumlah-" + i).val('1');
+            }
+        }
+        if ($("#harga-" + i).length > 0) {
+            int_total_obat = parseInt(getNumber($("#harga-" + i).text()));
+        }
+
+        if (($("#harga-" + i).length > 0) && ($("#jumlah-" + i).length > 0)) {
+            $("#total-" + i).html(int_jumlah_obat * int_total_obat);
+        }
     }
 
     $('#total').val(total_harga);
@@ -263,12 +270,12 @@ $(function () {
         minDate: d
     });
 
-    $('body').on("propertychange input", '.table-responsive input', function (e) {
+    $('body').on("keyup input", '.table-responsive input', function (e) {
         checkTotal();
         return false;
     });
 
-    $('#kode-obat').keypress(function (e) {
+    $('#kode-obat').keyup(function (e) {
         var key = e.which;
         if (key == 13)  // the enter key code
         {
@@ -277,7 +284,7 @@ $(function () {
         }
     });
 
-    $('#diskon').on('propertychange input', function (e) {
+    $('#diskon').on('keyup input', function (e) {
 
         diskon = parseInt($('#diskon').val());
 
@@ -304,6 +311,7 @@ $(function () {
             uang = getNumber($('#uang').val());
             diskon = $('#diskon').val().length > 0 ? getNumber($('#diskon').val().toString()) : 0;
             total_harga = getNumber($('#total-harga').val());
+            total = getNumber($('#total').val());
             tgl_transaksi = $('#tgl_transaksi').val();
             customer = $('#customer').val();
             dokter = $('#dokter').length > 0 ? $('#dokter').val() : '';
@@ -317,6 +325,7 @@ $(function () {
                     action: 'simpan-penjualan',
                     jumlah: jumlah,
                     uang: uang,
+                    total: total,
                     diskon: diskon,
                     total_harga: total_harga,
                     tanggal: tgl_transaksi,
@@ -351,8 +360,32 @@ $(function () {
                                     },
                                 }).done(function (data) {
                                     data = JSON.parse(data);
-                                    if (data.status != 'sukses')
+                                    if (data.status != 'sukses') {
                                         callNoty('error', 'Simpan error.');
+                                    } else {
+                                        if(i==total_obat)
+                                        {
+                                            endLoader();
+                                            callNoty('success', 'Berhasil Simpan Penjualan.');
+
+                                            swal({
+                                                title: "Berhasil Simpan Penjualan.",
+                                                type: "success",
+                                                showCancelButton: false,
+                                                confirmButtonClass: "btn-success",
+                                                confirmButtonText: "Oke",
+                                                showLoaderOnConfirm: true,
+                                                closeOnConfirm: false
+                                            }, function (isConfirm) {
+                                                    url = base_url + 'penjualan-reguler/print?transaksi=' + no_transaksi;
+                                                    window.open(
+                                                        url,
+                                                        '_blank'
+                                                    );
+                                                location.reload();
+                                            });                                            
+                                        }
+                                    }
                                 }).fail(function (jqXHR, textStatus, errorThrown) {
                                     if (jqXHR.status == 444)
                                         sessionExpireHandler();
@@ -369,20 +402,6 @@ $(function () {
                     sessionExpireHandler();
                 else
                     callNoty('warning');
-            });
-
-            endLoader();
-            callNoty('success', 'Berhasil Simpan Penjualan.');
-            swal({
-                title: "Berhasil Simpan Penjualan.",
-                type: "success",
-                showCancelButton: false,
-                confirmButtonClass: "btn-success",
-                confirmButtonText: "Oke",
-                showLoaderOnConfirm: true,
-                closeOnConfirm: false
-            }, function (isConfirm) {
-                location.reload();
             });
         }
     });

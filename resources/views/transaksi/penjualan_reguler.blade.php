@@ -14,7 +14,7 @@
 
 <div class="box box-success ">
     <div class="box-header no-shadow no-padding nav-tabs-custom" style="margin-bottom: 0px; min-height: 45px;">
-    	<h3 class="box-title" style="padding:10px;">Transaksi penjualan obat reguler</h3>
+    	<h3 class="box-title" style="padding:10px;">Transaksi penjualan obat {{$jenis}}</h3>
     </div>
     <div class="box-body">
         <div class="col-xs-12 col-md-6">
