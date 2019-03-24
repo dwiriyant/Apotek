@@ -32,20 +32,6 @@
 
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         
-                        <div class="form-group">
-                            <label for="datetimepicker1" class="control-label col-sm-3">Tanggal</label>
-                            <div class="col-sm-9">
-                                <div class="input-daterange" id="datepicker">
-                                    <div class="input-group">
-                                        <input type="hidden" name="start" value="<?=$search['start']?>">
-                                        <input type="text" id="datetimepicker1" class="input-sm form-control date" rel="start" value="<?=$search['start'] ? date('d M Y', strtotime($search['start'])) : '' ?>">
-                                        <span class="input-group-addon">to</span>
-                                        <input type="hidden" name="end" value="<?=$search['end']?>">
-                                        <input type="text" id="datetimepicker2" class="input-sm form-control date" rel="end" value="<?=$search['end'] ? date('d M Y', strtotime($search['end'])) : '' ?>">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                     </div>
 
@@ -54,7 +40,7 @@
                         <div class="pull-right text-center">
                             <button type="submit" class="btn btn-sm btn-primary btn-flat" id="button-search"><i class="fa fa-search"></i> Search</button>
                             <a href="<?=url($route)?>" class="btn btn-default btn-sm"><i class="fa fa-list-alt"></i> Show All</a>
-                            <a href="<?=route('report-penjualan',$param)?>&export=true" class="btn btn-success btn-sm" target="_blank"><i class="fa fa-save"></i> Export</a>
+                            <a href="<?=route('report-retur-pembelian',$param)?>&export=true" class="btn btn-success btn-sm" target="_blank"><i class="fa fa-save"></i> Export</a>
 
 
                         </div>

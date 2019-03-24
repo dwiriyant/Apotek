@@ -207,6 +207,7 @@ class PenjualanController extends Controller
                         $transaksi->total = post('total');
                         $transaksi->jumlah = post('jumlah_obat');
                         $transaksi->total_harga = post('total');
+                        $transaksi->jual_pack = (int)post('jual_pack');
                         $transaksi->save();
 
                         $obat = Obat::where('kode',post('kode_obat'))->where('status','!=',9)->first();

@@ -11,14 +11,15 @@ function callbackForm(){
     });
 }
 
-function updateStok(id_obat, stok_nyata) {
+function updateStok(id_obat, stok_nyata, keterangan) {
     $.ajax({
         url : base_url + 'stok-opname/remote',
         method : 'post',
         data : {
             action : 'updateStok',
             id_obat : id_obat,
-            stok_nyata : stok_nyata
+            stok_nyata : stok_nyata,
+            keterangan: keterangan,
         },
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -29,7 +30,7 @@ function updateStok(id_obat, stok_nyata) {
     }).always(function(){
         endLoader();
     }).done(function(data){
-        $("#stok-nyata-note-"+id_obat).hide();
+        $("#keterangan-note-"+id_obat).hide();
         $("#stok-software-"+id_obat).text(stok_nyata);
     }).fail(function(jqXHR, textStatus, errorThrown){
         if (jqXHR.status == 444)
@@ -43,12 +44,13 @@ $(function() {
     Holder.run();
     callbackForm();
 
-    $('.stok-nyata').on('keypress',function(e) {
+    $('.keterangan').on('keypress', function (e) {
         var id_obat = $(this).data('id');
-        var stok_nyata = $('#stok-nyata-'+id_obat).val();
-        $("#stok-nyata-note-"+id_obat).show();
-        if(e.which == 13 && stok_nyata != '') {
-            updateStok(id_obat, stok_nyata);
+        var keterangan = $('#keterangan-' + id_obat).val();
+        var stok_nyata = $('#stok-nyata-' + id_obat).val();
+        $("#keterangan-note-" + id_obat).show();
+        if (e.which == 13 && stok_nyata != '') {
+            updateStok(id_obat, stok_nyata, keterangan);
         }
     });
 

@@ -50,13 +50,25 @@
                     </div>
 
                     <div class="col-lg-4 col-md-6 col-sm-12">
+                        
+                        <div class="form-group">
+                            <label for="supplier" class="col-sm-3 control-label">Supplier</label>
+                            <div class="col-sm-9">
+                                <select class="form-control" name="supplier">
+                                    <option value="">All</option>
+                                    @foreach($supplier as $supp)
+                                    <option value="<?= $supp['id'] ?>" <?=@$supp['id']==$search['supplier'] ? 'selected' : ''?> ><?= $supp['nama']?></option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
 
                         <div class="pull-right text-center">
                             <button type="submit" class="btn btn-sm btn-primary btn-flat" id="button-search"><i class="fa fa-search"></i> Search</button>
-                            <a href="<?=url($route)?>" class="btn btn-default btn-sm"><i class="fa fa-list-alt"></i> Show All</a>
-                            <a href="<?=route('report-penjualan',$param)?>&export=true" class="btn btn-success btn-sm" target="_blank"><i class="fa fa-save"></i> Export</a>
-
-
+                            <a href="<?=url($route)?>/po/dashboard" class="btn btn-default btn-sm"><i class="fa fa-list-alt"></i> Show All</a>
+                            <a href="<?=url('pembelian-reguler/po')?>">
+                                <button type="button" class="btn btn-sm btn-success btn-flat"><i class="fa fa-download"></i> Tambah PO</button>
+                            </a>
                         </div>
 
                     </div>
@@ -88,45 +100,8 @@
     
 </div>
 
-<style>
-    @media screen and (min-width: 768px) {
-    .modals-class {
-        width: 70%; /* either % (e.g. 60%) or px (400px) */
-    }
-}
-</style>
-<!-- Modal -->
-<div id="popup-detail" class="modal fade" role="dialog">
-  <div class="modal-dialog modals-class">
-
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Detail Transaksi</h4>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="box">
-                    <div class="box-body table-responsive no-padding">
-                        <div id="table-detail"></div>
-                    </div>
-            
-                </div>
-            </div>
-            
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-
-  </div>
-</div>
 
 @endsection
 @section('js')
-<script src="{{ asset('js/report/penjualan.js') }}"></script>
+<script src="{{ asset('js/report/pembelian.js') }}"></script>
 @stop

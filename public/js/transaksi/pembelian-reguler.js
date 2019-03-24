@@ -221,106 +221,9 @@ function cariObat(kode_obat = '') {
         endLoader();
     }).done(function(data){
         data = JSON.parse(data);
+        data = data.data;
+        generateTable(data, id_obat);
         
-        if(data.data != null)
-        {
-            callNoty('success', 'Data sudah tersedia.');
-            data = data.data;
-
-            for(i=1;i<=total_obat;i++)
-            {
-                if($("#total-"+i).length > 0)
-                {
-                    if($("#kode-"+i).text() == data.kode)
-                    {
-                        $("#jumlah-"+i).val(parseInt($("#jumlah-"+i).val())+1);
-                        checkTotal();
-                        return false;
-                    }
-                }
-            }
-            kat_all = '';
-            kategori.forEach(kat => {
-                kat_all += '<option value="' + kat.id + '" ' + (data.kategori.id == kat.id ? 'selected' : '') +' >' + kat.nama + '</option >';
-            });	
-            total_obat++;
-            result = '<tr id="list-'+ total_obat+'"> ' +
-                '<td class="nomor"></td>' +
-                '<td><input style="border: 0;" id="kode-' + total_obat + '"  type="number" value="' + id_obat + '" disabled></td>' +
-                '<td><input style="border: 0;" id="nama-' + total_obat + '"  type="text" disabled value="' + data.nama +'"></td>' +
-                '<td>' +
-                '<select class="form-control" id="kategori-' + total_obat + '">' +
-                kat_all +
-                '</select >' +
-                '</td>' +
-                '<td><input style="border: 0;" id="satuan-' + total_obat + '"  type="text" disabled value="' + data.satuan +'"></td>' +
-                '<td><select class="form-control" id="type-' + total_obat + '"><option value="1"'+ (data.type == '1' ? 'selected' : '') + '>Sendiri</option><option value="2"' + (data.type == '2' ? 'selected' : '') +'>Konsinyasi</option></select></td>';
-                if (jenis == 'langsung') {
-                    
-                    result +=
-                        '<td><input style="border: 0;" id="harga-' + total_obat + '" class="currency" type="text" value="0"></td>';
-                }
-                result +=
-                    '<td><input style="max-width: 55px;border: 0;" id="jumlah-' + total_obat + '"  type="number" value="1"></td>';
-                if (jenis == 'langsung') {
-                    result +=
-                        '<td id="total-' + total_obat + '"> Rp. ' + 0 + '</td>';
-                }
-                result +=
-                '<td onclick="hapusObat('+total_obat+')" style="cursor:pointer;" data-id="'+ total_obat+'"><i style="color:red" class="fa fa-times"></i> </td>' +
-            '</tr>';
-            $("#data-kosong").hide();
-            $("#data-obat").append(result);
-            checkTotal();
-            reorderNomor();
-        }
-        else
-        {
-            kat_all = '';
-            kategori.forEach(kat => {
-                kat_all += '<option value="' + kat.id + '" >' + kat.nama + '</option >';
-            });	
-            for (i = 1; i <= total_obat; i++) {
-                if ($("#total-" + i).length > 0) {
-                    if ($("#kode-" + i).val() == id_obat) {
-                        $("#jumlah-" + i).val(parseInt($("#jumlah-" + i).val()) + 1);
-                        checkTotal();
-                        return false;
-                    }
-                }
-            }
-            callNoty('information', 'Data belum tersedia.');
-            total_obat++;
-            
-            result = '<tr id="list-' + total_obat + '"> ' +
-                '<td class="nomor"></td>' +
-                '<td><input style="border: 0;" id="kode-' + total_obat + '"  type="number" value="' + id_obat+'"></td>' +
-                '<td><input style="border: 0;" id="nama-' + total_obat + '"  type="text" value=""></td>' +
-                '<td>'+
-                '<select class="form-control" id="kategori-' + total_obat + '">'+
-                    kat_all	+
-                '</select >' +
-                '</td>' +
-                '<td><select class="form-control" id="satuan-' + total_obat + '"><option value="tablet">Tablet</option><option value="kapsul">Kapsul</option><option value="botol">Botol</option><option value="kotak">Kotak</option><option value="ml">ML</option><option value="vial">Vial</option><option value="tube">Tube</option><option value="pot">Pot</option><option value="supp">Supp</option><option value="ampul">Ampul</option></select></td>' +
-                '<td><select class="form-control" id="type-' + total_obat + '"><option value="1">Sendiri</option><option value="2">Konsinyasi</option></select></td>';
-                if (jenis == 'langsung') {
-                result +=
-                    '<td><input style="border: 0;" id="harga-' + total_obat + '" class="currency" type="text" value="0"></td>';
-                }
-                result +=
-                '<td><input style="max-width: 55px;border: 0;" id="jumlah-' + total_obat + '"  type="number" value="1"></td>';
-                if (jenis == 'langsung') {
-                    result +=
-                        '<td id="total-' + total_obat + '"> Rp. ' + 0 + '</td>';
-                }
-                result +=
-                '<td onclick="hapusObat(' + total_obat + ')" style="cursor:pointer;" data-id="' + total_obat + '"><i style="color:red" class="fa fa-times"></i> </td>' +
-                '</tr>';
-            $("#data-kosong").hide();
-            $("#data-obat").append(result);
-            checkTotal();
-            reorderNomor();
-        }
         $("#popup-obat").modal('hide');
     }).fail(function(jqXHR, textStatus, errorThrown){
         if (jqXHR.status == 444)
@@ -330,15 +233,130 @@ function cariObat(kode_obat = '') {
     });
 }
 
+function generateTable(data, id_obat)
+{
+    if (data != null) {
+        callNoty('success', 'Data sudah tersedia.');
+
+        for (i = 1; i <= total_obat; i++) {
+            if ($("#total-" + i).length > 0) {
+                if ($("#kode-" + i).text() == data.kode) {
+                    $("#jumlah-" + i).val(parseInt($("#jumlah-" + i).val()) + 1);
+                    checkTotal();
+                    return false;
+                }
+            }
+        }
+        kat_all = '';
+        kategori.forEach(kat => {
+            kat_all += '<option value="' + kat.id + '" ' + (data.kategori.id == kat.id ? 'selected' : '') + ' >' + kat.nama + '</option >';
+        });
+        total_obat++;
+        result = '<tr id="list-' + total_obat + '"> ' +
+            '<td class="nomor"></td>' +
+            '<td><input style="border: 0;" id="kode-' + total_obat + '"  type="number" value="' + id_obat + '" disabled></td>' +
+            '<td><input style="border: 0;" id="nama-' + total_obat + '"  type="text" disabled value="' + data.nama + '"></td>' +
+            '<td>' +
+            '<select class="form-control" id="kategori-' + total_obat + '">' +
+            kat_all +
+            '</select >' +
+            '</td>' +
+            '<td><input style="border: 0;" id="satuan-' + total_obat + '"  type="text" disabled value="' + data.satuan + '"></td>' +
+            '<td><select class="form-control" id="type-' + total_obat + '"><option value="1"' + (data.type == '1' ? 'selected' : '') + '>Sendiri</option><option value="2"' + (data.type == '2' ? 'selected' : '') + '>Konsinyasi</option></select></td>';
+        if (jenis == 'langsung') {
+
+            result +=
+                '<td><input style="border: 0;" id="harga-' + total_obat + '" class="currency" type="text" value="0"></td>';
+        }
+        result +=
+            '<td><input style="max-width: 55px;border: 0;" id="jumlah-' + total_obat + '"  type="number" value="1"></td>';
+        if (jenis == 'langsung') {
+            result +=
+                '<td id="total-' + total_obat + '"> Rp. ' + 0 + '</td>';
+        }
+        result +=
+            '<td onclick="hapusObat(' + total_obat + ')" style="cursor:pointer;" data-id="' + total_obat + '"><i style="color:red" class="fa fa-times"></i> </td>' +
+            '</tr>';
+        $("#data-kosong").hide();
+        $("#data-obat").append(result);
+        checkTotal();
+        reorderNomor();
+    }
+    else {
+        kat_all = '';
+        kategori.forEach(kat => {
+            kat_all += '<option value="' + kat.id + '" >' + kat.nama + '</option >';
+        });
+        for (i = 1; i <= total_obat; i++) {
+            if ($("#total-" + i).length > 0) {
+                if ($("#kode-" + i).val() == id_obat) {
+                    $("#jumlah-" + i).val(parseInt($("#jumlah-" + i).val()) + 1);
+                    checkTotal();
+                    return false;
+                }
+            }
+        }
+        callNoty('information', 'Data belum tersedia.');
+        total_obat++;
+
+        result = '<tr id="list-' + total_obat + '"> ' +
+            '<td class="nomor"></td>' +
+            '<td><input style="border: 0;" id="kode-' + total_obat + '"  type="number" value="' + id_obat + '"></td>' +
+            '<td><input style="border: 0;" id="nama-' + total_obat + '"  type="text" value=""></td>' +
+            '<td>' +
+            '<select class="form-control" id="kategori-' + total_obat + '">' +
+            kat_all +
+            '</select >' +
+            '</td>' +
+            '<td><select class="form-control" id="satuan-' + total_obat + '"><option value="tablet">Tablet</option><option value="kapsul">Kapsul</option><option value="botol">Botol</option><option value="kotak">Kotak</option><option value="ml">ML</option><option value="vial">Vial</option><option value="tube">Tube</option><option value="pot">Pot</option><option value="supp">Supp</option><option value="ampul">Ampul</option></select></td>' +
+            '<td><select class="form-control" id="type-' + total_obat + '"><option value="1">Sendiri</option><option value="2">Konsinyasi</option></select></td>';
+        if (jenis == 'langsung') {
+            result +=
+                '<td><input style="border: 0;" id="harga-' + total_obat + '" class="currency" type="text" value="0"></td>';
+        }
+        result +=
+            '<td><input style="max-width: 55px;border: 0;" id="jumlah-' + total_obat + '"  type="number" value="1"></td>';
+        if (jenis == 'langsung') {
+            result +=
+                '<td id="total-' + total_obat + '"> Rp. ' + 0 + '</td>';
+        }
+        result +=
+            '<td onclick="hapusObat(' + total_obat + ')" style="cursor:pointer;" data-id="' + total_obat + '"><i style="color:red" class="fa fa-times"></i> </td>' +
+            '</tr>';
+        $("#data-kosong").hide();
+        $("#data-obat").append(result);
+        checkTotal();
+        reorderNomor();
+    }
+}
+
 $(function() {
-    $('.date2').datetimepicker({
-        format: "DD MMM YYYY HH:mm",
-        showClear : false,
-        showTodayButton : true,
-        useCurrent : false,
-        allowInputToggle : true,
-        minDate:d
-    });
+
+    if (typeof kode !== "undefined")
+        cariObat(kode);
+    
+    if (isEmpty(pembelian))
+        $('.date2').datetimepicker({
+            format: "DD MMM YYYY HH:mm",
+            showClear: false,
+            showTodayButton: true,
+            useCurrent: false,
+            allowInputToggle: true,
+            minDate: d
+        });
+    else {
+        $('.date2').datetimepicker({
+            format: "DD MMM YYYY HH:mm",
+            showClear: false,
+            showTodayButton: true,
+            useCurrent: false,
+            allowInputToggle: true,
+        });
+        
+        jQuery.each(pembelian.transaksi_po, function (i, val) {
+            generateTable(val.obat_po, val.obat_po.kode);
+        });	
+    }
 
     $('body').on("propertychange input", '.table-responsive input', function (e) {
         checkTotal();
@@ -445,12 +463,15 @@ $(function() {
                                             showLoaderOnConfirm: true,
                                             closeOnConfirm: false
                                         }, function (isConfirm) {
-                                            url = base_url + 'pembelian-reguler/print?transaksi=' + no_transaksi;
-                                            window.open(
-                                                url,
-                                                '_blank'
-                                            );
-                                            location.reload();
+                                            if (isEmpty(pembelian) && jenis == 'po')
+                                            {
+                                                url = base_url + 'pembelian-reguler/print?transaksi=' + no_transaksi;
+                                                window.open(
+                                                    url,
+                                                    '_blank'
+                                                );
+                                            }
+                                            location.href = base_url + 'pembelian-reguler';
                                         });
                                     }
                                 }
@@ -475,4 +496,3 @@ $(function() {
     });
 
 })
-

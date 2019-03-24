@@ -11,8 +11,10 @@
     var base_url = "{{url('/')}}/";
     var kategori = {!! $kategori !!};
     var jenis = '{{$jenis}}';
-    
+    var pembelian = {!! json_encode($pembelian) !!};
+    var kode = '{{ $kode }}';
 </script>
+
 <div class="box box-success ">
     <div class="box-header no-shadow no-padding nav-tabs-custom" style="margin-bottom: 0px; min-height: 45px;">
     	<h3 class="box-title" style="padding:10px;">Transaksi pembelian obat {{$jenis}}</h3>
@@ -27,11 +29,11 @@
                 </div>
             </div>
             <div class="form-group">
-                <input type="hidden" id="tgl_transaksi" name="tgl_transaksi" class="dt-value" value="<?= date('Y-m-d H:i:s',strtotime('now')) ;?>">
+                <input type="hidden" id="tgl_transaksi" name="tgl_transaksi" class="dt-value" value="<?= date('Y-m-d H:i:s',@$pembelian['tanggal'] ? strtotime($pembelian['tanggal']) : strtotime('now')) ;?>">
                 <label for="tgl_transaksi" class="control-label">Tanggal Transaksi</label>
                 
                 <div class="input-group date2">
-                    <input type="text" autocomplete="off" class="form-control" placeholder="Schedule" value="<?= date('d M Y H:i',  strtotime('now'))?>">
+                    <input {{@$pembelian['tanggal'] ? 'disabled' : ''}} type="text" autocomplete="off" class="form-control" placeholder="Schedule" value="<?= date('d M Y H:i', @$pembelian['tanggal'] ? strtotime($pembelian['tanggal']) : strtotime('now'))?>">
                     <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                 </div>
             </div>
@@ -44,7 +46,7 @@
                     <select class="form-control" id="supplier">
                         {{ $jenis != 'po' ? '<option value="" >Langsung</option>' : '' }}
                         @foreach($supplier as $supp)
-                        <option value="<?= $supp['id'] ?>"><?= $supp['nama']?></option>
+                        <option value="<?= $supp['id'] ?>" {{ @$pembelian['id_supplier'] == $supp['id'] ? 'selected' : '' }}><?= $supp['nama']?></option>
                         @endforeach
                     </select>
                 </div>

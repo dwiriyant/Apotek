@@ -76,9 +76,7 @@
                         <div class="pull-right text-center">
                             <button type="submit" class="btn btn-sm btn-primary btn-flat" id="button-search"><i class="fa fa-search"></i> Search</button>
                             <a href="<?=url($route)?>" class="btn btn-default btn-sm"><i class="fa fa-list-alt"></i> Show All</a>
-                            <a href="<?=route('obat',$param)?>&export=true" class="btn btn-success btn-sm" target="_blank"><i class="fa fa-save"></i> Export</a>
-
-
+                            <a href="<?=route('report-stok-opname',$param)?>&export=true" class="btn btn-success btn-sm" target="_blank"><i class="fa fa-save"></i> Export</a>
                         </div>
 
                     </div>
@@ -90,9 +88,6 @@
 </div>
 
 <div class="row">
-    <div class="col-xs-12 col-md-12" id="form-container">
-        <?php echo $form?>
-    </div>
 
     <div class="col-xs-12 col-md-12">
         <div class="box box-primary">
@@ -116,5 +111,5 @@
 
 @endsection
 @section('js')
-<script src="{{ asset('js/master/obat.js') }}"></script>
+<script src="{{ asset('js/report/stok_opname.js') }}"></script>
 @stop

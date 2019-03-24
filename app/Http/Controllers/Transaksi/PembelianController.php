@@ -39,6 +39,19 @@ class PembelianController extends Controller
             $po = true;
         else if($po != '')
             abort(404);
+
+        $pos = $po;
+        $approve = false;
+        if(get('approve') && $po == '')
+        {
+            $approve = get('approve');
+            $pos = 'po';
+        }
+
+        $kode = null;
+        if(get('kode') && $kode == '')
+            $kode = get('kode');
+
         $last_id = (string)Pembelian::max('id');
         $len = strlen($last_id);
         
@@ -52,22 +65,37 @@ class PembelianController extends Controller
             $last_id = '001';
         $nomor_transaksi      = date('dmy').'1'.rand(pow(10, 2-1), pow(10, 2)-1).$last_id;
 
+        $pembelian = [];
+        if($approve)
+        {
+            $pembelian = Pembelian::where('no_transaksi',$approve)->where('status',2)->with('supplier')->with('transaksiPo')->first();
+            if($pembelian)
+            {
+                $pembelian = $pembelian->toArray();
+                $nomor_transaksi = $pembelian['no_transaksi'];
+            } else {
+                abort(404);
+            }
+        }
+        
         $data          = [
-            'title'              => 'Obat',
+            'title'              => 'Pembelian',
             'breadcrumb'         => [
                 ['url' => url('/'), 'text' => '<i class="fa fa-dashboard"></i> Dashboard'],
-                ['url' => '#', 'text' => '<i class="fa fa-tag"></i> Obat'],
+                ['url' => '#', 'text' => '<i class="fa fa-tag"></i> Pembelian'],
             ],
             'header_title'       => 'Transaksi',
             'nomor_transaksi'    => $nomor_transaksi,
-            'header_description' => 'Pembelian '.$po ? 'PO' : 'Langsung',
+            'header_description' => 'Pembelian '. ($pos ? 'PO' : 'Langsung'),
             'route'              => $this->_route,
             'jenis'              => $po ? 'po' : 'langsung',
             'flash_message'      => view('_flash_message', []),
             'kategori'           => Kategori::where('status','!=',9)->get()->toJson(),
             'supplier'           => Supplier::where('status','!=',9)->get()->toArray(),
+            'pembelian'          => $pembelian,
+            'kode'               => $kode
         ];
-        
+                
         return view("transaksi/pembelian_reguler", $data);
 
     }
@@ -141,30 +169,73 @@ class PembelianController extends Controller
                         echo json_encode(['data' => $obat->toArray()]);
                     break;
                 case 'simpan-pembelian':
-                        $pembelian = new Pembelian();
+                        $pembelian = Pembelian::where('no_transaksi',post('no_transaksi'))->where('status',2)->first();
+                        if($pembelian)
+                        {
+                            $pembelian->status = 1;
+
+                        } else {
+                            $pembelian = new Pembelian();
+                            $pembelian->no_transaksi = post('no_transaksi');
+                            if(post('jenis') == 'po')
+                                $pembelian->status = 2;
+                        }
+                        
                         $pembelian->id_supplier = post('supplier') != '' ? (int)post('supplier') : null;
                         $pembelian->jumlah = post('jumlah');
                         $pembelian->total_harga = post('total_harga');
                         $pembelian->tanggal = post('tanggal');
                         $pembelian->jenis = post('jenis');
-                        if(post('jenis') == 'po')
-                            $pembelian->status = 2;
-                        $pembelian->no_transaksi = post('no_transaksi');
+                        
+                        
                         $pembelian->save();
 
                         return json_encode(['status'=>'sukses','id'=>$pembelian->id]);
                     break;
                 case 'simpan-transaksi':
-                        $transaksi = new TransaksiPembelian();
-                        $transaksi->id_pembelian = post('id_pembelian');
+
+                        $transaksi = TransaksiPembelian::where('id_pembelian',post('id_pembelian'))->where('status',2)->first();
+                        $jenis = post('jenis');
+                        if($transaksi){
+                            $jenis = 'po';
+                            $transaksis = clone($transaksi);
+                        }
+                        else
+                            $transaksis = $transaksi;
+                        if($transaksis)
+                        {
+                            $transaksi->status = 1;
+
+                        } else {
+                            $transaksi = new TransaksiPembelian();
+                            $transaksi->id_pembelian = post('id_pembelian');
+
+                            if ($jenis == 'po')
+                            {
+                                $transaksi->status = 2;
+                                
+                                $obat = new ObatPO();
+                                $obat->id_pembelian = post('id_pembelian');
+                                $obat->nama = post('nama_obat');
+                                $obat->kode = post('kode_obat');
+                                $obat->kategori = post('kategori_obat');
+                                $obat->tgl_kadaluarsa = date('Y-m-d',strtotime('+3 year'));
+                                $obat->satuan = post('satuan_obat');
+                                $obat->type = post('type_obat');
+                                $obat->stok = post('jumlah_obat') == '' ? 0 : (int)post('jumlah_obat');
+                                $obat->save();
+                            }
+                        }
+                        
                         $transaksi->kode_obat = post('kode_obat');
                         $transaksi->total = post('harga');
                         $transaksi->jumlah = post('jumlah_obat');
                         $transaksi->total_harga = post('total');
+                        
                         $transaksi->save();
 
-                        if(post('jenis') == 'langsung')
-                        {
+                        if($jenis == 'langsung' || $transaksis)
+                        {                                
                             $obat = Obat::where('kode',post('kode_obat'))->where('status','!=',9)->first();
                             if($obat)
                             {
@@ -181,17 +252,7 @@ class PembelianController extends Controller
                                 $obat->stok = post('jumlah_obat') == '' ? 0 : (int)post('jumlah_obat');
                                 $obat->save();
                             }
-                        } else {
-                            $obat = new ObatPO();
-                            $obat->nama = post('nama_obat');
-                            $obat->kode = post('kode_obat');
-                            $obat->kategori = post('kategori_obat');
-                            $obat->tgl_kadaluarsa = date('Y-m-d',strtotime('+3 year'));
-                            $obat->satuan = post('satuan_obat');
-                            $obat->type = post('type_obat');
-                            $obat->stok = post('jumlah_obat') == '' ? 0 : (int)post('jumlah_obat');
-                            $obat->save();
-                        }
+                        } 
 
                         return json_encode(['status'=>'sukses']);
                     break;
