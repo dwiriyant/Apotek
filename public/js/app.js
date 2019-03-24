@@ -398,3 +398,11 @@ function getNumber(txt) {
     var numb = txt.match(/\d/g);
     return numb.join("");
 }
+
+function isEmpty(obj) {
+    for (var key in obj) {
+        if (obj.hasOwnProperty(key))
+            return false;
+    }
+    return true;
+}

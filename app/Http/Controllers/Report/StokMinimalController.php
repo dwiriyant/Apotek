@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Master;
+namespace App\Http\Controllers\Report;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Response;
@@ -11,16 +11,19 @@ use PHPExcel_IOFactory;
 use PHPExcel_Style_Alignment;
 use PHPExcel_Style_Border;
 use PHPExcel_Style_Fill;
-use App\Customer;
+use App\Obat;
 use App\Kategori;
 use Auth;
+use App\Imports\ObatImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
 
-class CustomerController extends Controller
+class StokMinimalController extends Controller
 {
     private $_page   = 1;
     private $_limit  = 25;
     private $_search = [];
-    private $_route  = 'customer';
+    private $_route  = 'stok-minimal';
     
     /**
      * Create a new controller instance.
@@ -31,14 +34,11 @@ class CustomerController extends Controller
     {
         $this->middleware('auth');
         $this->table = $table;
-         
         $this->_search = [
             'name'     => trim(get('name')),
-            'alamat'   => trim(get('kode')),
-            'telepon'   => trim(get('telepon')),
-            'jk'   => trim(get('jk')),
-            'pekerjaan'   => trim(get('pekerjaan')),
-            'email'   => trim(get('email')),
+            'kode'   => trim(get('kode')),
+            'satuan'   => trim(get('satuan')),
+            'kategori'   => trim(get('kategori')),
         ];
     }
 
@@ -49,12 +49,12 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        $customer      = false;
+        $obat      = false;
         $this->_page = request()->page;
 
         if (isPost()) {
             $v = $this->validator(post());
-            $v->rule('required', ['nama']);
+            $v->rule('required', ['nama','kode','kategori','harga_satuan']);
 
             // end validation
             if ($v->validate()) 
@@ -62,7 +62,7 @@ class CustomerController extends Controller
         }
 
         if (request('id')) {
-            $customer = Customer::where('id',(int)request('id'))->first();
+            $obat = Obat::where('id',(int)request('id'))->first();
         }
 
         if (isAjax()) {
@@ -71,10 +71,10 @@ class CustomerController extends Controller
 
             $param = array_filter($param);
 
-            if($customer)
-                $customer = $customer->toArray();
+            if($obat)
+                $obat = $obat->toArray();
 
-            echo $this->_form($customer, $param);
+            echo $this->_form($obat, $param);
 
             return;
         }
@@ -82,54 +82,40 @@ class CustomerController extends Controller
 
         $param   = [];
 
-        $customer = Customer::where('status','!=',9);
+        $obat = Obat::where('status','!=',9)->where('stok','<=',5);
+
+        if ($search['kode']!='') {
+            $obat = $obat->where('kode','like', '%' . $this->_search['kode'] . '%');
+            $param   = [
+                'kode'   => $this->_search['kode'],
+            ];
+        }
+
+        if ($search['satuan']!='') {
+            $obat = $obat->where('satuan',$this->_search['satuan']);
+            $param   = [
+                'satuan'   => $this->_search['satuan'],
+            ];
+        }
 
         if ($search['name']!='') {
-            $customer = $customer->where('nama','like', '%' . $this->_search['name'] . '%');
+            $obat = $obat->where('nama','like', '%' . $this->_search['name'] . '%');
             $param   = [
                 'name'   => $this->_search['name'],
             ];
         }
 
-        if ($search['alamat']!='') {
-            $customer = $customer->where('alamat','like', '%' . $this->_search['alamat'] . '%');
+        if ($search['kategori']!='') {
+            $obat = $obat->where('kategori', (int)$this->_search['kategori']);
             $param   = [
-                'alamat'   => $this->_search['alamat'],
+                'kategori'   => $this->_search['kategori'],
             ];
         }
 
-        if ($search['telepon']!='') {
-            $customer = $customer->where('telepon','like', '%' . $this->_search['telepon'] . '%');
-            $param   = [
-                'telepon'   => $this->_search['telepon'],
-            ];
-        }
-
-        if ($search['jk']!='') {
-            $customer = $customer->where('jk',$this->_search['jk']);
-            $param   = [
-                'jk'   => $this->_search['jk'],
-            ];
-        }
-
-        if ($search['pekerjaan']!='') {
-            $customer = $customer->where('pekerjaan','like', '%' . $this->_search['pekerjaan'] . '%');
-            $param   = [
-                'pekerjaan'   => $this->_search['pekerjaan'],
-            ];
-        }
-
-        if ($search['email']!='') {
-            $customer = $customer->where('nama','like', '%' . $this->_search['email'] . '%');
-            $param   = [
-                'email'   => $this->_search['email'],
-            ];
-        }
-
-        $count = $customer->count();
+        $count = $obat->count();
 
         $this->_page = get('page', 1);
-       // var_dump($data);die();
+       
         $maxPage = ceil($count / $this->_limit);
             if ($maxPage < $this->_page)
                 $this->_page = $maxPage;
@@ -142,46 +128,54 @@ class CustomerController extends Controller
         if (get('export', false)) {
             if($this->_page == 1)
             {
-                $datas = $customer->orderBy('created_at', 'desc')->get();
+                $datas = $obat->orderBy('created_at', 'desc')->get();
             }
             else
             {
-                $datas = $customer->skip($offset)->take($this->_limit)->orderBy('created_at', 'desc')->get();
+                $datas = $obat->skip($offset)->take($this->_limit)->orderBy('created_at', 'desc')->get();
             }
             $datas = $datas->toArray();
             $this->export_content($datas,get());
             return;
         }
 
-        $customer = $customer->skip($offset)->take($this->_limit)->orderBy('created_at', 'desc')->get();
+        $obat = $obat->skip($offset)->take($this->_limit)->orderBy('created_at', 'desc')->get();
         
-        $customer = $customer->toArray();
+        $obat = $obat->toArray();
 
         $data = [];
         $i    = $offset;
-        foreach ($customer as $key => $value) {
+        foreach ($obat as $key => $value) {
+
+            $kategori = Kategori::where('id',$value['kategori'])->first();
             $data[] = [
                 'number'             => ++$i,
+                'kode'               => $value['kode'],
                 'nama'               => $value['nama'],
-                'alamat'             => $value['alamat'],
-                'telepon'            => $value['telepon'],
-                'jk'                 => $value['jk'],
-                'tgl_lahir'          => $value['tgl_lahir'],
-                'pekerjaan'          => $value['pekerjaan'],
-                'email'              => $value['email'],
-                'action'             => view('master/customer/_action', ['param' => $param, 'customer' => $value, 'route' => $this->_route, 'column' => 'action'])
+                'kategori'           => isset($kategori->nama) ? $kategori->nama : '-',
+                'tgl_kadaluarsa'     => date('d-m-Y', strtotime($value['tgl_kadaluarsa'])),
+                'harga_jual_satuan'  => 'Rp.'. number_format($value['harga_jual_satuan'],0,'.','.'),
+                'harga_jual_resep'   => 'Rp.'. number_format($value['harga_jual_resep'],0,'.','.'),
+                'harga_jual_pack'   => 'Rp.'. number_format($value['harga_jual_pack'],0,'.','.'),
+                'type'             => $value['type'] == 1 ? 'Sendiri' : 'Konsinyasi',
+                'satuan'             => $value['satuan'],
+                'stok'               => $value['stok'],
+                'action'             => '<a target="_blank" title="PO" href="'.route('pembelian-po','po').'?kode='.$value['kode'].'" class="btn btn-sm btn-default"><i class="fa fa-paper-plane"> Requset PO</i></a>'
             ];
         }
 
         $column = array(
             array('header' => 'No', 'data' => 'number', 'width' => '30px', 'class' => 'text-center'),
-            array('header' => 'Nama', 'data' => 'nama', 'width' => '250px'),
-            array('header' => 'Alamat', 'data' => 'alamat', 'width' => '250px'),
-            array('header' => 'Telepon', 'data' => 'telepon', 'width' => '250px'),
-            array('header' => 'Jenis Kelamin', 'data' => 'jk', 'width' => '250px'),
-            array('header' => 'Tanggal Lahir', 'data' => 'tgl_lahir', 'width' => '250px'),
-            array('header' => 'Pekerjaan', 'data' => 'pekerjaan', 'width' => '250px'),
-            array('header' => 'Email', 'data' => 'email', 'width' => '250px'),
+            array('header' => 'Kode Obat', 'data' => 'kode', 'width' => '250px'),
+            array('header' => 'Nama Obat', 'data' => 'nama', 'width' => '250px'),
+            array('header' => 'Kategori', 'data' => 'kategori', 'width' => '250px'),
+            array('header' => 'Tanggal Kadaluarsa', 'data' => 'tgl_kadaluarsa', 'width' => '250px'),
+            array('header' => 'Harga Jual Satuan', 'data' => 'harga_jual_satuan', 'width' => '250px'),
+            array('header' => 'Harga Jual Resep', 'data' => 'harga_jual_resep', 'width' => '250px'),
+            array('header' => 'Harga Jual Pack', 'data' => 'harga_jual_pack', 'width' => '250px'),
+            array('header' => 'Status', 'data' => 'type', 'width' => '250px'),
+            array('header' => 'Satuan', 'data' => 'satuan', 'width' => '250px'),
+            array('header' => 'Stok', 'data' => 'stok', 'width' => '250px'),
             
             array('header' => 'Action', 'data' => 'action', 'width' => '120px')
         );
@@ -201,26 +195,27 @@ class CustomerController extends Controller
 
         $param['page'] = $this->_page;
         $data          = [
-            'title'              => 'Customer',
+            'title'              => 'Obat',
             'breadcrumb'         => [
                 ['url' => url('/'), 'text' => '<i class="fa fa-dashboard"></i> Dashboard'],
-                ['url' => '#', 'text' => '<i class="fa fa-tag"></i> Customer'],
+                ['url' => '#', 'text' => '<i class="fa fa-tag"></i> Obat'],
             ],
             'header_title'       => 'Master',
-            'header_description' => 'Customer',
+            'header_description' => 'Obat',
             'table'              => $table,
             'route'              => $this->_route,
             'total'              => $count,
             'offset'             => $count == 0 ? -1 : $offset,
             'search'             => $this->_search,
+            'kategori'           => Kategori::where('status','!=',9)->get()->toArray(),
             'limit'              => $this->_limit,
             'pagination'         => $pagination,
             'flash_message'      => view('_flash_message', []),
             'param'              => $param,
-            'form'               => $this->_form($customer, $param),
+            'form'               => '',
         ];
         
-        return view("master/customer/index", $data);
+        return view("master/obat/index", $data);
 
     }
 
@@ -231,7 +226,7 @@ class CustomerController extends Controller
         if (isPost()) {
             // start validation
             $v = $this->validator(post());
-            $v->rule('required', ['nama']);
+            $v->rule('required', ['nama','kode','kategori','harga_satuan']);
 
             // end validation
             if ($v->validate()) {
@@ -240,10 +235,10 @@ class CustomerController extends Controller
 
                 if (isset($data['id'])) {
 
-                    return redirect($this->_route)->with('success','Success <strong>' . (post('id') ? 'UPDATE' : 'ADD NEW') . '</strong> customer.');
+                    return redirect($this->_route)->with('success','Success <strong>' . (post('id') ? 'UPDATE' : 'ADD NEW') . '</strong> obat.');
 
                 } else {
-                    return redirect($this->_route)->with('error','Failed to save customer.');
+                    return redirect($this->_route)->with('error','Failed to save obat.');
                 }
             }
             $row = post();
@@ -254,13 +249,14 @@ class CustomerController extends Controller
 
         // prepare form data
         $data = [
-            'customer'      => $row,
+            'obat'      => $row,
             'errors'        => $errors,
             'route'         => $this->_route,
             'param'         => $param,
+            'kategori'      => Kategori::where('status','!=',9)->get()->toArray()
         ];
 
-        return view('master/customer/_form', $data);
+        return view('master/obat/_form', $data);
     }
 
     /**
@@ -271,7 +267,7 @@ class CustomerController extends Controller
     {
         if (isPost()) {
             $param     = [];
-            $paramable = ['nama','alamat', 'telepon', 'jk','pekerjaan','email'];
+            $paramable = ['name','kode','kategori','satuan'];
             foreach ($paramable as $key => $value) {
                 $post = post($value);
                 if ($post!='')
@@ -282,23 +278,23 @@ class CustomerController extends Controller
     }
 
     /**
-     * delete customer
+     * delete obat
      * @return redirect to referer page
      */
     function delete()
     {
         $id = get('id');
         if ($id) {
-            $customer = Customer::where('id',(int)$id)->first();
-            $customer->status = 9;
-            $customer->save();
+            $obat = Obat::where('id',(int)$id)->first();
+            $obat->status = 9;
+            $obat->save();
 
-            if ($customer) {
-                 return redirect($this->_route)->with('success','Success <strong>DELETE</strong> customer.');
+            if ($obat) {
+                 return redirect($this->_route)->with('success','Success <strong>DELETE</strong> obat.');
             }
         } else
         {
-            return redirect($this->_route)->with('error','Failes <strong>DELETE</strong> customer.');
+            return redirect($this->_route)->with('error','Failes <strong>DELETE</strong> obat.');
         }
         
     }
@@ -311,6 +307,12 @@ class CustomerController extends Controller
     {
         if (isPost() && isAjax()) {
             switch (post('action')) {
+                case 'getObatByKode':
+                    $kode = (int)post('kode');
+                    $result = Obat::where('kode', $kode)->first();
+                    return json_encode($result);
+                    break;
+
                 default:
                     break;
             }
@@ -322,22 +324,40 @@ class CustomerController extends Controller
         if(empty($post))
             return;
 
-        $customer = Customer::where('id',(int)@$post['id'])->first();
+        $obat = Obat::where('id',(int)@$post['id'])->first();
+        $obat2 = Obat::where('kode',$post['kode'])->first();
 
-        if(!$customer)
-            $customer = new Customer();
-
-        $customer->nama = $post['nama'];
-        $customer->alamat = $post['alamat'];
-        $customer->telepon = $post['telepon'];
-        $customer->jk = $post['jk'];
-        $customer->tgl_lahir = $post['tgl_lahir'];
-        $customer->pekerjaan = $post['pekerjaan'];
-        $customer->email = $post['email'];
-        
-        $customer->save();
-
-        return $customer->toArray();
+        if($obat2)
+        {
+            $obat->nama = $post['nama'];
+            $obat->kode = $post['kode'];
+            $obat->kategori = $post['kategori'] == '' ? 0 : (int)$post['kategori'];
+            $obat->tgl_kadaluarsa = $post['tgl_kadaluarsa'];
+            $obat->harga_jual_satuan = $post['harga_satuan'] == '' ? 0 : (int)$post['harga_satuan'];
+            $obat->harga_jual_resep = $post['harga_resep'] == '' ? 0 : (int)$post['harga_resep'];
+            $obat->harga_jual_pack = $post['harga_pack'] == '' ? 0 : (int)$post['harga_pack'];
+            $obat->satuan = $post['satuan'];
+            $obat->type = $post['type'];
+            $obat2->stok = $obat2->stok + ($post['stok'] == '' ? 0 : (int)$post['stok']);
+            $obat2->update();
+        } else 
+        {
+            if(!$obat)
+                $obat = new Obat();
+            $obat->nama = $post['nama'];
+            $obat->kode = $post['kode'];
+            $obat->kategori = $post['kategori'] == '' ? 0 : (int)$post['kategori'];
+            $obat->tgl_kadaluarsa = $post['tgl_kadaluarsa'];
+            $obat->harga_jual_satuan = $post['harga_satuan'] == '' ? 0 : (int)$post['harga_satuan'];
+            $obat->harga_jual_resep = $post['harga_resep'] == '' ? 0 : (int)$post['harga_resep'];
+            $obat->harga_jual_pack = $post['harga_pack'] == '' ? 0 : (int)$post['harga_pack'];
+            $obat->satuan = $post['satuan'];
+            $obat->type = $post['type'];
+            $obat->stok = $post['stok'] == '' ? 0 : (int)$post['stok'];
+            
+            $obat->save();
+        }
+        return $obat->toArray();
     }
 
     function export_content($data,$get)
@@ -351,7 +371,7 @@ class CustomerController extends Controller
         else
             $_title = '';
 
-        $report_title = 'Report Data Customer '. $_title;
+        $report_title = 'Report Data Obat '. $_title;
         // Create new PHPExcel object
         $objPHPExcel = new PHPExcelces();
         // Set properties
@@ -417,30 +437,36 @@ class CustomerController extends Controller
 
         $abj = 'A';
         
-        $objPHPExcel->getActiveSheet()->setTitle('Report Content customer');
+        $objPHPExcel->getActiveSheet()->setTitle('Report Data Obat');
 
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'No.');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
-        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Nama Customer');
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Kode Obat');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
-        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Alamat');
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Nama Obat');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
-        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Telepon');
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Kategori Obat');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
-        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Jenis Kelamin');
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Tanggal Kadaluarsa');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
-        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Tanngal Lahir');
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Harga Jual Satuan');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
-        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Pekerjaan');
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Harga Jual Resep');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
-        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Email');
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Harga Jual Pack');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Satuan');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Stok');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
         // Rename sheet
@@ -452,25 +478,33 @@ class CustomerController extends Controller
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
 
+            $kategori = Kategori::where('id',$value['kategori'])->first();
+
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['kode']);
+            $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+            $abj++;
             $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['nama']);
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
-            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['alamat']);
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, isset($kategori->nama) ? $kategori->nama : '-');
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
-            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['telepon']);
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, date('d-m-Y', strtotime($value['tgl_kadaluarsa'])));
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
-            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['jk']);
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Rp.'. number_format($value['harga_jual_satuan'],0,'.','.'));
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
-            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['tgl_lahir']);
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Rp.'. number_format($value['harga_jual_resep'],0,'.','.'));
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
-            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['pekerjaan']);
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Rp.'. number_format($value['harga_jual_pack'],0,'.','.'));
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
-            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['email']);
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['satuan']);
+            $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+            $abj++;
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['stok']);
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
             
@@ -511,6 +545,21 @@ class CustomerController extends Controller
         $objWriter->save('php://output');
         $this->end();
         
+    }
+
+    public function import(Request $request)
+    {
+        $uploadedFile = $request->file('file');
+        $filename = time() . '-' . $uploadedFile->getClientOriginalName();
+        $path = Storage::disk('local')->putFileAs(
+            'files/Obat',
+            $uploadedFile,
+            $filename
+          );
+        $filepath = storage_path('app') . '/' . $path;
+        Excel::import(new ObatImport, $filepath);
+        
+        return redirect('/obat')->with('success', 'Data berhasil diimport!');
     }
 
 }

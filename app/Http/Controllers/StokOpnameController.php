@@ -139,8 +139,9 @@ class StokOpnameController extends Controller
                 'kategori'           => isset($kategori->nama) ? $kategori->nama : '-',
                 'satuan'             => $value['satuan'],
                 'stok'               => '<span id="stok-software-'.$value['id'].'">'.$value['stok'].'</span>',
-                'stok_nyata'         => '<input data-id="'.$value['id'].'" type="number" id="stok-nyata-'.$value['id'].'" class="stok-nyata input-sm form-control"/> 
-                <small id="stok-nyata-note-'.$value['id'].'" class="text-muted" style="display:none;">Tekan ENTER agar stok berubah.</small>'
+                'stok_nyata'         => '<input data-id="'.$value['id'].'" type="number" id="stok-nyata-'.$value['id'].'" class="stok-nyata input-sm form-control"/>',
+                'keterangan'         => '<input data-id="'.$value['id'].'" type="text" id="keterangan-'.$value['id'].'" class="keterangan input-sm form-control"/> 
+                <small id="keterangan-note-'.$value['id'].'" class="text-muted" style="display:none;">Tekan ENTER agar Stok & keterangan berubah.</small>'
             ];
         }
 
@@ -152,6 +153,7 @@ class StokOpnameController extends Controller
             array('header' => 'Satuan', 'data' => 'satuan', 'width' => '200px'),
             array('header' => 'Stok Software', 'data' => 'stok', 'width' => '200px'),
             array('header' => 'Stok Nyata', 'data' => 'stok_nyata', 'width' => '250px'),
+            array('header' => 'Keterangan', 'data' => 'keterangan', 'width' => '250px'),
         );
 
         $table = $this->table->create_list(['class' => 'table'], $data, $column);
@@ -258,8 +260,10 @@ class StokOpnameController extends Controller
         if (isPost() && isAjax()) {
             switch (post('action')) {
                 case 'updateStok':
-                $post = array('id_obat' => post('id_obat'), 'stok_nyata' => post('stok_nyata'));
-                $this->_save($post);
+                
+                    $post = array('id_obat' => post('id_obat'), 'stok_nyata' => post('stok_nyata'),'keterangan' => post('keterangan'));
+
+                    $this->_save($post);
                 break;
 
                 default:
@@ -279,6 +283,8 @@ class StokOpnameController extends Controller
         $stok->id_obat = (int) $post['id_obat'];
         $stok->stok_software = (int) $obat->stok;
         $stok->stok_nyata = (int) $post['stok_nyata'];
+        $stok->keterangan = $post['keterangan'];
+        $stok->operator = Auth::user()->name;
         $stok->save();
 
         $obat->stok = (int) $post['stok_nyata'];

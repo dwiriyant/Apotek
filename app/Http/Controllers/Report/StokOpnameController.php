@@ -1,32 +1,26 @@
 <?php
 
-namespace App\Http\Controllers\Retur;
+namespace App\Http\Controllers\Report;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
 use App\Libraries\Table;
+use App\StokOpname;
+use App\Kategori;
+use Auth;
 use PHPExcel as PHPExcelces; 
 use PHPExcel_IOFactory;
 use PHPExcel_Style_Alignment;
 use PHPExcel_Style_Border;
 use PHPExcel_Style_Fill;
-use App\Pembelian;
-use App\Kategori;
-use App\ReturPembelian;
-use App\Obat;
-use App\Supplier;
-use App\TransaksiPembelian;
-use Auth;
-use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Storage;
 
-class PembelianController extends Controller
+class StokOpnameController extends Controller
 {
     private $_page   = 1;
     private $_limit  = 25;
     private $_search = [];
-    private $_route  = 'retur-pembelian';
+    private $_route  = 'report-stok-opname';
     
     /**
      * Create a new controller instance.
@@ -38,11 +32,10 @@ class PembelianController extends Controller
         $this->middleware('auth');
         $this->table = $table;
         $this->_search = [
-            'supplier'   => trim(get('supplier')),
-            'jenis'   => trim(get('jenis')),
-            'start'   => trim(get('start')),
-            'end'   => trim(get('end')),
-            'no_transaksi'   => trim(get('no_transaksi')),
+            'name'     => trim(get('name')),
+            'kode'   => trim(get('kode')),
+            'satuan'   => trim(get('satuan')),
+            'kategori'   => trim(get('kategori')),
         ];
     }
 
@@ -53,44 +46,38 @@ class PembelianController extends Controller
      */
     public function index()
     {
-        $pembelian      = false;
+        $stokOpname      = false;
         $this->_page = request()->page;
-
-        if (request('id')) {
-            $pembelian = Pembelian::where('id',(int)request('id'))->first();
-        }
-        $search = $this->_search;
 
         $param   = [];
 
-        $pembelian = Pembelian::where('status',1);
+        $stokOpname = new StokOpname;
 
-        if ($search['start']!='' && $search['end']!='') {
-            $pembelian = $pembelian->whereBetween('tanggal', [$search['start'], date('Y-m-d', strtotime($search['end'] . '+1day'))]);
+        if ($this->_search['kode']!='') {
+            // $stokOpname = $stokOpname->where('kode','like', '%' . $this->_search['kode'] . '%');
+
+            $stokOpname = $stokOpname->whereHas('obat', function ($query) {
+                $query->where('kode', 'like', '%' . $this->_search['kode'] . '%');
+            });
+
             $param   = [
-                'start'   => $this->_search['start'],
-                'end'   => $this->_search['end'],
+                'kode'   => $this->_search['kode'],
             ];
         }
 
-        if ($search['no_transaksi']!='') {
-            $pembelian = $pembelian->where('no_transaksi',$search['no_transaksi']);
+        if ($this->_search['name']!='') {
+            $stokOpname = $stokOpname->whereHas('obat', function ($query) {
+                $query->where('nama', 'like', '%' . $this->_search['name'] . '%');
+            });
             $param   = [
-                'no_transaksi'   => $this->_search['no_transaksi']
+                'name'   => $this->_search['name'],
             ];
         }
 
-        if ($search['supplier']!='') {
-            $pembelian = $pembelian->where('id_supplier',$search['supplier']);
-            $param   = [
-                'supplier'   => $this->_search['supplier']
-            ];
-        }
-
-        $count = $pembelian->count();
+        $count = $stokOpname->count();
 
         $this->_page = get('page', 1);
-       
+
         $maxPage = ceil($count / $this->_limit);
             if ($maxPage < $this->_page)
                 $this->_page = $maxPage;
@@ -100,48 +87,51 @@ class PembelianController extends Controller
 
         $offset = offset((int)$this->_page, $this->_limit); 
 
+        $stokOpname = $stokOpname->with('obat');
+
         if (get('export', false)) {
             if($this->_page == 1)
             {
-                $datas = $pembelian->orderBy('created_at', 'desc')->get();
+                $datas = $stokOpname->orderBy('created_at', 'desc')->get();
             }
             else
             {
-                $datas = $pembelian->skip($offset)->take($this->_limit)->orderBy('created_at', 'desc')->get();
+                $datas = $stokOpname->skip($offset)->take($this->_limit)->orderBy('created_at', 'desc')->get();
             }
             $datas = $datas->toArray();
             $this->export_content($datas,get());
             return;
         }
-        $pembelian = $pembelian->with('supplier');
-        $pembelian = $pembelian->skip($offset)->take($this->_limit)->orderBy('created_at', 'desc')->get();
+
+        $stokOpname = $stokOpname->skip($offset)->take($this->_limit)->orderBy('created_at', 'desc')->get();
         
-        $pembelian = $pembelian->toArray();
+        $stokOpname = $stokOpname->toArray();
 
         $data = [];
         $i    = $offset;
-        foreach ($pembelian as $key => $value) {
+        foreach ($stokOpname as $key => $value) {
+            $kategori = Kategori::where('id',$value['obat']['kategori'])->first();
             $data[] = [
                 'number'             => ++$i,
-                'no'            => $value['no_transaksi'],
-                'supplier'           => isset($value['supplier']['nama']) ? $value['supplier']['nama'] : '-',
-                'jumlah'            => $value['jumlah'],
-                'jenis'         => $value['jenis'],
-                'tanggal'     => date('d M Y H:i',strtotime($value['tanggal'])),
-                'harga'         => 'Rp.'. number_format($value['total_harga'],0,'.','.'),
-                'action'    => '<button data-id="'.$value['id'].'" type="button" class="btn btn-sm btn-info get-detail"><i class="fa fa-eye">Detail</i></button>'
+                'kode'               => $value['obat']['kode'],
+                'nama'               => $value['obat']['nama'],
+                'kategori'           => isset($kategori->nama) ? $kategori->nama : '-',
+                'satuan'             => $value['obat']['satuan'],
+                'stok'               => $value['stok_software'],
+                'stok_nyata'         => $value['stok_nyata'],
+                'keterangan'         => $value['keterangan'],
             ];
         }
 
         $column = array(
             array('header' => 'No', 'data' => 'number', 'width' => '30px', 'class' => 'text-center'),
-            array('header' => 'No Transaksi', 'data' => 'no', 'width' => '250px'),
-            array('header' => 'Tanggal Pembelian', 'data' => 'tanggal', 'width' => '250px'),
-            array('header' => 'Jumlah', 'data' => 'jumlah', 'width' => '250px'),
-            array('header' => 'Total Harga', 'data' => 'harga', 'width' => '250px'),
-            array('header' => 'Supplier', 'data' => 'supplier', 'width' => '250px'),
-            array('header' => 'Jenis Transaksi', 'data' => 'jenis', 'width' => '250px'),
-            array('header' => 'Detail', 'data' => 'action', 'width' => '100px'),
+            array('header' => 'Kode Obat', 'data' => 'kode', 'width' => '200px'),
+            array('header' => 'Nama Obat', 'data' => 'nama', 'width' => '200px'),
+            array('header' => 'Kategori', 'data' => 'kategori', 'width' => '200px'),
+            array('header' => 'Satuan', 'data' => 'satuan', 'width' => '200px'),
+            array('header' => 'Stok Software', 'data' => 'stok', 'width' => '200px'),
+            array('header' => 'Stok Nyata', 'data' => 'stok_nyata', 'width' => '250px'),
+            array('header' => 'Keterangan', 'data' => 'stok_nyata', 'width' => '250px'),
         );
 
         $table = $this->table->create_list(['class' => 'table'], $data, $column);
@@ -159,105 +149,27 @@ class PembelianController extends Controller
 
         $param['page'] = $this->_page;
         $data          = [
-            'title'              => 'Pembelian',
+            'title'              => 'Stok Opname',
             'breadcrumb'         => [
                 ['url' => url('/'), 'text' => '<i class="fa fa-dashboard"></i> Dashboard'],
-                ['url' => '#', 'text' => '<i class="fa fa-tag"></i> Report Pembelian'],
+                ['url' => '#', 'text' => '<i class="fa fa-tag"></i> Stok Opname'],
             ],
-            'header_title'       => 'Report',
-            'header_description' => 'Pembelian',
+            'header_title'       => 'Stok',
+            'header_description' => 'Stok Opname',
             'table'              => $table,
             'route'              => $this->_route,
             'total'              => $count,
             'offset'             => $count == 0 ? -1 : $offset,
             'search'             => $this->_search,
-            'kategori'           => Kategori::where('status','!=',9)->get()->toArray(),
             'limit'              => $this->_limit,
             'pagination'         => $pagination,
-            'flash_message'      => view('_flash_message', []),
+            'kategori'           => Kategori::where('status','!=',9)->get()->toArray(),
+            'flash_message'      => '',
             'param'              => $param,
-            'supplier'           => Supplier::where('status','!=',9)->get()->toArray(),
         ];
         
-        return view("retur/pembelian", $data);
+        return view("report/stok_opname", $data);
 
-    }
-
-    function remote()
-    {
-        if (isPost() && isAjax()) {
-            switch (post('action')) {
-                case 'get-transaction':
-                    $transaksi = TransaksiPembelian::where('status','!=',9)->where('id_pembelian',post('id'));
-
-                    $transaksi = $transaksi->with('obat')->get()->toArray();
-                    
-                    $data = [];
-                    $i    = 0;
-                    foreach ($transaksi as $key => $value) {
-
-                        $kategori = Kategori::where('id',$value['obat']['kategori'])->first();
-                        $data[] = [
-                            'number'             => ++$i,
-                            'kode'               => $value['obat']['kode'],
-                            'nama'               => $value['obat']['nama'],
-                            'kategori'           => isset($kategori->nama) ? $kategori->nama : '-',
-                            'harga_satuan'  => 'Rp.'. number_format($value['total'],0,'.','.'),
-                            'satuan'  => $value['obat']['satuan'],
-                            'type'               => $value['obat']['type'] == 1 ? 'Sendiri' : 'Konsinyasi',
-                            'jumlah' => $value['jumlah'],
-                            'total' => 'Rp.'. number_format($value['total_harga'],0,'.','.'),
-                            'retur'         => '<input data-id="'.$value['id'].'" type="number" id="retur-'.$value['id'].'" class="retur input-sm form-control"/>',
-                            'keterangan'         => '<input data-id="'.$value['id'].'" data-kode="'.$value['obat']['kode'].'" type="text" id="keterangan-'.$value['id'].'" class="keterangan input-sm form-control"/> 
-                            <small id="keterangan-note-'.$value['id'].'" class="text-muted" style="display:none;">Tekan ENTER utk menyimpan.</small>'
-                        ];
-                    }
-
-                    $column = array(
-                        array('header' => 'No', 'data' => 'number', 'width' => '30px', 'class' => 'text-center'),
-                        array('header' => 'Kode Obat', 'data' => 'kode', 'width' => '250px'),
-                        array('header' => 'Nama Obat', 'data' => 'nama', 'width' => '250px'),
-                        array('header' => 'Kategori', 'data' => 'kategori', 'width' => '250px'),
-                        array('header' => 'Satuan', 'data' => 'satuan', 'width' => '250px'),
-                        array('header' => 'Status', 'data' => 'type', 'width' => '250px'),
-                        array('header' => 'Harga Beli', 'data' => 'harga_satuan', 'width' => '250px'),
-                        array('header' => 'Jumlah', 'data' => 'jumlah', 'width' => '250px'),
-                        array('header' => 'Total', 'data' => 'total', 'width' => '250px'),
-                        array('header' => 'Retur', 'data' => 'retur', 'width' => '250px'),
-                        array('header' => 'Keterangan', 'data' => 'keterangan', 'width' => '250px'),
-                    );
-
-                    $table = $this->table->create_list(['class' => 'table'], $data, $column);
-                    
-                    return $table;
-
-                    break;
-                case 'retur':
-                    $post = post();
-
-                    $obat = Obat::where('kode',(int)@$post['kode'])->first();
-
-                    $trans = TransaksiPembelian::where('id',$post['id'])->with('pembelian')->first();
-                    if($trans)
-                        $trans = $trans->toArray();
-                    $no_transaksi = (int)@$trans['pembelian']['no_transaksi'];
-
-                    $stok = new ReturPembelian();
-                    $stok->id_transaksi = (int) $post['id'];
-                    $stok->no_transaksi = $no_transaksi;
-                    $stok->jumlah = (int) $post['retur'];
-                    $stok->keterangan = $post['keterangan'];
-                    $stok->operator = Auth::user()->name;
-                    $stok->save();
-
-                    $obat->stok = $obat->stok - (int) $post['retur'];
-                    $obat->save();
-
-                break;
-                default:
-                    break;
-            }
-        }
     }
 
     /**
@@ -268,7 +180,7 @@ class PembelianController extends Controller
     {
         if (isPost()) {
             $param     = [];
-            $paramable = ['start','end','no_transaksi','supplier'];
+            $paramable = ['name','kode','kategori','satuan'];
             foreach ($paramable as $key => $value) {
                 $post = post($value);
                 if ($post!='')
@@ -289,12 +201,12 @@ class PembelianController extends Controller
         else
             $_title = '';
 
-        $report_title = 'Report Data Pembelian '. $_title;
+        $report_title = 'Report Stok Opname '. $_title;
         // Create new PHPExcel object
         $objPHPExcel = new PHPExcelces();
         // Set properties
-        $objPHPExcel->getProperties()->setCreator("Brilio.net");
-        $objPHPExcel->getProperties()->setLastModifiedBy("Brilio.net");
+        $objPHPExcel->getProperties()->setCreator("www.elysian.web.id");
+        $objPHPExcel->getProperties()->setLastModifiedBy("www.elysian.web.id");
         $objPHPExcel->getProperties()->setTitle("Office XLS");
         $objPHPExcel->getProperties()->setSubject("Office XLS");
         $objPHPExcel->getProperties()->setDescription($report_title.", generated using PHP classes.");
@@ -355,48 +267,63 @@ class PembelianController extends Controller
 
         $abj = 'A';
         
-        $objPHPExcel->getActiveSheet()->setTitle('Report Data Pembelian '. $_title);
+        $objPHPExcel->getActiveSheet()->setTitle('Report Data Penjualan '. $_title);
 
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'No.');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
-        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Tanggal pembelian');
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Kode Obat');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
-        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Jumlah');
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Nama Obat');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
-        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Jenis');
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Kategori Obat');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
-        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Pelanggan');
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Satuan');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
-        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Dokter');
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Stok Software');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Stok Nyata');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Keterangan');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
 
         $i++;
+        
         foreach ($data as $key => $value) 
         {     
+            $kategori = Kategori::where('id',$value['obat']['kategori'])->first();
+
             $abj = 'A';
             $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $key+1);
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
 
-            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, date('d M Y H:i',strtotime($value['tanggal'])));
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['obat']['kode']);
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
-            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['jumlah']);
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['obat']['nama']);
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
-            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['jenis']);
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, isset($kategori->nama) ? $kategori->nama : '-');
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
-            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, isset($value['customer']['nama']) ? $value['customer']['nama'] : '-');
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['obat']['satuan']);
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
-            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, isset($value['dokter']['nama']) ? $value['dokter']['nama'] : '-');
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['stok_software']);
+            $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+            $abj++;
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['stok_nyata']);
+            $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+            $abj++;
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['keterangan']);
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
             
@@ -415,6 +342,10 @@ class PembelianController extends Controller
         $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setAutoSize(true);
         $objPHPExcel->getActiveSheet()->getColumnDimension('L')->setAutoSize(true);
         $objPHPExcel->getActiveSheet()->getColumnDimension('M')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('N')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('O')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('P')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('Q')->setAutoSize(true);
 
 
         //End Sheet User Agent        
@@ -438,5 +369,5 @@ class PembelianController extends Controller
         $this->end();
         
     }
-
+    
 }

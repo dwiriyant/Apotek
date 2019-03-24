@@ -110,7 +110,7 @@
 					<small class="help-block" style="<?php echo (isset($errors['harga_resep'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['harga_resep'])) ? $errors['harga_resep'][0] : '' ;?></small>
 				</div>
 				<div class="form-group <?php echo isset($errors['harga_pack']) ? 'has-error' : '' ; ?>">
-					<label for="harga_pack" class="control-label">Harga Jual Resep</label>
+					<label for="harga_pack" class="control-label">Harga Jual Pack</label>
 					<div>
 					   <input type="text" data-currency="harga_pack" class="form-control currency" value="<?=isset($obat['harga_jual_pack']) ? $obat['harga_jual_pack']: ""?>" placeholder="Harga Jual Pack">
 					   <input id="harga_pack" type="hidden" class="form-control" name="harga_pack" value="<?=isset($obat['harga_jual_pack']) ? $obat['harga_jual_pack']: ""?>">

@@ -13,6 +13,7 @@ use PHPExcel_Style_Border;
 use PHPExcel_Style_Fill;
 use App\Penjualan;
 use App\Kategori;
+use App\TransaksiPenjualan;
 use Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
@@ -39,6 +40,7 @@ class PenjualanController extends Controller
             'jenis'   => trim(get('jenis')),
             'start'   => trim(get('start')),
             'end'   => trim(get('end')),
+            'no_transaksi'   => trim(get('no_transaksi')),
         ];
     }
 
@@ -53,19 +55,26 @@ class PenjualanController extends Controller
         $this->_page = request()->page;
 
         if (request('id')) {
-            $penjualan = penjualan::where('id',(int)request('id'))->first();
+            $penjualan = Penjualan::where('id',(int)request('id'))->first();
         }
         $search = $this->_search;
 
         $param   = [];
 
-        $penjualan = penjualan::where('status','!=',9);
+        $penjualan = Penjualan::where('status','!=',9);
 
         if ($search['start']!='' && $search['end']!='') {
             $penjualan = $penjualan->whereBetween('tanggal', [$search['start'], date('Y-m-d', strtotime($search['end'] . '+1day'))]);
             $param   = [
                 'start'   => $this->_search['start'],
                 'end'   => $this->_search['end'],
+            ];
+        }
+
+        if ($search['no_transaksi']!='') {
+            $penjualan = $penjualan->where('no_transaksi',$search['no_transaksi']);
+            $param   = [
+                'no_transaksi'   => $this->_search['no_transaksi']
             ];
         }
 
@@ -82,6 +91,8 @@ class PenjualanController extends Controller
 
         $offset = offset((int)$this->_page, $this->_limit); 
 
+        $penjualan = $penjualan->with('customer')->with('dokter')->with('transaksi');
+
         if (get('export', false)) {
             if($this->_page == 1)
             {
@@ -95,7 +106,7 @@ class PenjualanController extends Controller
             $this->export_content($datas,get());
             return;
         }
-        $penjualan = $penjualan->with('customer')->with('dokter');
+        
         $penjualan = $penjualan->skip($offset)->take($this->_limit)->orderBy('created_at', 'desc')->get();
         
         $penjualan = $penjualan->toArray();
@@ -108,10 +119,13 @@ class PenjualanController extends Controller
                 'no'            => $value['no_transaksi'],
                 'customer'           => isset($value['customer']['nama']) ? $value['customer']['nama'] : '-',
                 'dokter'           => isset($value['dokter']['nama']) ? $value['dokter']['nama'] : '-',
-                'jumlah'            => $value['jumlah'],
+                'jumlah'            => count($value['transaksi']),
                 'jenis'         => $value['jenis'],
                 'tanggal'     => date('d M Y H:i',strtotime($value['tanggal'])),
+                'total'         => 'Rp.'. number_format($value['total'],0,'.','.'),
+                'diskon'         => $value['diskon'].'%',
                 'harga'         => 'Rp.'. number_format($value['total_harga'],0,'.','.'),
+                'action'    => '<button data-id="'.$value['id'].'" type="button" class="btn btn-sm btn-info get-detail"><i class="fa fa-eye">Detail</i></button>'
             ];
         }
 
@@ -119,11 +133,14 @@ class PenjualanController extends Controller
             array('header' => 'No', 'data' => 'number', 'width' => '30px', 'class' => 'text-center'),
             array('header' => 'No Transaksi', 'data' => 'no', 'width' => '250px'),
             array('header' => 'Tanggal Penjualan', 'data' => 'tanggal', 'width' => '250px'),
-            array('header' => 'Jumlah', 'data' => 'jumlah', 'width' => '250px'),
+            array('header' => 'Jumlah Transaksi', 'data' => 'jumlah', 'width' => '250px'),
+            array('header' => 'Total', 'data' => 'total', 'width' => '250px'),
+            array('header' => 'Diskon', 'data' => 'diskon', 'width' => '250px'),
             array('header' => 'Total Harga', 'data' => 'harga', 'width' => '250px'),
             array('header' => 'Pelanggan', 'data' => 'customer', 'width' => '250px'),
             array('header' => 'Dokter', 'data' => 'dokter', 'width' => '250px'),
             array('header' => 'Jenis Transaksi', 'data' => 'jenis', 'width' => '250px'),
+            array('header' => 'Detail', 'data' => 'action', 'width' => '100px'),
         );
 
         $table = $this->table->create_list(['class' => 'table'], $data, $column);
@@ -164,6 +181,58 @@ class PenjualanController extends Controller
 
     }
 
+    function remote()
+    {
+        if (isPost() && isAjax()) {
+            switch (post('action')) {
+                case 'get-transaction':
+                    $transaksi = TransaksiPenjualan::where('status','!=',9)->where('id_penjualan',post('id'));
+
+                    $transaksi = $transaksi->with('obat')->get()->toArray();
+                    
+                    $data = [];
+                    $i    = 0;
+                    foreach ($transaksi as $key => $value) {
+
+                        $kategori = Kategori::where('id',$value['obat']['kategori'])->first();
+                        $data[] = [
+                            'number'             => ++$i,
+                            'kode'               => $value['obat']['kode'],
+                            'nama'               => $value['obat']['nama'],
+                            'kategori'           => isset($kategori->nama) ? $kategori->nama : '-',
+                            'harga_satuan'  => 'Rp.'. number_format($value['total'],0,'.','.'),
+                            'satuan'  => $value['obat']['satuan'],
+                            'type'               => $value['obat']['type'] == 1 ? 'Sendiri' : 'Konsinyasi',
+                            'jumlah' => $value['jumlah'],
+                            'total' => 'Rp.'. number_format($value['total_harga'],0,'.','.'),
+                            'jual_pack'             => $value['jual_pack'] ? 'Ya' : 'Tidak'
+                        ];
+                    }
+
+                    $column = array(
+                        array('header' => 'No', 'data' => 'number', 'width' => '30px', 'class' => 'text-center'),
+                        array('header' => 'Kode Obat', 'data' => 'kode', 'width' => '250px'),
+                        array('header' => 'Nama Obat', 'data' => 'nama', 'width' => '250px'),
+                        array('header' => 'Kategori', 'data' => 'kategori', 'width' => '250px'),
+                        array('header' => 'Satuan', 'data' => 'satuan', 'width' => '250px'),
+                        array('header' => 'Status', 'data' => 'type', 'width' => '250px'),
+                        array('header' => 'Harga Satuan', 'data' => 'harga_satuan', 'width' => '250px'),
+                        array('header' => 'Jumlah', 'data' => 'jumlah', 'width' => '250px'),
+                        array('header' => 'Total', 'data' => 'total', 'width' => '250px'),
+                        array('header' => 'Jual Pack', 'data' => 'jual_pack', 'width' => '250px'),
+                    );
+
+                    $table = $this->table->create_list(['class' => 'table'], $data, $column);
+                    
+                    return $table;
+
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
     /**
      * build search url then redirect
      * @return redirect
@@ -172,7 +241,7 @@ class PenjualanController extends Controller
     {
         if (isPost()) {
             $param     = [];
-            $paramable = ['start','end'];
+            $paramable = ['start','end','no_transaksi'];
             foreach ($paramable as $key => $value) {
                 $post = post($value);
                 if ($post!='')
@@ -197,8 +266,8 @@ class PenjualanController extends Controller
         // Create new PHPExcel object
         $objPHPExcel = new PHPExcelces();
         // Set properties
-        $objPHPExcel->getProperties()->setCreator("Brilio.net");
-        $objPHPExcel->getProperties()->setLastModifiedBy("Brilio.net");
+        $objPHPExcel->getProperties()->setCreator("www.elysian.web.id");
+        $objPHPExcel->getProperties()->setLastModifiedBy("www.elysian.web.id");
         $objPHPExcel->getProperties()->setTitle("Office XLS");
         $objPHPExcel->getProperties()->setSubject("Office XLS");
         $objPHPExcel->getProperties()->setDescription($report_title.", generated using PHP classes.");
@@ -264,10 +333,22 @@ class PenjualanController extends Controller
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'No.');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'No Transaksi');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Tanggal penjualan');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
-        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Jumlah');
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Jumlah Transaksi');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Total');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Diskon');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Total Harga');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Jenis');
@@ -280,7 +361,40 @@ class PenjualanController extends Controller
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
 
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'DETAIL => ');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Kode Obat');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Nama Obat');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Kategori');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Satuan');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Status');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Harga Satuan');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Jumlah');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Total');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Jual Pack');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
+
         $i++;
+        
         foreach ($data as $key => $value) 
         {     
             $abj = 'A';
@@ -288,10 +402,22 @@ class PenjualanController extends Controller
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
 
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['no_transaksi']);
+            $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+            $abj++;
             $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, date('d M Y H:i',strtotime($value['tanggal'])));
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
-            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['jumlah']);
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, count($value['transaksi']));
+            $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+            $abj++;
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Rp.'. number_format($value['total'],0,'.','.'));
+            $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+            $abj++;
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['diskon']);
+            $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+            $abj++;
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Rp.'. number_format($value['total_harga'],0,'.','.'));
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
             $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['jenis']);
@@ -303,7 +429,42 @@ class PenjualanController extends Controller
             $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, isset($value['dokter']['nama']) ? $value['dokter']['nama'] : '-');
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
-            
+            $abj++;
+            foreach ($value['transaksi'] as $k => $v) 
+            {   
+                $abj = 'L';
+                $kategori = Kategori::where('id',$v['obat']['kategori'])->first();
+                $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $v['obat']['kode']);
+                $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+                $abj++;
+                $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $v['obat']['nama']);
+                $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+                $abj++;
+                $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, isset($kategori->nama) ? $kategori->nama : '-');
+                $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+                $abj++;
+                $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $v['obat']['satuan']);
+                $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+                $abj++;
+                $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $v['obat']['type'] == 1 ? 'Sendiri' : 'Konsinyasi');
+                $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+                $abj++;
+                $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Rp.'. number_format($v['total'],0,'.','.'));
+                $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+                $abj++;
+                $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $v['jumlah']);
+                $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+                $abj++;
+                
+                $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Rp.'. number_format($v['total_harga'],0,'.','.'));
+                $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+                $abj++;
+                $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $v['jual_pack'] ? 'Ya' : 'Tidak');
+                $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+                $abj++;
+
+                $i++;
+            }
             $i++;
         }
         $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(5);
@@ -319,6 +480,10 @@ class PenjualanController extends Controller
         $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setAutoSize(true);
         $objPHPExcel->getActiveSheet()->getColumnDimension('L')->setAutoSize(true);
         $objPHPExcel->getActiveSheet()->getColumnDimension('M')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('N')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('O')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('P')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('Q')->setAutoSize(true);
 
 
         //End Sheet User Agent        

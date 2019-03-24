@@ -31,7 +31,7 @@ $(".get-detail").click(function () {
 function getDetail(id) {
 
     $.ajax({
-        url: base_url + 'report-pembelian/remote',
+        url: base_url + 'retur-pembelian/remote',
         method: 'post',
         data: { action: 'get-transaction', id: id },
         headers: {
@@ -44,6 +44,48 @@ function getDetail(id) {
         endLoader();
     }).done(function (html) {
         $('#table-detail').html(html);
+
+        $('.keterangan').on('keypress', function (e) {
+            var id = $(this).data('id');
+            var kode = $(this).data('kode');
+            var keterangan = $('#keterangan-' + id).val();
+            var retur = $('#retur-' + id).val();
+            $("#keterangan-note-" + id).show();
+            if (e.which == 13 && retur != '') {
+                updateRetur(id, kode, retur, keterangan);
+            }
+        });
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        if (jqXHR.status == 444)
+            sessionExpireHandler();
+        else
+            callNoty('warning');
+    });
+}
+
+
+function updateRetur(id, kode, retur, keterangan) {
+    $.ajax({
+        url: base_url + 'retur-pembelian/remote',
+        method: 'post',
+        data: {
+            action: 'retur',
+            id: id,
+            kode: kode,
+            retur: retur,
+            keterangan: keterangan,
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        beforeSend: function () {
+            callLoader();
+        }
+    }).always(function () {
+        endLoader();
+    }).done(function (data) {
+        $("#keterangan-note-" + id).hide();
+        callNoty('success', 'Berhasil update data retur');
     }).fail(function (jqXHR, textStatus, errorThrown) {
         if (jqXHR.status == 444)
             sessionExpireHandler();

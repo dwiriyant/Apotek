@@ -22,6 +22,17 @@
                     <div class="col-lg-4 col-md-6 col-sm-12">
 
                         <div class="form-group">
+                            <label for="no_transaksi" class="col-sm-3 control-label">NoTransaksi</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="no_transaksi" id="no_transaksi" class="form-control input-sm" value="{{ $search['no_transaksi'] }}" placeholder="No Transaksi">
+                            </div>
+                        </div> 
+
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        
+                        <div class="form-group">
                             <label for="datetimepicker1" class="control-label col-sm-3">Tanggal</label>
                             <div class="col-sm-9">
                                 <div class="input-daterange" id="datepicker">
@@ -40,22 +51,22 @@
 
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         
-                        {{-- <div class="form-group">
-                            <label for="name" class="col-sm-3 control-label">Konsumen</label>
+                        <div class="form-group">
+                            <label for="supplier" class="col-sm-3 control-label">Supplier</label>
                             <div class="col-sm-9">
-                                <input type="text" name="konsumen" id="konsumen" class="form-control input-sm" value="{{ $search['konsumen'] }}" placeholder="Nama Obat">
+                                <select class="form-control" name="supplier">
+                                    <option value="">All</option>
+                                    @foreach($supplier as $supp)
+                                    <option value="<?= $supp['id'] ?>" <?=@$supp['id']==$search['supplier'] ? 'selected' : ''?> ><?= $supp['nama']?></option>
+                                    @endforeach
+                                </select>
                             </div>
-                        </div> --}}
-
-                    </div>
-
-                    <div class="col-lg-4 col-md-6 col-sm-12">
-                        
+                        </div>
 
                         <div class="pull-right text-center">
                             <button type="submit" class="btn btn-sm btn-primary btn-flat" id="button-search"><i class="fa fa-search"></i> Search</button>
                             <a href="<?=url($route)?>" class="btn btn-default btn-sm"><i class="fa fa-list-alt"></i> Show All</a>
-                            <a href="<?=route('obat',$param)?>&export=true" class="btn btn-success btn-sm" target="_blank"><i class="fa fa-save"></i> Export</a>
+                            <a href="<?=route('report-pembelian',$param)?>&export=true" class="btn btn-success btn-sm" target="_blank"><i class="fa fa-save"></i> Export</a>
 
 
                         </div>
@@ -89,6 +100,43 @@
     
 </div>
 
+<style>
+    @media screen and (min-width: 768px) {
+    .modals-class {
+        width: 70%; /* either % (e.g. 60%) or px (400px) */
+    }
+}
+</style>
+<!-- Modal -->
+<div id="popup-detail" class="modal fade" role="dialog">
+  <div class="modal-dialog modals-class">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Detail Transaksi</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-body table-responsive no-padding">
+                        <div id="table-detail"></div>
+                    </div>
+            
+                </div>
+            </div>
+            
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 @endsection
 @section('js')

@@ -163,7 +163,7 @@
           </ul>
         </li>
         <?php endif; ?>
-        <li class="treeview {{ (str_replace(['penjualan-reguler','pembelian-reguler','penjualan-resep'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
+        <li class="treeview {{ (str_replace(['penjualan-reguler','pembelian-reguler','penjualan-resep','dashboard-po','pembelian-po','setting-biaya'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
           <a href="#">
             <i class="fa fa-shopping-cart"></i> <span>Transaksi</span>
             <span class="pull-right-container">
@@ -185,7 +185,7 @@
               </ul>
             </li>
 
-            <li class="treeview {{ (str_replace(['pembelian-reguler'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
+            <li class="treeview {{ (str_replace(['pembelian-reguler','dashboard-po','pembelian-po'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
               <a href="#"><i class="fa fa-circle-o"></i> Pembelian
                 <span class="pull-right-container">
                   <i class="fa fa-angle-left pull-right"></i>
@@ -193,18 +193,36 @@
               </a>
               <ul class="treeview-menu">
                 <li {{ in_array(Route::currentRouteName(), ['pembelian-reguler']) ? 'class=active' : '' }}><a href="{{ route('pembelian-reguler') }}"><i class="fa fa-circle-o"></i> Langsung</a></li>
-                <li {{ in_array(Route::currentRouteName(), ['pembelian-po']) ? 'class=active' : '' }}><a href="{{ url('pembelian-reguler','po') }}"><i class="fa fa-circle-o"></i> PO (Surat Pesanan)</a></li>
+                <li {{ in_array(Route::currentRouteName(), ['dashboard-po','pembelian-po']) ? 'class=active' : '' }}><a href="{{ route('dashboard-po') }}"><i class="fa fa-circle-o"></i> PO (Surat Pesanan)</a></li>
               </ul>
             </li>
             
             <li {{ in_array(Route::currentRouteName(), ['setting-biaya']) ? 'class=active' : '' }}><a href="{{ route('setting-biaya') }}"><i class="fa fa-circle-o"></i> Setting Biaya</a></li>
-
-            <li {{ in_array(Route::currentRouteName(), ['']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Retur Pembelian</a></li>
-            <li {{ in_array(Route::currentRouteName(), ['']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Retur Penjualan</a></li>
             
           </ul>
         </li>
-        <li class="treeview {{ (str_replace(['report-penjualan'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
+
+        <li class="treeview {{ in_array(Route::currentRouteName(), ['retur-penjualan','retur-pembelian']) ? 'active' : '' }}">
+          <a href="#">
+            <i class="fa fa-undo"></i> <span>Retur</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+
+          <ul class="treeview-menu">
+            <li {{ in_array(Route::currentRouteName(), ['retur-penjualan']) ? 'class=active' : '' }}><a href="{{ route('retur-penjualan') }}"><i class="fa fa-circle-o"></i> Penjualan</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['retur-pembelian']) ? 'class=active' : '' }}><a href="{{ route('retur-pembelian') }}"><i class="fa fa-circle-o"></i> Pembelian</a></li>
+          </ul>
+        </li>
+
+        <li class="{{ Route::currentRouteName() == 'stok-opname' ? 'active' : '' }}">
+          <a href="{{ route('stok-opname') }}">
+            <i class="fa fa-th-list"></i> <span>Stok Opname</span>
+          </a>
+        </li>
+        
+        <li class="treeview {{ (str_replace(['report-penjualan','report-pembelian','report-stok-opname','report-retur-penjualan','report-retur-pembelian','stok-minimal'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
           <a href="#">
             <i class="fa fa-book"></i> <span>Report</span>
             <span class="pull-right-container">
@@ -215,14 +233,11 @@
           <ul class="treeview-menu">
             <li {{ in_array(Route::currentRouteName(), ['report-penjualan']) ? 'class=active' : '' }}><a href="{{ route('report-penjualan') }}"><i class="fa fa-circle-o"></i> Penjualan</a></li>
             <li {{ in_array(Route::currentRouteName(), ['report-pembelian']) ? 'class=active' : '' }}><a href="{{ route('report-pembelian') }}"><i class="fa fa-circle-o"></i> Pembelian</a></li>
-            <li {{ in_array(Route::currentRouteName(), ['']) ? 'class=active' : '' }}><a href="{{ route('/') }}"><i class="fa fa-circle-o"></i> Stok Opname</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['report-stok-opname']) ? 'class=active' : '' }}><a href="{{ route('report-stok-opname') }}"><i class="fa fa-circle-o"></i> Stok Opname</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['report-retur-penjualan']) ? 'class=active' : '' }}><a href="{{ route('report-retur-penjualan') }}"><i class="fa fa-circle-o"></i> Retur Penjualan</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['report-retur-pembelian']) ? 'class=active' : '' }}><a href="{{ route('report-retur-pembelian') }}"><i class="fa fa-circle-o"></i> Retur Pembelian</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['stok-minimal']) ? 'class=active' : '' }}><a href="{{ route('stok-minimal') }}"><i class="fa fa-circle-o"></i> Stok Minimal</a></li>
           </ul>
-        </li>
-
-        <li class="{{ Route::currentRouteName() == 'stok-opname' ? 'active' : '' }}">
-          <a href="{{ route('stok-opname') }}">
-            <i class="fa fa-dashboard"></i> <span>Stok Opname</span>
-          </a>
         </li>
         
       </ul>
@@ -260,12 +275,28 @@
   <!-- /.content-wrapper -->
   <footer class="main-footer">
     <div class="pull-right hidden-xs">
-      <b>Version</b> 2.4.0
+    <b>
+      <a target="_blank" title="Backup" href="{{ route('backup-db') }}" class="btn btn-sm btn-warning"> Backup DB</a>
+      <button id="restore-button" title="Backup" class="btn btn-sm btn-default"> Restore DB</button>
+      <form id='restore-form' action="{{ route('restore-db') }}" method="POST" enctype="multipart/form-data"> 
+        @csrf
+        <input id='restore-file' type='file' name='database' style="display:none;"/>
+            
+      </form> 
+    </b> 
     </div>
-    <strong>Copyright &copy; 2014-2016 <a href="https://adminlte.io">Almsaeed Studio</a>.</strong> All rights
-    reserved.
+    <strong>Jl. Brantas 24 Batu / 0341 - 511303 / 081234073427
   </footer>
 
+  <script>
+    document.getElementById('restore-button').addEventListener('click', openDialog);
+      function openDialog() {
+          document.getElementById('restore-file').click();
+      }
+    document.getElementById("restore-file").onchange = function() {
+      document.getElementById("restore-form").submit();
+    };
+    </script>
   
   <!-- Add the sidebar's background. This div must be placed
        immediately after the control sidebar -->

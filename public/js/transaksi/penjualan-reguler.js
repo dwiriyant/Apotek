@@ -57,6 +57,7 @@ function cariObatPopup()
 
 $('#kode-obat').focus();
 $('#simpan').prop('disabled', true);
+$('#simpan-cetak').prop('disabled', true);
 var d = new Date();
 d.setHours(0, 0, 0, 0);
 var total_obat = 0;
@@ -248,6 +249,7 @@ function cariObat(kode_obat = '') {
             checkTotal();
             reorderNomor();
             $("#popup-obat").modal('hide');
+            checkTotal();
         }
         else
             callNoty('error', 'Maaf data tidak ditemukan.');
@@ -344,6 +346,10 @@ $(function () {
                     if (id_penjualan.length !== 'undefined')
                         for (i = 1; i <= total_obat; i++) {
                             if ($("#total-" + i).length > 0) {
+                                if($('#pack-' + i).length > 0)
+                                    jual_pack = $('#pack-' + i).val();
+                                else
+                                    jual_pack = '0';
                                 $.ajax({
                                     url: base_url + 'penjualan-reguler/remote',
                                     method: 'post',
@@ -354,6 +360,7 @@ $(function () {
                                         harga: getNumber($('#harga-' + i).html()),
                                         total: getNumber($('#total-' + i).html()),
                                         jumlah_obat: $('#jumlah-' + i).val(),
+                                        jual_pack: jual_pack,
                                     },
                                     headers: {
                                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -377,13 +384,119 @@ $(function () {
                                                 showLoaderOnConfirm: true,
                                                 closeOnConfirm: false
                                             }, function (isConfirm) {
-                                                    url = base_url + 'penjualan-reguler/print?transaksi=' + no_transaksi;
-                                                    window.open(
-                                                        url,
-                                                        '_blank'
-                                                    );
+                                                    
                                                 location.reload();
                                             });                                            
+                                        }
+                                    }
+                                }).fail(function (jqXHR, textStatus, errorThrown) {
+                                    if (jqXHR.status == 444)
+                                        sessionExpireHandler();
+                                    else
+                                        callNoty('warning');
+                                });
+                            }
+                        }
+                }
+                else
+                    callNoty('error', 'Simpan error.');
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 444)
+                    sessionExpireHandler();
+                else
+                    callNoty('warning');
+            });
+        }
+    });
+
+    $("#simpan-cetak").click(function () {
+        if (!$("#simpan-cetak").is(":disabled")) {
+            callLoader();
+
+            jumlah = 0;
+            for (i = 1; i <= total_obat; i++) {
+                jumlah += parseInt($("#jumlah-" + i).val());
+            }
+            uang = getNumber($('#uang').val());
+            diskon = $('#diskon').val().length > 0 ? getNumber($('#diskon').val().toString()) : 0;
+            total_harga = getNumber($('#total-harga').val());
+            total = getNumber($('#total').val());
+            tgl_transaksi = $('#tgl_transaksi').val();
+            customer = $('#customer').val();
+            dokter = $('#dokter').length > 0 ? $('#dokter').val() : '';
+            jenis = jenis;
+            no_transaksi = $('#nomor-transaksi').val();
+
+            $.ajax({
+                url: base_url + 'penjualan-reguler/remote',
+                method: 'post',
+                data: {
+                    action: 'simpan-penjualan',
+                    jumlah: jumlah,
+                    uang: uang,
+                    total: total,
+                    diskon: diskon,
+                    total_harga: total_harga,
+                    tanggal: tgl_transaksi,
+                    jenis: jenis,
+                    customer: customer,
+                    dokter: dokter,
+                    no_transaksi: no_transaksi,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+            }).done(function (data) {
+                data = JSON.parse(data);
+                if (data.status == 'sukses') {
+                    id_penjualan = data.id;
+                    if (id_penjualan.length !== 'undefined')
+                        for (i = 1; i <= total_obat; i++) {
+                            if ($("#total-" + i).length > 0) {
+                                if ($('#pack-' + i).length > 0)
+                                    jual_pack = $('#pack-' + i).val();
+                                else
+                                    jual_pack = '0';
+                                $.ajax({
+                                    url: base_url + 'penjualan-reguler/remote',
+                                    method: 'post',
+                                    data: {
+                                        action: 'simpan-transaksi',
+                                        id_penjualan: id_penjualan,
+                                        kode_obat: $('#kode-' + i).html(),
+                                        harga: getNumber($('#harga-' + i).html()),
+                                        total: getNumber($('#total-' + i).html()),
+                                        jumlah_obat: $('#jumlah-' + i).val(),
+                                        jual_pack: jual_pack,
+                                    },
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                }).done(function (data) {
+                                    data = JSON.parse(data);
+                                    if (data.status != 'sukses') {
+                                        callNoty('error', 'Simpan error.');
+                                    } else {
+                                        if (i == total_obat+1) {
+                                            endLoader();
+                                            callNoty('success', 'Berhasil Simpan Penjualan.');
+
+                                            swal({
+                                                title: "Berhasil Simpan Penjualan.",
+                                                type: "success",
+                                                showCancelButton: false,
+                                                confirmButtonClass: "btn-success",
+                                                confirmButtonText: "Oke",
+                                                showLoaderOnConfirm: true,
+                                                closeOnConfirm: false
+                                            }, function (isConfirm) {
+                                                url = base_url + 'penjualan-reguler/print?transaksi=' + no_transaksi;
+                                                window.open(
+                                                    url,
+                                                    '_blank'
+                                                );
+                                                location.reload();
+                                            });
                                         }
                                     }
                                 }).fail(function (jqXHR, textStatus, errorThrown) {
