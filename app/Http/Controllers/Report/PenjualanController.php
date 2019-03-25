@@ -262,7 +262,7 @@ class PenjualanController extends Controller
         else
             $_title = '';
 
-        $report_title = 'Report Data Penjualan '. $_title;
+        $report_title = 'Report Penjualan '. $_title;
         // Create new PHPExcel object
         $objPHPExcel = new PHPExcelces();
         // Set properties
@@ -328,7 +328,7 @@ class PenjualanController extends Controller
 
         $abj = 'A';
         
-        $objPHPExcel->getActiveSheet()->setTitle('Report Data Penjualan '. $_title);
+        $objPHPExcel->getActiveSheet()->setTitle('Report Data Penjualan ');
 
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'No.');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);

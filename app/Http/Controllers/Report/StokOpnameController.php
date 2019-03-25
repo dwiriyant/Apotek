@@ -267,7 +267,7 @@ class StokOpnameController extends Controller
 
         $abj = 'A';
         
-        $objPHPExcel->getActiveSheet()->setTitle('Report Data Penjualan '. $_title);
+        $objPHPExcel->getActiveSheet()->setTitle('Report Stok Opname ');
 
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'No.');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);

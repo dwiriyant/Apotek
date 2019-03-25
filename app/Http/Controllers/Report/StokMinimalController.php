@@ -371,7 +371,7 @@ class StokMinimalController extends Controller
         else
             $_title = '';
 
-        $report_title = 'Report Data Obat '. $_title;
+        $report_title = 'Report Data Stok Minimal '. $_title;
         // Create new PHPExcel object
         $objPHPExcel = new PHPExcelces();
         // Set properties
@@ -437,7 +437,7 @@ class StokMinimalController extends Controller
 
         $abj = 'A';
         
-        $objPHPExcel->getActiveSheet()->setTitle('Report Data Obat');
+        $objPHPExcel->getActiveSheet()->setTitle('Report Data Stok Minimal');
 
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'No.');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);

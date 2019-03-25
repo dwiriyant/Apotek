@@ -355,7 +355,7 @@ class PembelianController extends Controller
 
         $abj = 'A';
         
-        $objPHPExcel->getActiveSheet()->setTitle('Report Data Pembelian '. $_title);
+        $objPHPExcel->getActiveSheet()->setTitle('Report Data Pembelian ');
 
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'No.');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
