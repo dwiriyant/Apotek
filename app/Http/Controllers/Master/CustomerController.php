@@ -417,7 +417,7 @@ class CustomerController extends Controller
 
         $abj = 'A';
         
-        $objPHPExcel->getActiveSheet()->setTitle('Report Content customer');
+        $objPHPExcel->getActiveSheet()->setTitle('Report Data customer');
 
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'No.');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
