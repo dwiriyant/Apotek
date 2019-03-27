@@ -41,6 +41,8 @@ Route::group(['middleware' => 'admin'], function () {
 	Route::post('/kategori/search', 'Master\KategoriController@search');
 	Route::get('/kategori/delete', 'Master\KategoriController@delete')->name('kategori-delete');
 
+	Route::any('/toko', 'Master\TokoController@index')->name('toko');
+
 	Route::any('/supplier', 'Master\SupplierController@index')->name('supplier');
 	Route::post('/supplier/search', 'Master\SupplierController@search');
 	Route::get('/supplier/delete', 'Master\SupplierController@delete')->name('supplier-delete');

@@ -8,7 +8,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Admin Apotek Batu Sehat</title>
+    <title>Admin {{ ucwords(getToko('nama')) }}</title>
 
     <link rel="icon" href="{{ asset('img/favicon.png') }}" type="image/png" >
 

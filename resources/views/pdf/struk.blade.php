@@ -51,9 +51,9 @@
     <table width="100%">
         <tr>
             <td align="center" >
-                <h3>APOTEK BATU SEHAT</h3>
-                <h3>Jl. Brantas 24 Batu</h3>
-                <h3>0341 - 511303 / 081234073427</h3>
+                <h3>{{ $toko['nama'] }}</h3>
+                <h3>{{ $toko['alamat'] }}</h3>
+                <h3>{{ $toko['no_telp'] }}</h3>
 
             </td>
         </tr>
@@ -95,28 +95,38 @@
         </tr>
     </table>
 
-    <table border="0" cellpadding="0" cellspacing="0" style="width:70%;float:left;">
-        <tbody>
+    <table border="0" cellpadding="0" cellspacing="0" style="width:100%;float:left;">
+        <thead>
             <tr>
-                <td>
-                    @foreach ($data['transaksi'] as $transaksi)
+            <td style="width:70%">&nbsp;</td>
+            <td style="width:30%">&nbsp;</td>
+            </tr>
+        </thead>
+        <tbody>
+            
+                
+            @foreach ($data['transaksi'] as $transaksi)
+                <tr>
+                    <td>
                         <h3>{{$transaksi['obat']['nama']}}</h3>
-                        <h3 style="margin-left: 7px;">{{$transaksi['jumlah']}} x {{number_format($transaksi['total'],2,",",".")}}</h3>
-                    @endforeach
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <table border="0" cellpadding="0" cellspacing="0" style="width:30%;float:right">
-        <tbody>
-            <tr>
-                <td class="fr">
-                    @foreach ($data['transaksi'] as $transaksi)
+                    </td>
+                    <td class="fr">
                         <h3>{{$transaksi['obat']['satuan']}}</h3>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h3 style="margin-left: 7px;">{{$transaksi['jumlah']}} x {{number_format($transaksi['total'],2,",",".")}}</h3>
+                    </td>
+                    <td class="fr">
                         <h3 style="text-align: right;">{{number_format($transaksi['total_harga'],2,",",".")}}</h3>
-                    @endforeach
-                </td>
-            </tr>
+                    </td>
+                </tr>
+
+                        
+            @endforeach
+                
+            
         </tbody>
     </table>
 

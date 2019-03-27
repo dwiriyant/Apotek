@@ -12,6 +12,7 @@ use App\Penjualan;
 use App\Customer;
 use App\Dokter;
 use App\Kategori;
+use App\Toko;
 use App\TransaksiPenjualan;
 use Auth;
 
@@ -247,6 +248,7 @@ class PenjualanController extends Controller
         $data['transaksi'] = $transaksi;
         $data['data'] = $data;
 
+        $data['toko'] = Toko::first();
 
         $GLOBALS['bodyHeight'] = 0;
 

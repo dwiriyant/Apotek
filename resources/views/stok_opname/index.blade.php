@@ -33,6 +33,9 @@
                             <div class="col-sm-9">
                                 <select class="form-control" name="satuan">
                                     <option value="" >All</option>
+                                    <option value="biji/pc" <?=@$obat['satuan']=='biji/pc' ? 'selected' : ''?>>Biji/pc</option>
+                                    <option value="sachet" <?=@$obat['satuan']=='sachet' ? 'selected' : ''?>>Sachet</option>
+                                    <option value="strip" <?=@$obat['satuan']=='strip' ? 'selected' : ''?>>Strip</option>
                                     <option value="tablet" <?=@$obat['satuan']=='tablet' ? 'selected' : ''?> >Tablet</option>
                                     <option value="kapsul" <?=@$obat['satuan']=='kapsul' ? 'selected' : ''?> >Kapsul</option>
                                     <option value="botol" <?=@$obat['satuan']=='botol' ? 'selected' : ''?> >Botol</option>
