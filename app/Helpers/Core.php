@@ -1,5 +1,7 @@
 <?php
 
+use App\Toko;
+
 function clean_post ($content = "", $clean = true) {
     if ( $content != "" ) {
         $var = $content;
@@ -192,6 +194,12 @@ function transformDate($value, $format = 'Y-m-d')
     } catch (\ErrorException $e) {
         return \Carbon\Carbon::createFromFormat($format, $value);
     }
+}
+
+function getToko($key = 'nama')
+{
+    $toko = Toko::first();
+    return strtolower($toko->$key);
 }
 
 /* eof */

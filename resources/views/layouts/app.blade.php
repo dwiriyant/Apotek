@@ -6,8 +6,8 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <title>Admin Apotek Batu Sehat</title>
+    
+    <title>Admin {{ ucwords(getToko('nama')) }}</title>
 
     <link rel="icon" href="{{ asset('img/favicon.png') }}" type="image/png" >
 
@@ -74,9 +74,9 @@
     <!-- Logo -->
     <a href="{{ route('/') }} " class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
-      <span class="logo-mini"><b>B</b>S</span>
+      <span class="logo-mini"><b>A</b>P</span>
       <!-- logo for regular state and mobile devices -->
-      <span class="logo-lg" style="    margin: 0px;"><img style="width: 15%;margin-left: -15px;margin-right: 5px;" src="{{ asset('img/logo.png') }}"><b>Batu Sehat</b> Apotek</span>
+      <span class="logo-lg" style="    margin: 0px;"><img style="width: 15%;margin-left: -15px;margin-right: 5px;" src="{{ asset('img/logo.png') }}"><b style="font-size: 15px;">{{ strtoupper(getToko('nama')) }}</b></span>
     </a>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top">
@@ -145,7 +145,7 @@
         </li>
         
         <?php if(Auth::user()->level == 1): ?>
-        <li class="treeview {{ (str_replace(['obat','kategori','supplier','customer','dokter','pengguna'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
+        <li class="treeview {{ (str_replace(['obat','kategori','supplier','customer','dokter','pengguna','toko'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
           <a href="#">
             <i class="fa fa-tasks"></i> <span>Master</span>
             <span class="pull-right-container">
@@ -160,6 +160,7 @@
             <li {{ in_array(Route::currentRouteName(), ['customer']) ? 'class=active' : '' }}><a href="{{ route('customer') }}"><i class="fa fa-circle-o"></i> Customer</a></li>
             <li {{ in_array(Route::currentRouteName(), ['dokter']) ? 'class=active' : '' }}><a href="{{ route('dokter') }}"><i class="fa fa-circle-o"></i> Dokter</a></li>
             <li {{ in_array(Route::currentRouteName(), ['pengguna']) ? 'class=active' : '' }}><a href="{{ route('user') }}"><i class="fa fa-circle-o"></i> Pengguna</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['toko']) ? 'class=active' : '' }}><a href="{{ route('toko') }}"><i class="fa fa-circle-o"></i> Apotek</a></li>
           </ul>
         </li>
         <?php endif; ?>
@@ -285,7 +286,7 @@
       </form> 
     </b> 
     </div>
-    <strong>Jl. Brantas 24 Batu / 0341 - 511303 / 081234073427
+    <strong>{{ getToko('no_telp') }}
   </footer>
 
   <script>

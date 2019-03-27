@@ -308,7 +308,7 @@ function generateTable(data, id_obat)
             kat_all +
             '</select >' +
             '</td>' +
-            '<td><select class="form-control" id="satuan-' + total_obat + '"><option value="tablet">Tablet</option><option value="kapsul">Kapsul</option><option value="botol">Botol</option><option value="kotak">Kotak</option><option value="ml">ML</option><option value="vial">Vial</option><option value="tube">Tube</option><option value="pot">Pot</option><option value="supp">Supp</option><option value="ampul">Ampul</option></select></td>' +
+            '<td><select class="form-control" id="satuan-' + total_obat + '"><option value="biji/pc">Biji/pc</option><option value="sachet">Sachet</option><option value="strip">Strip</option><option value="tablet">Tablet</option><option value="kapsul">Kapsul</option><option value="botol">Botol</option><option value="kotak">Kotak</option><option value="ml">ML</option><option value="vial">Vial</option><option value="tube">Tube</option><option value="pot">Pot</option><option value="supp">Supp</option><option value="ampul">Ampul</option></select></td>' +
             '<td><select class="form-control" id="type-' + total_obat + '"><option value="1">Sendiri</option><option value="2">Konsinyasi</option></select></td>';
         if (jenis == 'langsung') {
             result +=

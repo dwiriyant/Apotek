@@ -62,7 +62,7 @@ class ObatController extends Controller
         }
 
         if (request('id')) {
-            $obat = Obat::where('id',(int)request('id'))->first();
+            $obat = Obat::where('id',(int)request('id'))->where('status','!=',9)->first();
         }
 
         if (isAjax()) {
@@ -329,17 +329,20 @@ class ObatController extends Controller
 
         if($obat2)
         {
-            $obat->nama = $post['nama'];
-            $obat->kode = $post['kode'];
-            $obat->kategori = $post['kategori'] == '' ? 0 : (int)$post['kategori'];
-            $obat->tgl_kadaluarsa = $post['tgl_kadaluarsa'];
-            $obat->harga_jual_satuan = $post['harga_satuan'] == '' ? 0 : (int)$post['harga_satuan'];
-            $obat->harga_jual_resep = $post['harga_resep'] == '' ? 0 : (int)$post['harga_resep'];
-            $obat->harga_jual_pack = $post['harga_pack'] == '' ? 0 : (int)$post['harga_pack'];
-            $obat->satuan = $post['satuan'];
-            $obat->type = $post['type'];
+            if($obat2->status == 9)
+                $obat2->status = 1;
+            $obat2->nama = $post['nama'];
+            $obat2->kode = $post['kode'];
+            $obat2->kategori = $post['kategori'] == '' ? 0 : (int)$post['kategori'];
+            $obat2->tgl_kadaluarsa = $post['tgl_kadaluarsa'];
+            $obat2->harga_jual_satuan = $post['harga_satuan'] == '' ? 0 : (int)$post['harga_satuan'];
+            $obat2->harga_jual_resep = $post['harga_resep'] == '' ? 0 : (int)$post['harga_resep'];
+            $obat2->harga_jual_pack = $post['harga_pack'] == '' ? 0 : (int)$post['harga_pack'];
+            $obat2->satuan = $post['satuan'];
+            $obat2->type = $post['type'];
             $obat2->stok = $obat2->stok + ($post['stok'] == '' ? 0 : (int)$post['stok']);
             $obat2->update();
+            return $obat2->toArray();
         } else 
         {
             if(!$obat)
@@ -356,8 +359,9 @@ class ObatController extends Controller
             $obat->stok = $post['stok'] == '' ? 0 : (int)$post['stok'];
             
             $obat->save();
+            return $obat->toArray();
         }
-        return $obat->toArray();
+        
     }
 
     function export_content($data,$get)

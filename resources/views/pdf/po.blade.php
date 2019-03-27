@@ -90,9 +90,9 @@
             <tbody>
                 <tr>
                     <td align="center" style="font-weight: bold;">
-                        <h1>Apotek Batu Sehat</h1>
-                        <h3>Jl. Brantas 24 Batu</h3>
-                        <h3>0341 - 511303 / 081234073427</h3>
+                        <h1>{{ ucwords(getToko('nama')) }}</h1>
+                        <h3>{{ getToko('alamat') }}</h3>
+                        <h3>{{ getToko('no_telp') }}</h3>
                     </td>
                 </tr>
             </tbody>
