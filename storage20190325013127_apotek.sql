@@ -520,6 +520,22 @@ INSERT INTO `users` VALUES (1,'admin','admin','admin@admin.com','',NULL,'$2y$12$
 UNLOCK TABLES;
 
 --
+-- CREATE NEW TABLE TOKO
+--
+
+CREATE TABLE `toko` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `nama` varchar(255) DEFAULT NULL,
+  `alamat` varchar(255) DEFAULT NULL,
+  `no_telp` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `toko` (`id`, `nama`, `alamat`, `no_telp`)
+VALUES
+	(1,'APOTEK BATU SEHAT','Jl. Brantas 24 Batu','0341 - 511303 / 081234073427');
+
+--
 -- Dumping routines for database 'apotek'
 --
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
