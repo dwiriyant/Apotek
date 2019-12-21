@@ -290,7 +290,7 @@ class SupplierController extends Controller
         $id = get('id');
         if ($id) {
             $supplier = Supplier::where('id',(int)$id)->first();
-            $supplier->level = 9;
+            $supplier->status = 9;
             $supplier->save();
 
             if ($supplier) {
@@ -354,8 +354,8 @@ class SupplierController extends Controller
         // Create new PHPExcel object
         $objPHPExcel = new PHPExcelces();
         // Set properties
-        $objPHPExcel->getProperties()->setCreator("Brilio.net");
-        $objPHPExcel->getProperties()->setLastModifiedBy("Brilio.net");
+        $objPHPExcel->getProperties()->setCreator("www.elysian.web.id");
+        $objPHPExcel->getProperties()->setLastModifiedBy("www.elysian.web.id");
         $objPHPExcel->getProperties()->setTitle("Office XLS");
         $objPHPExcel->getProperties()->setSubject("Office XLS");
         $objPHPExcel->getProperties()->setDescription($report_title.", generated using PHP classes.");

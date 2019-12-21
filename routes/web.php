@@ -41,6 +41,8 @@ Route::group(['middleware' => 'admin'], function () {
 	Route::post('/kategori/search', 'Master\KategoriController@search');
 	Route::get('/kategori/delete', 'Master\KategoriController@delete')->name('kategori-delete');
 
+	Route::any('/toko', 'Master\TokoController@index')->name('toko');
+
 	Route::any('/supplier', 'Master\SupplierController@index')->name('supplier');
 	Route::post('/supplier/search', 'Master\SupplierController@search');
 	Route::get('/supplier/delete', 'Master\SupplierController@delete')->name('supplier-delete');
@@ -52,19 +54,62 @@ Route::group(['middleware' => 'admin'], function () {
 	Route::any('/dokter', 'Master\DokterController@index')->name('dokter');
 	Route::post('/dokter/search', 'Master\DokterController@search');
 	Route::get('/dokter/delete', 'Master\DokterController@delete')->name('dokter-delete');
+
+	Route::any('/setting-biaya', 'Transaksi\SettingBiayaController@index')->name('setting-biaya');
+	Route::post('/setting-biaya/search', 'Transaksi\SettingBiayaController@search');
+	Route::get('/setting-biaya/delete', 'Transaksi\SettingBiayaController@delete')->name('setting-biaya-delete');
+
+	Route::any('/stok-opname', 'StokOpnameController@index')->name('stok-opname');
+	Route::any('/stok-opname/remote', 'StokOpnameController@remote');
+	Route::any('/stok-opname/search', 'StokOpnameController@search');
+
+	Route::get('/backup-db', 'BackupController@index')->name('backup-db');
+	Route::post('/restore-db', 'BackupController@restore')->name('restore-db');
 });
 
 Route::any('/penjualan-reguler', 'Transaksi\PenjualanController@index')->name('penjualan-reguler');
+Route::any('/penjualan-reguler/print', 'Transaksi\PenjualanController@print');
 Route::post('/penjualan-reguler/remote', 'Transaksi\PenjualanController@remote');
 
-Route::any('/penjualan-reguler/{grosir}', 'Transaksi\PenjualanController@index')->name('penjualan-resep');
-Route::post('/penjualan-reguler/{grosir}/remote', 'Transaksi\PenjualanController@remote');
+Route::any('/penjualan-reguler/{resep}', 'Transaksi\PenjualanController@index')->name('penjualan-resep');
+Route::post('/penjualan-reguler/{resep}/remote', 'Transaksi\PenjualanController@remote');
 
 Route::any('/pembelian-reguler', 'Transaksi\PembelianController@index')->name('pembelian-reguler');
+Route::any('/pembelian-reguler/print', 'Transaksi\PembelianController@print');
 Route::post('/pembelian-reguler/remote', 'Transaksi\PembelianController@remote');
 
+Route::any('/pembelian-reguler/{po}', 'Transaksi\PembelianController@index')->name('pembelian-po');
+Route::post('/pembelian-reguler/{po}/remote', 'Transaksi\PembelianController@remote');
+
+Route::any('/pembelian-reguler/po/dashboard', 'Transaksi\PembelianPOController@index')->name('dashboard-po');
+Route::any('/pembelian-reguler/po/dashboard/delete', 'Transaksi\PembelianPOController@delete')->name('dashboard-po-delete');
+Route::any('/pembelian-reguler/po/dashboard/remote', 'Transaksi\PembelianPOController@remote');
+Route::any('/pembelian-reguler/po/dashboard/search', 'Transaksi\PembelianPOController@search');
+
 Route::any('/report-penjualan', 'Report\PenjualanController@index')->name('report-penjualan');
+Route::any('/report-penjualan/remote', 'Report\PenjualanController@remote');
 Route::any('/report-penjualan/search', 'Report\PenjualanController@search');
 
 Route::any('/report-pembelian', 'Report\PembelianController@index')->name('report-pembelian');
+Route::any('/report-pembelian/remote', 'Report\PembelianController@remote');
 Route::any('/report-pembelian/search', 'Report\PembelianController@search');
+
+Route::any('/report-stok-opname', 'Report\StokOpnameController@index')->name('report-stok-opname');
+Route::any('/report-stok-opname/search', 'Report\StokOpnameController@search');
+
+Route::any('/report-retur-penjualan', 'Report\ReturPenjualanController@index')->name('report-retur-penjualan');
+Route::any('/report-retur-penjualan/search', 'Report\ReturPenjualanController@search');
+
+Route::any('/report-retur-pembelian', 'Report\ReturPembelianController@index')->name('report-retur-pembelian');
+Route::any('/report-retur-pembelian/search', 'Report\ReturPembelianController@search');
+
+Route::any('/stok-minimal', 'Report\StokMinimalController@index')->name('stok-minimal');
+Route::post('/stok-minimal/search', 'Report\StokMinimalController@search');
+
+Route::any('/retur-penjualan', 'Retur\PenjualanController@index')->name('retur-penjualan');
+Route::any('/retur-penjualan/remote', 'Retur\PenjualanController@remote');
+Route::any('/retur-penjualan/search', 'Retur\PenjualanController@search');
+
+Route::any('/retur-pembelian', 'Retur\PembelianController@index')->name('retur-pembelian');
+Route::any('/retur-pembelian/remote', 'Retur\PembelianController@remote');
+Route::any('/retur-pembelian/search', 'Retur\PembelianController@search');

@@ -17,4 +17,14 @@ class Pembelian extends Model
         return $this->hasOne('App\Supplier','id','id_supplier');
     }
 
+    public function transaksiPo()
+    {
+        return $this->hasMany('App\TransaksiPembelian','id_pembelian','id')->with('obat_po');
+    }
+
+    public function transaksi()
+    {
+        return $this->hasMany('App\TransaksiPembelian','id_pembelian','id')->with('obat');
+    }
+
 }

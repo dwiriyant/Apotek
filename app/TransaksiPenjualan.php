@@ -12,4 +12,14 @@ class TransaksiPenjualan extends Model
 
     protected $table = 'transaksi_penjualan';
 
+    public function obat()
+    {
+        return $this->hasOne('App\Obat','kode','kode_obat');
+    }
+
+    public function penjualan()
+    {
+        return $this->belongsTo('App\Penjualan','id_penjualan','id');
+    }
+
 }

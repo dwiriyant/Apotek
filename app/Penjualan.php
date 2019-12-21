@@ -21,4 +21,9 @@ class Penjualan extends Model
     {
         return $this->hasOne('App\Dokter','id','id_dokter');
     }
+
+    public function transaksi()
+    {
+        return $this->hasMany('App\TransaksiPenjualan','id_penjualan','id')->with('obat');
+    }
 }   

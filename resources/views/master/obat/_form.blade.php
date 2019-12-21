@@ -27,9 +27,12 @@
 				
 				<div class="form-group <?php echo isset($errors['kode']) ? 'has-error' : '' ; ?>">
 					<label for="kode" class="control-label">Kodes Obat</label>
-					<div>
-					   <input type="number" name="kode" id="kodeObat" class="form-control" value="<?=isset($obat['kode']) ? $obat['kode']: ""?>" placeholder="Kode Obat">
+					<div class="input-group">
+						<input type="number" name="kode" id="kodeObat" class="form-control" value="<?=isset($obat['kode']) ? $obat['kode']: ""?>" placeholder="Kode Obat">
+						<span id="cek-kode" class="input-group-addon" style="cursor:pointer"><i class="fa fa-check"> Cek kode</i></span>
 					</div>
+
+					<small id="kode-exist" class="help-block" style="display:none;"><span class="label label-warning">Kode Sudah Digunakan!</span></small>
 
 					<small class="help-block" style="<?php echo (isset($errors['kode'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['kode'])) ? $errors['kode'][0] : '' ;?></small>
 
@@ -55,19 +58,31 @@
 					<small class="help-block" style="<?php echo (isset($errors['obat'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['obat'])) ? $errors['obat'][0] : '' ;?></small>
 				</div>
 				<div class="form-group <?php echo isset($errors['tgl_kadaluarsa']) ? 'has-error' : '' ; ?>">
-	                <input type="hidden" name="tgl_kadaluarsa" class="dt-value" value="<?= isset($obat['tgl_kadaluarsa']) ? $obat['tgl_kadaluarsa'] : date('Y-m-d',strtotime('+3 year')) ;?>">
-	                <label for="tgl_kadaluarsa" class="control-label">Tanggal Kadaluarsa</label>
-	                
-	                <div class="input-group date2">
-	                    <input type="text" autocomplete="off" class="form-control" placeholder="Schedule" value="<?= date('D, j M Y', (isset($obat['tgl_kadaluarsa']) ? strtotime($obat['tgl_kadaluarsa']) : strtotime('+3 year')))?>">
-	                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-	                </div>
-	                <?php if (isset($errors['tgl_kadaluarsa'])) {?>
-	                    <small class="help-block"><i class="fa fa-times-circle-o"></i> <?php echo $errors['tgl_kadaluarsa'][0]?></small>
-	                <?php }?>
+						<input type="hidden" name="tgl_kadaluarsa" class="dt-value" value="<?= isset($obat['tgl_kadaluarsa']) ? $obat['tgl_kadaluarsa'] : date('Y-m-d',strtotime('+3 year')) ;?>">
+						<label for="tgl_kadaluarsa" class="control-label">Tanggal Kadaluarsa</label>
+						
+						<div class="input-group date2">
+							<input type="text" autocomplete="off" class="form-control" placeholder="Schedule" value="<?= date('D, j M Y', (isset($obat['tgl_kadaluarsa']) ? strtotime($obat['tgl_kadaluarsa']) : strtotime('+3 year')))?>">
+							<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+						</div>
+						<?php if (isset($errors['tgl_kadaluarsa'])) {?>
+							<small class="help-block"><i class="fa fa-times-circle-o"></i> <?php echo $errors['tgl_kadaluarsa'][0]?></small>
+						<?php }?>
 
-	                <small class="help-block" style="<?php echo (isset($errors['tgl_kadaluarsa'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['tgl_kadaluarsa'])) ? $errors['tgl_kadaluarsa'][0] : '' ;?></small>
-	            </div>
+						<small class="help-block" style="<?php echo (isset($errors['tgl_kadaluarsa'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['tgl_kadaluarsa'])) ? $errors['tgl_kadaluarsa'][0] : '' ;?></small>
+				</div>
+
+				<div class="form-group <?php echo isset($errors['type']) ? 'has-error' : '' ; ?>">
+					<label for="type" class="control-label">Status</label>
+					<div>
+						<select class="form-control" name="type">
+							<option value="1" <?=@$obat['type']=='1' ? 'selected' : ''?> >Sendiri</option>
+							<option value="2" <?=@$obat['type']=='2' ? 'selected' : ''?> >Konsinyasi</option>
+						</select>
+					</div>
+
+					<small class="help-block" style="<?php echo (isset($errors['type'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['type'])) ? $errors['type'][0] : '' ;?></small>
+				</div>
 
                  <div class="form-group" style="margin-top: 40px;">
 	                <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> <?php echo @$obat['id'] ? 'Save Changes' : 'Save New'; ?></button>
@@ -94,10 +109,22 @@
 
 					<small class="help-block" style="<?php echo (isset($errors['harga_resep'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['harga_resep'])) ? $errors['harga_resep'][0] : '' ;?></small>
 				</div>
+				<div class="form-group <?php echo isset($errors['harga_pack']) ? 'has-error' : '' ; ?>">
+					<label for="harga_pack" class="control-label">Harga Jual Pack</label>
+					<div>
+					   <input type="text" data-currency="harga_pack" class="form-control currency" value="<?=isset($obat['harga_jual_pack']) ? $obat['harga_jual_pack']: ""?>" placeholder="Harga Jual Pack">
+					   <input id="harga_pack" type="hidden" class="form-control" name="harga_pack" value="<?=isset($obat['harga_jual_pack']) ? $obat['harga_jual_pack']: ""?>">
+					</div>
+
+					<small class="help-block" style="<?php echo (isset($errors['harga_pack'])) ? '' : 'display:none;' ?>"><i class="fa fa-times-circle-o"></i> <?php  echo (isset($errors['harga_pack'])) ? $errors['harga_pack'][0] : '' ;?></small>
+				</div>
 				<div class="form-group <?php echo isset($errors['satuan']) ? 'has-error' : '' ; ?>">
 					<label for="satuan" class="control-label">Satuan</label>
 					<div>
 						<select class="form-control" name="satuan">
+							<option value="biji/pc" <?=@$obat['satuan']=='biji/pc' ? 'selected' : ''?>>Biji/pc</option>
+							<option value="sachet" <?=@$obat['satuan']=='sachet' ? 'selected' : ''?>>Sachet</option>
+							<option value="strip" <?=@$obat['satuan']=='strip' ? 'selected' : ''?>>Strip</option>
 							<option value="tablet" <?=@$obat['satuan']=='tablet' ? 'selected' : ''?> >Tablet</option>
 							<option value="kapsul" <?=@$obat['satuan']=='kapsul' ? 'selected' : ''?> >Kapsul</option>
 							<option value="botol" <?=@$obat['satuan']=='botol' ? 'selected' : ''?> >Botol</option>
@@ -108,6 +135,7 @@
 							<option value="pot" <?=@$obat['satuan']=='pot' ? 'selected' : ''?> >Pot</option>
 							<option value="supp" <?=@$obat['satuan']=='supp' ? 'selected' : ''?> >Supp</option>
 							<option value="ampul" <?=@$obat['satuan']=='ampul' ? 'selected' : ''?> >Ampul</option>
+							
 						</select>
 					</div>
 

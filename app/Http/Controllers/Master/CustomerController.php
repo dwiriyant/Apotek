@@ -290,7 +290,7 @@ class CustomerController extends Controller
         $id = get('id');
         if ($id) {
             $customer = Customer::where('id',(int)$id)->first();
-            $customer->level = 9;
+            $customer->status = 9;
             $customer->save();
 
             if ($customer) {
@@ -355,8 +355,8 @@ class CustomerController extends Controller
         // Create new PHPExcel object
         $objPHPExcel = new PHPExcelces();
         // Set properties
-        $objPHPExcel->getProperties()->setCreator("Brilio.net");
-        $objPHPExcel->getProperties()->setLastModifiedBy("Brilio.net");
+        $objPHPExcel->getProperties()->setCreator("www.elysian.web.id");
+        $objPHPExcel->getProperties()->setLastModifiedBy("www.elysian.web.id");
         $objPHPExcel->getProperties()->setTitle("Office XLS");
         $objPHPExcel->getProperties()->setSubject("Office XLS");
         $objPHPExcel->getProperties()->setDescription($report_title.", generated using PHP classes.");
@@ -417,7 +417,7 @@ class CustomerController extends Controller
 
         $abj = 'A';
         
-        $objPHPExcel->getActiveSheet()->setTitle('Report Content customer');
+        $objPHPExcel->getActiveSheet()->setTitle('Report Data customer');
 
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'No.');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);

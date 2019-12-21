@@ -126,11 +126,64 @@ function callbackForm(){
     Holder.run({
         images : '#form-photo'
     });
+
+    $("form").keypress(function (e) {
+        if (e.which == 13) {
+            checkObat();
+            return false;
+        }
+    });
+
+    function checkObat() {
+        $.ajax({
+            url: base_url + 'obat/remote',
+            method: 'post',
+            data: {
+                action: 'getObatByKode',
+                kode: $('#kodeObat').val()
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function () {
+                callLoader();
+            }
+        }).always(function () {
+            endLoader();
+        }).done(function (data) {
+            if (data !== 'null') {
+                data = JSON.parse(data);
+                var url = base_url + 'obat?id	=' + data.id;
+                ajaxLoadForm(url, callbackForm);
+                $('#kode-exist').show();
+            } else {
+                $('#kode-exist').hide();
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status == 444)
+                sessionExpireHandler();
+            else
+                callNoty('warning');
+        });
+    }
+
+    $("#cek-kode").click(function () {
+        checkObat();
+    });
+
 }
 
 $(function() {
     Holder.run();
     callbackForm();
+
+    $("form").keypress(function (e) { 
+        if(e.which == 13) 
+        { 
+            checkObat();
+            return false; 
+        } 
+    });
 
     $('.date2').datetimepicker({
         format: "DD MMM YYYY",
@@ -151,6 +204,44 @@ $(function() {
         var url = $(this).attr('href');
         ajaxLoadForm(url, callbackForm);
     });
+
+    $("#cek-kode").click(function () {
+        checkObat();
+    });
+
+    function checkObat()
+    {
+        $.ajax({
+            url: base_url + 'obat/remote',
+            method: 'post',
+            data: {
+                action: 'getObatByKode',
+                kode: $('#kodeObat').val()
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function () {
+                callLoader();
+            }
+        }).always(function () {
+            endLoader();
+        }).done(function (data) {
+            if (data !== 'null') {
+                data = JSON.parse(data);
+                var url = base_url + 'obat?id	=' + data.id;
+                ajaxLoadForm(url, callbackForm);
+                $('#kode-exist').show();
+            } else {
+                $('#kode-exist').hide();
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status == 444)
+                sessionExpireHandler();
+            else
+                callNoty('warning');
+        });
+    }
 
 })
 
