@@ -12,6 +12,7 @@ use PHPExcel_Style_Alignment;
 use PHPExcel_Style_Border;
 use PHPExcel_Style_Fill;
 use App\Obat;
+use App\Config;
 use App\Kategori;
 use Auth;
 use App\Imports\ObatImport;
@@ -82,7 +83,9 @@ class StokMinimalController extends Controller
 
         $param   = [];
 
-        $obat = Obat::where('status','!=',9)->where('stok','<=',5);
+        $stok_minimal = Config::where('nama','stok_minimal')->first();
+
+        $obat = Obat::where('status','!=',9)->where('stok','<=',@$stok_minimal->value ? $stok_minimal->value : 5);
 
         if ($search['kode']!='') {
             $obat = $obat->where('kode','like', '%' . $this->_search['kode'] . '%');
