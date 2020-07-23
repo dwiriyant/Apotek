@@ -81,8 +81,9 @@
                                 <th style="width:250px;">Kategori</th>
                                 <th style="width:120px;">Satuan</th>
                                 <th style="width:120px;">Status</th>
-                                <th style="width:250px;">Harga Satuan</th>
-                                <th style="width:100px;">Jumlah</th>
+                                <th style="width:200px;">Harga Satuan</th>
+                                <th style="width:80px;">Jumlah</th>
+                                <th style="width:120px;">Diskon</th>
                                 <th style="width:300px;">Total</th>
                                 {!!$jenis == 'resep' ? '' : '<th style="width:100px;">Jual Pack?</th>'!!}
                                 <th style="width:50px;">X</th>
@@ -113,7 +114,7 @@
                             <label style="margin-top: 5px;font-size: 20px;" for="name" class="col-sm-3 control-label">Total</label>
                             <div class="col-sm-9">
                                 <div class="input-group">
-                                    <span class="input-group-addon">Rp. </span><input style="height: 40px;font-size: 20px;" type="text" id="total" readonly class="form-control input-sm currency2" value="" placeholder="Harga Sebelum Diskon">
+                                    <span class="input-group-addon">Rp. </span><input style="height: 40px;font-size: 20px;" type="text" id="total" disabled class="form-control input-sm currency2" value="" placeholder="Harga Sebelum Diskon">
                                 </div>
                             </div>
                         </div>
@@ -125,11 +126,24 @@
                             </div>
                         </div>
                     </div>
+                    @if($jenis=='resep')
+                    <div class="form-group col-md-12 col-xs-6" style="display: inline-block;">
+                        <label style="margin-top: 5px;font-size: 20px;" for="name" class="col-sm-3 control-label">Jasa Resep</label>
+                        <div class="col-sm-9">
+                            <div class="input-group">
+                                <span class="input-group-addon">Rp. </span>
+                                <input style="height: 40px;font-size: 20px;" type="text" id="jasa-resep" class="form-control input-sm currency2" value="" placeholder="Biaya Jasa Resep">
+                            </div>
+                        </div>
+                    </div>
+                    @else
+                        <input type="hidden" id="jasa-resep" value="0">
+                    @endif
                     <div class="form-group col-md-12 col-xs-6" style="display: inline-block;">
                         <label style="margin-top: 5px;font-size: 20px;" for="name" class="col-sm-3 control-label">Total Harga</label>
                         <div class="col-sm-9">
                             <div class="input-group">
-                                <span class="input-group-addon">Rp. </span><input style="height: 40px;font-size: 20px;color: green;" type="text" id="total-harga" readonly class="form-control input-sm currency2" value="" placeholder="Total Harga Setelah Diskon">
+                                <span class="input-group-addon">Rp. </span><input style="height: 40px;font-size: 20px;color: green;" type="text" id="total-harga" disabled class="form-control input-sm currency2" value="" placeholder="Total Harga Setelah Diskon">
                             </div>
                         </div>
                     </div>
@@ -147,7 +161,7 @@
                         <div class="col-sm-9">
                             <div class="input-group">
                                 <span class="input-group-addon">Rp. </span>
-                                <input style="height: 40px;font-size: 20px;color: red;" type="text" id="uang-kembali" class="form-control input-sm" value="" readonly placeholder="Kembali">
+                                <input style="height: 40px;font-size: 20px;color: red;" type="text" id="uang-kembali" class="form-control input-sm" value="" disabled placeholder="Kembali">
                             </div>
                         </div>
                     </div>

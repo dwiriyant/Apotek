@@ -188,9 +188,10 @@ class PenjualanController extends Controller
                 case 'simpan-penjualan':
                         $penjualan = new Penjualan();
                         $penjualan->jumlah = post('jumlah');
-                        post('jenis') == 'resep' ? $penjualan->id_dokter = post('dokter') : null;
+                        post('jenis') == 'resep' ? (post('dokter') != '' ? $penjualan->id_dokter = post('dokter') : null) : null;
                         $penjualan->id_konsumen = post('customer') ? post('customer') : null;
                         $penjualan->uang = post('uang');
+                        $penjualan->biaya_jasa = post('jasa_resep');
                         $penjualan->total = post('total');
                         $penjualan->diskon = post('diskon');
                         $penjualan->total_harga = post('total_harga');
@@ -207,6 +208,7 @@ class PenjualanController extends Controller
                         $transaksi->kode_obat = post('kode_obat');
                         $transaksi->total = post('total');
                         $transaksi->jumlah = post('jumlah_obat');
+                        $transaksi->diskon = post('diskon');
                         $transaksi->total_harga = post('total');
                         $transaksi->jual_pack = (int)post('jual_pack');
                         $transaksi->save();

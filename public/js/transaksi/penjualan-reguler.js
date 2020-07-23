@@ -64,6 +64,7 @@ var total_obat = 0;
 var total_harga = 0;
 var diskon = 0;
 var harga_diskon = 0;
+var jasa_resep = 0;
 
 function checkButton() {
     if ($('#data-obat').html() == '') {
@@ -144,7 +145,14 @@ function checkTotal() {
         }
 
         if (($("#harga-" + i).length > 0) && ($("#jumlah-" + i).length > 0)) {
-            $("#total-" + i).html(int_jumlah_obat * int_total_obat);
+            sub_total = int_jumlah_obat * int_total_obat;
+            diskon_obat = parseInt(getNumber($("#diskon-" + i).val()));
+            if (isNaN(diskon_obat))
+                return false;
+
+            $("#diskon-" + i).val(formatMoney(diskon_obat));
+            sub_total = sub_total - diskon_obat;
+            $("#total-" + i).html(sub_total);
         }
     }
 
@@ -160,6 +168,18 @@ function checkTotal() {
     }
 
     harga_diskon = total_harga - (total_harga * diskon / 100)
+
+    jasa_resep = $('#jasa-resep').val().length > 0 ? $('#jasa-resep').val() : '0';
+    jasa_resep = parseInt(getNumber(jasa_resep));
+    if (isNaN(jasa_resep))
+        jasa_resep = 0;
+    if (jasa_resep < 0) {
+        $('#jasa-resep').val('0');
+        jasa_resep = 0;
+    }
+
+    harga_diskon = harga_diskon + jasa_resep;
+
     $('#total-harga').val(harga_diskon);
     $('#total-atas').html(harga_diskon.format());
 
@@ -228,6 +248,7 @@ function cariObat(kode_obat = '') {
                 '<td>' + (data.type == 1 ? 'Sendiri' : 'Konsinyasi') + '</td>' +
                 '<td id="harga-' + total_obat + '"> Rp. ' + formatMoney(jenis == 'resep' ? data.harga_jual_resep: data.harga_jual_satuan) + '</td>' +
                 '<td><input style="max-width: 55px;" id="jumlah-' + total_obat + '" class="jumlah-obat" style="border: 0;" type="number" value="1"></td>' +
+                '<td><input style="max-width: 75px;" id="diskon-' + total_obat + '" class="diskon-obat" style="border: 0;" type="number" value="0"></td>' +
                 '<td id="total-' + total_obat + '"> Rp. ' + formatMoney(jenis == 'resep' ? data.harga_jual_resep : data.harga_jual_satuan) + '</td>';
             if(jenis == 'resep')
             {
@@ -293,6 +314,11 @@ $(function () {
         checkTotal();
     });
 
+    $('#jasa-resep').on('keyup input', function (e) {
+
+        checkTotal();
+    });
+
     $('#uang').maskMoney({ prefix: '', thousands: '.', decimal: ',', precision: 0 }).on('keyup.maskMoney', function () {
 
         checkTotal();
@@ -311,6 +337,7 @@ $(function () {
                 jumlah += parseInt($("#jumlah-" + i).val());
             }
             uang = getNumber($('#uang').val());
+            jasa_resep = getNumber($('#jasa-resep').val());
             diskon = $('#diskon').val().length > 0 ? getNumber($('#diskon').val().toString()) : 0;
             total_harga = getNumber($('#total-harga').val());
             total = getNumber($('#total').val());
@@ -327,6 +354,7 @@ $(function () {
                     action: 'simpan-penjualan',
                     jumlah: jumlah,
                     uang: uang,
+                    jasa_resep: jasa_resep,
                     total: total,
                     diskon: diskon,
                     total_harga: total_harga,
@@ -358,6 +386,7 @@ $(function () {
                                         id_penjualan: id_penjualan,
                                         kode_obat: $('#kode-' + i).html(),
                                         harga: getNumber($('#harga-' + i).html()),
+                                        diskon: getNumber($('#diskon-' + i).val()),
                                         total: getNumber($('#total-' + i).html()),
                                         jumlah_obat: $('#jumlah-' + i).val(),
                                         jual_pack: jual_pack,
@@ -368,9 +397,10 @@ $(function () {
                                 }).done(function (data) {
                                     data = JSON.parse(data);
                                     if (data.status != 'sukses') {
+                                        endLoader();
                                         callNoty('error', 'Simpan error.');
                                     } else {
-                                        if(i==total_obat)
+                                        if(i==total_obat+1)
                                         {
                                             endLoader();
                                             callNoty('success', 'Berhasil Simpan Penjualan.');
@@ -418,6 +448,7 @@ $(function () {
                 jumlah += parseInt($("#jumlah-" + i).val());
             }
             uang = getNumber($('#uang').val());
+            jasa_resep = getNumber($('#jasa-resep').val());
             diskon = $('#diskon').val().length > 0 ? getNumber($('#diskon').val().toString()) : 0;
             total_harga = getNumber($('#total-harga').val());
             total = getNumber($('#total').val());
@@ -434,6 +465,7 @@ $(function () {
                     action: 'simpan-penjualan',
                     jumlah: jumlah,
                     uang: uang,
+                    jasa_resep: jasa_resep,
                     total: total,
                     diskon: diskon,
                     total_harga: total_harga,
@@ -466,6 +498,7 @@ $(function () {
                                         kode_obat: $('#kode-' + i).html(),
                                         harga: getNumber($('#harga-' + i).html()),
                                         total: getNumber($('#total-' + i).html()),
+                                        diskon: getNumber($('#diskon-' + i).val()),
                                         jumlah_obat: $('#jumlah-' + i).val(),
                                         jual_pack: jual_pack,
                                     },
@@ -475,6 +508,7 @@ $(function () {
                                 }).done(function (data) {
                                     data = JSON.parse(data);
                                     if (data.status != 'sukses') {
+                                        endLoader();
                                         callNoty('error', 'Simpan error.');
                                     } else {
                                         if (i == total_obat+1) {
