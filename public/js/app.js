@@ -395,6 +395,8 @@ function formatMoney(n, c, d, t) {
   };
 
 function getNumber(txt) {
+    if(txt == '')
+        return txt;
     var numb = txt.match(/\d/g);
     return numb.join("");
 }

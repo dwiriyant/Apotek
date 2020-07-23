@@ -202,7 +202,7 @@ div.mce-fullscreen {
     width: 210px;
     height: 40px;
     margin-top: 5px;
-    background: url('../img/logo-white.png') no-repeat;
+    /* background: url('../img/logo-white.png') no-repeat; */
     background-size: 210px 40px;
 }
 body.skin-black .logo-lg, body.skin-black-light .logo-lg {
@@ -214,7 +214,7 @@ body.skin-black .logo-lg, body.skin-black-light .logo-lg {
     width: 150px;
     height: 30px;
     margin-top: -5px;
-    background: url('../img/logo-white.png') no-repeat;
+    /* background: url('../img/logo-white.png') no-repeat; */
     background-size: 150px 30px;
 }
 body.skin-black .logo-lg-hz, body.skin-black-light .logo-lg-hz {

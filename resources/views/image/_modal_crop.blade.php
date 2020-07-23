@@ -12,7 +12,7 @@
             <div id="cropper" class="form-inline">
               <img src="" alt="Picture" class="img-responsive img-polaroid"><br />
               <strong>Cropped image size : </strong>
-              <input type="text" readonly class="form-control input-sm" style="width:50px;" id="crop-width"> x <input readonly type="text" style="width:50px;" class="form-control input-sm" id="crop-height"></span>
+              <input type="text" disabled class="form-control input-sm" style="width:50px;" id="crop-width"> x <input disabled type="text" style="width:50px;" class="form-control input-sm" id="crop-height"></span>
             </div>
             <?php }else{?>
             <div class="row">
