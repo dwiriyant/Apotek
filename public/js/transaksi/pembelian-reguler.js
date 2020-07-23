@@ -247,6 +247,7 @@ function generateTable(data, id_obat)
                 }
             }
         }
+        console.log(data);
         kat_all = '';
         kategori.forEach(kat => {
             kat_all += '<option value="' + kat.id + '" ' + (data.kategori.id == kat.id ? 'selected' : '') + ' >' + kat.nama + '</option >';
@@ -268,8 +269,13 @@ function generateTable(data, id_obat)
             result +=
                 '<td><input style="border: 0;" id="harga-' + total_obat + '" class="currency" type="text" value="0"></td>';
         }
-        result +=
-            '<td><input style="max-width: 55px;border: 0;" id="jumlah-' + total_obat + '"  type="number" value="1"></td>';
+        if (typeof data.jumlah != "undefined") {
+            result +=
+                '<td><input style="max-width: 55px;border: 0;" id="jumlah-' + total_obat + '"  type="number" value="' + data.jumlah + '"></td>';
+        } else {
+            result +=
+                '<td><input style="max-width: 55px;border: 0;" id="jumlah-' + total_obat + '"  type="number" value="1"></td>';
+        }
         if (jenis == 'langsung') {
             result +=
                 '<td id="total-' + total_obat + '"> Rp. ' + 0 + '</td>';
@@ -354,6 +360,7 @@ $(function() {
         });
         
         jQuery.each(pembelian.transaksi_po, function (i, val) {
+            val.obat_po.jumlah = val.jumlah;
             generateTable(val.obat_po, val.obat_po.kode);
         });	
     }
@@ -471,7 +478,10 @@ $(function() {
                                                     '_blank'
                                                 );
                                             }
-                                            location.href = base_url + 'pembelian-reguler';
+                                            if (jenis == 'po' || data.po)
+                                                location.href = base_url + 'pembelian-reguler/po';
+                                            else
+                                                location.href = base_url + 'pembelian-reguler';
                                         });
                                     }
                                 }

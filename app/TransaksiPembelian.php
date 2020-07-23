@@ -14,7 +14,7 @@ class TransaksiPembelian extends Model
 
     public function obat_po()
     {
-        return $this->hasOne('App\ObatPO','id_pembelian','id_pembelian');
+        return $this->hasOne('App\ObatPO','kode','kode_obat');
     }
 
     public function obat()

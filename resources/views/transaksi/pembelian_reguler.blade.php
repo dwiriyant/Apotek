@@ -102,7 +102,7 @@
                         <label style="margin-top: 5px;font-size: 20px;" for="name" class="col-sm-3 control-label">Total Harga</label>
                         <div class="col-sm-9">
                             <div class="input-group">
-                                <span class="input-group-addon">Rp. </span><input style="height: 40px;font-size: 20px;" type="text" id="total" readonly class="form-control input-sm currency2" value="" placeholder="Total Harga">
+                                <span class="input-group-addon">Rp. </span><input style="height: 40px;font-size: 20px;" type="text" id="total" disabled class="form-control input-sm currency2" value="" placeholder="Total Harga">
                             </div>
                         </div>
                     </div>

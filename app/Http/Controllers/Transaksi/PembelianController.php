@@ -179,13 +179,13 @@ class PembelianController extends Controller
                             $pembelian->no_transaksi = post('no_transaksi');
                             if(post('jenis') == 'po')
                                 $pembelian->status = 2;
+                            $pembelian->jenis = post('jenis');
                         }
                         
                         $pembelian->id_supplier = post('supplier') != '' ? (int)post('supplier') : null;
                         $pembelian->jumlah = post('jumlah');
                         $pembelian->total_harga = post('total_harga');
                         $pembelian->tanggal = post('tanggal');
-                        $pembelian->jenis = post('jenis');
                         
                         
                         $pembelian->save();
@@ -193,12 +193,17 @@ class PembelianController extends Controller
                         return json_encode(['status'=>'sukses','id'=>$pembelian->id]);
                     break;
                 case 'simpan-transaksi':
-
-                        $transaksi = TransaksiPembelian::where('id_pembelian',post('id_pembelian'))->where('status',2)->first();
-                        $jenis = post('jenis');
+                        $jenis = post('jenis');    
+                        $return_po = false;
+                        if($jenis == 'langsung')
+                            $transaksi = TransaksiPembelian::where('id_pembelian',post('id_pembelian'))->where('kode_obat',post('kode_obat'))->where('status',2)->first();
+                        else
+                            $transaksi = false;
+                        
                         if($transaksi){
                             $jenis = 'po';
                             $transaksis = clone($transaksi);
+                            $return_po = true;
                         }
                         else
                             $transaksis = $transaksi;
@@ -212,6 +217,7 @@ class PembelianController extends Controller
 
                             if ($jenis == 'po')
                             {
+                                $return_po = true;
                                 $transaksi->status = 2;
                                 
                                 $obat = new ObatPO();
@@ -225,6 +231,7 @@ class PembelianController extends Controller
                                 $obat->stok = post('jumlah_obat') == '' ? 0 : (int)post('jumlah_obat');
                                 $obat->save();
                             }
+                            $transaksi->id_obat_po = isset($obat->id) ? $obat->id : 0;
                         }
                         
                         $transaksi->kode_obat = post('kode_obat');
@@ -254,7 +261,7 @@ class PembelianController extends Controller
                             }
                         } 
 
-                        return json_encode(['status'=>'sukses']);
+                        return json_encode(['status'=>'sukses','po' => $return_po]);
                     break;
                 default:
                     break;
@@ -268,19 +275,19 @@ class PembelianController extends Controller
         if($transaksi=='')
             abort(404);
 
-        $penjualan = Pembelian::where('no_transaksi',$transaksi)->with('supplier')->first();
-        if($penjualan)
-            $penjualan = $penjualan->toArray();
+        $pembelian = Pembelian::where('no_transaksi',$transaksi)->with('supplier')->first();
+        if($pembelian)
+            $pembelian = $pembelian->toArray();
         else 
             abort(404);
 
-        $transaksi = TransaksiPembelian::where('id_pembelian',$penjualan['id'])->with('obat_po')->get();
+        $transaksi = TransaksiPembelian::where('id_pembelian',$pembelian['id'])->with('obat_po')->get();
         if($transaksi)
             $transaksi = $transaksi->toArray();
         else 
             abort(404);
-
-        $data['penjualan'] = $penjualan;
+        
+        $data['pembelian'] = $pembelian;
         $data['transaksi'] = $transaksi;
         
         return view("pdf.po", $data);

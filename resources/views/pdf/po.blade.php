@@ -125,9 +125,9 @@
             <tbody>
                 <tr>
                     <td>
-                        <h2>: {{ $penjualan['no_transaksi']}}</h2>
-                        <h2>: {{ $penjualan['supplier']['nama']}}</h2>
-                        <h2>: {{ date('d / m / Y', strtotime($penjualan['tanggal'])) }}</h2>
+                        <h2>: {{ $pembelian['no_transaksi']}}</h2>
+                        <h2>: {{ $pembelian['supplier']['nama']}}</h2>
+                        <h2>: {{ date('d / m / Y', strtotime($pembelian['tanggal'])) }}</h2>
                     </td>
                 </tr>
             </tbody>
