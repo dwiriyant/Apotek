@@ -145,7 +145,7 @@
         </li>
         
         <?php if(Auth::user()->level == 1): ?>
-        <li class="treeview {{ (str_replace(['obat','kategori','supplier','customer','dokter','pengguna','toko'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
+        <li class="treeview {{ (str_replace(['obat','kategori','supplier','customer','dokter','pengguna','toko','stok_minimal'], '', Route::currentRouteName()) != Route::currentRouteName()) ? 'active' : '' }}">
           <a href="#">
             <i class="fa fa-tasks"></i> <span>Master</span>
             <span class="pull-right-container">
@@ -161,6 +161,7 @@
             <li {{ in_array(Route::currentRouteName(), ['dokter']) ? 'class=active' : '' }}><a href="{{ route('dokter') }}"><i class="fa fa-circle-o"></i> Dokter</a></li>
             <li {{ in_array(Route::currentRouteName(), ['pengguna']) ? 'class=active' : '' }}><a href="{{ route('user') }}"><i class="fa fa-circle-o"></i> Pengguna</a></li>
             <li {{ in_array(Route::currentRouteName(), ['toko']) ? 'class=active' : '' }}><a href="{{ route('toko') }}"><i class="fa fa-circle-o"></i> Apotek</a></li>
+            <li {{ in_array(Route::currentRouteName(), ['stok_minimal']) ? 'class=active' : '' }}><a href="{{ route('stok_minimal') }}"><i class="fa fa-circle-o"></i> Stok Minimal</a></li>
           </ul>
         </li>
         <?php endif; ?>

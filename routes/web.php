@@ -43,6 +43,8 @@ Route::group(['middleware' => 'admin'], function () {
 
 	Route::any('/toko', 'Master\TokoController@index')->name('toko');
 
+	Route::any('/stok_minimal', 'Master\StokMinimalController@index')->name('stok_minimal');
+
 	Route::any('/supplier', 'Master\SupplierController@index')->name('supplier');
 	Route::post('/supplier/search', 'Master\SupplierController@search');
 	Route::get('/supplier/delete', 'Master\SupplierController@delete')->name('supplier-delete');
