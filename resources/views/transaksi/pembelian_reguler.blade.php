@@ -72,13 +72,14 @@
                                 <th style="width:120px;">Type</th>
                                 {!!$jenis == 'po' ? '' : '<th style="width:250px;">Harga Beli</th>'!!}
                                 <th style="width:100px;">Jumlah</th>
+                                {!!$jenis == 'po' ? '' : '<th style="width:120px;">Diskon</th>'!!}
                                 {!!$jenis == 'po' ? '' : '<th style="width:300px;">Total</th>'!!}
                                 <th style="width:50px;">X</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr id="data-kosong">
-                                <td colspan="9">Data Kosong !</td>
+                                <td colspan="15">Data Kosong !</td>
                             </tr>
                         </tbody>
                         <tbody id="data-obat"></tbody>
@@ -97,6 +98,16 @@
                     </div>
                 </div>  
                 <div class="col-md-7 col-md-offset-1">
+                    @if($jenis != 'po')
+                    <div class="form-group col-md-12 col-xs-6" style="display: inline-block;">
+                        <label style="margin-top: 5px;font-size: 20px;" for="name" class="col-sm-3 control-label">PPN 10%</label>
+                        <div class="col-sm-9">
+                            <div class="input-group">
+                                <span class="input-group-addon">Rp. </span><input style="height: 40px;font-size: 20px;" type="text" id="ppn" disabled class="form-control input-sm currency2" value="" placeholder="PPN">
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                     @if($jenis != 'po')
                     <div class="form-group col-md-12 col-xs-6" style="display: inline-block;">
                         <label style="margin-top: 5px;font-size: 20px;" for="name" class="col-sm-3 control-label">Total Harga</label>
