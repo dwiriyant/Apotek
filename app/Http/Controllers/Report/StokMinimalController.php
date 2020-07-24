@@ -85,6 +85,15 @@ class StokMinimalController extends Controller
 
         $stok_minimal = Config::where('nama','stok_minimal')->first();
 
+        $kode_obat = Obat::select('kode')->where('status','!=',9)->where('stok','<=',@$stok_minimal->value ? $stok_minimal->value : 5)->get();
+
+        $kode_obats = [];
+        foreach ($kode_obat as $key => $value) {
+            $kode_obats[] = $value->kode;
+        }
+        if(!empty($kode_obats))
+            $kode_obats = implode(',',$kode_obats);
+
         $obat = Obat::where('status','!=',9)->where('stok','<=',@$stok_minimal->value ? $stok_minimal->value : 5);
 
         if ($search['kode']!='') {
@@ -216,6 +225,7 @@ class StokMinimalController extends Controller
             'flash_message'      => view('_flash_message', []),
             'param'              => $param,
             'form'               => '',
+            'kode_obat'          => $kode_obats
         ];
         
         return view("master/obat/index", $data);

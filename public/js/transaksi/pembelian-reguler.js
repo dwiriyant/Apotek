@@ -182,11 +182,16 @@ function checkTotal() {
         }
 
         sub_total = int_jumlah_obat * int_total_obat;
-        diskon_obat = parseInt(getNumber($("#diskon-" + i).val()));
-        if (isNaN(diskon_obat))
-            return false;
+        if ($("#diskon-" + i).length > 0) {
+            diskon_obat = parseInt(getNumber($("#diskon-" + i).val()));
 
-        $("#diskon-" + i).val(formatMoney(diskon_obat));
+            if (isNaN(diskon_obat)) 
+                return false
+
+            $("#diskon-" + i).val(formatMoney(diskon_obat));
+        } else {
+            diskon_obat = 0;
+        }
         sub_total = sub_total - diskon_obat;
         $("#total-" + i).html(sub_total);
 
@@ -235,7 +240,7 @@ function cariObat(kode_obat = '') {
     }).done(function(data){
         data = JSON.parse(data);
         data = data.data;
-        generateTable(data, id_obat);
+        generateTable(data, data.kode);
         
         $("#popup-obat").modal('hide');
     }).fail(function(jqXHR, textStatus, errorThrown){
@@ -260,12 +265,13 @@ function generateTable(data, id_obat)
                 }
             }
         }
-        console.log(data);
+        
         kat_all = '';
         kategori.forEach(kat => {
             kat_all += '<option value="' + kat.id + '" ' + (data.kategori.id == kat.id ? 'selected' : '') + ' >' + kat.nama + '</option >';
         });
         total_obat++;
+        console.log(id_obat);
         result = '<tr id="list-' + total_obat + '"> ' +
             '<td class="nomor"></td>' +
             '<td><input style="border: 0;" id="kode-' + total_obat + '"  type="number" value="' + id_obat + '" disabled></td>' +
@@ -351,9 +357,16 @@ function generateTable(data, id_obat)
 }
 
 $(function() {
-
-    if (typeof kode !== "undefined")
-        cariObat(kode);
+    if (typeof kode !== "undefined") {
+        var kodes = kode.split(",");
+        
+        var length = kodes.length;
+        for (var i = 0; i < length; i++) {
+            val_kode = kodes[i];
+            
+            cariObat(val_kode);
+        }
+    }
     
     if (isEmpty(pembelian))
         $('.date2').datetimepicker({
@@ -480,8 +493,7 @@ $(function() {
                                 if(data.status != 'sukses')
                                     callNoty('error','Simpan error.');
                                 else {
-                                    console.log(i);
-                                    console.log(total_obat);
+                                    
                                     if (i == total_obat+1) {
                                         endLoader();
                                         callNoty('success', 'Berhasil Simpan pembelian.');

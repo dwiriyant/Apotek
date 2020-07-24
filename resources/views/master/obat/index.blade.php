@@ -78,6 +78,9 @@
                         </div>
 
                         <div class="pull-right text-center">
+                            @if(isset($kode_obat) && !empty($kode_obat))
+                            <a target="_blank" title="PO" href="<?=route('pembelian-po','po').'?kode='.$kode_obat?>" class="btn btn-sm btn-warning"><i class="fa fa-paper-plane"><strong> Requset PO ALL</strong></i></a>
+                            @endif
                             <button type="submit" class="btn btn-sm btn-primary btn-flat" id="button-search"><i class="fa fa-search"></i> Search</button>
                             <a href="<?=url($route)?>" class="btn btn-default btn-sm"><i class="fa fa-list-alt"></i> Show All</a>
                             <a href="<?=route('obat',$param)?>&export=true" class="btn btn-success btn-sm" target="_blank"><i class="fa fa-save"></i> Export</a>
