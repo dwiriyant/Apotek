@@ -124,6 +124,7 @@ class PenjualanController extends Controller
                 'tanggal'     => date('d M Y H:i',strtotime($value['tanggal'])),
                 'total'         => 'Rp.'. number_format($value['total'],0,'.','.'),
                 'diskon'         => $value['diskon'].'%',
+                'biaya_jasa'         => 'Rp.'. number_format($value['biaya_jasa'],0,'.','.'),
                 'harga'         => 'Rp.'. number_format($value['total_harga'],0,'.','.'),
                 'action'    => '<button data-id="'.$value['id'].'" type="button" class="btn btn-sm btn-info get-detail"><i class="fa fa-eye">Detail</i></button>'
             ];
@@ -136,6 +137,7 @@ class PenjualanController extends Controller
             array('header' => 'Jumlah Transaksi', 'data' => 'jumlah', 'width' => '250px'),
             array('header' => 'Total', 'data' => 'total', 'width' => '250px'),
             array('header' => 'Diskon', 'data' => 'diskon', 'width' => '250px'),
+            array('header' => 'Jasa Resep', 'data' => 'biaya_jasa', 'width' => '250px'),
             array('header' => 'Total Harga', 'data' => 'harga', 'width' => '250px'),
             array('header' => 'Pelanggan', 'data' => 'customer', 'width' => '250px'),
             array('header' => 'Dokter', 'data' => 'dokter', 'width' => '250px'),
@@ -204,6 +206,7 @@ class PenjualanController extends Controller
                             'satuan'  => $value['obat']['satuan'],
                             'type'               => $value['obat']['type'] == 1 ? 'Sendiri' : 'Konsinyasi',
                             'jumlah' => $value['jumlah'],
+                            'diskon' => 'Rp.'. number_format($value['diskon'],0,'.','.'),
                             'total' => 'Rp.'. number_format($value['total_harga'],0,'.','.'),
                             'jual_pack'             => $value['jual_pack'] ? 'Ya' : 'Tidak'
                         ];
@@ -218,6 +221,7 @@ class PenjualanController extends Controller
                         array('header' => 'Status', 'data' => 'type', 'width' => '250px'),
                         array('header' => 'Harga Satuan', 'data' => 'harga_satuan', 'width' => '250px'),
                         array('header' => 'Jumlah', 'data' => 'jumlah', 'width' => '250px'),
+                        array('header' => 'Diskon', 'data' => 'diskon', 'width' => '250px'),
                         array('header' => 'Total', 'data' => 'total', 'width' => '250px'),
                         array('header' => 'Jual Pack', 'data' => 'jual_pack', 'width' => '250px'),
                     );
@@ -348,6 +352,9 @@ class PenjualanController extends Controller
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Diskon');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Jasa Resep');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Total Harga');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
@@ -386,6 +393,9 @@ class PenjualanController extends Controller
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Jumlah');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
+        $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Diskon');
+        $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
+        $abj++;
         $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Total');
         $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($styleHeader);
         $abj++;
@@ -415,6 +425,9 @@ class PenjualanController extends Controller
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
             $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $value['diskon']);
+            $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+            $abj++;
+            $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Rp.'. number_format($value['biaya_jasa'],0,'.','.'));
             $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
             $abj++;
             $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Rp.'. number_format($value['total_harga'],0,'.','.'));
@@ -453,6 +466,9 @@ class PenjualanController extends Controller
                 $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
                 $abj++;
                 $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, $v['jumlah']);
+                $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
+                $abj++;
+                $objPHPExcel->getActiveSheet()->SetCellValue($abj.$i, 'Rp.'. number_format($v['diskon'],0,'.','.'));
                 $objPHPExcel->getActiveSheet()->getStyle($abj.$i)->applyFromArray($style);
                 $abj++;
                 
