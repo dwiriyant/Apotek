@@ -184,6 +184,7 @@ class PembelianController extends Controller
                         
                         $pembelian->id_supplier = post('supplier') != '' ? (int)post('supplier') : null;
                         $pembelian->jumlah = post('jumlah');
+                        $pembelian->ppn = post('ppn');
                         $pembelian->total_harga = post('total_harga');
                         $pembelian->tanggal = post('tanggal');
                         
@@ -231,11 +232,11 @@ class PembelianController extends Controller
                                 $obat->stok = post('jumlah_obat') == '' ? 0 : (int)post('jumlah_obat');
                                 $obat->save();
                             }
-                            $transaksi->id_obat_po = isset($obat->id) ? $obat->id : 0;
                         }
                         
                         $transaksi->kode_obat = post('kode_obat');
                         $transaksi->total = post('harga');
+                        $transaksi->diskon = post('diskon');
                         $transaksi->jumlah = post('jumlah_obat');
                         $transaksi->total_harga = post('total');
                         
