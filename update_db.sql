@@ -9,4 +9,8 @@ CREATE TABLE `config` (
 
 ALTER TABLE `penjualan` ADD `biaya_jasa` int(11) NOT NULL DEFAULT 0 AFTER `total`;
 
+ALTER TABLE `pembelian` ADD `ppn` int(11) NOT NULL DEFAULT 0 AFTER `jumlah`;
+
 ALTER TABLE `transaksi_penjualan` ADD `diskon` int(11) NOT NULL DEFAULT 0 AFTER `jumlah`;
+
+ALTER TABLE `transaksi_pembelian` ADD `diskon` int(11) NOT NULL DEFAULT 0 AFTER `jumlah`;
