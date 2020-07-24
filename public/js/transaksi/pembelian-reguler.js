@@ -60,6 +60,7 @@ $('#simpan').prop('disabled', true);
 var d = new Date();
 d.setHours(0,0,0,0);
 var total_obat = 0;
+var ppn = 0;
 var total_harga = 0;
 var diskon = 0;
 var harga_diskon = 0;
@@ -113,6 +114,7 @@ function reorderNomor()
 
 function checkTotal() {
     
+    ppn = 0;
     total_harga = 0;
     for(i=1;i<=total_obat;i++)
     {
@@ -179,11 +181,22 @@ function checkTotal() {
             $("#harga-" + i).val('0');
         }
 
-        $("#total-" + i).html('Rp. ' + (int_jumlah_obat * int_total_obat).format());
+        sub_total = int_jumlah_obat * int_total_obat;
+        diskon_obat = parseInt(getNumber($("#diskon-" + i).val()));
+        if (isNaN(diskon_obat))
+            return false;
+
+        $("#diskon-" + i).val(formatMoney(diskon_obat));
+        sub_total = sub_total - diskon_obat;
+        $("#total-" + i).html(sub_total);
+
+        // $("#total-" + i).html('Rp. ' + (int_jumlah_obat * int_total_obat).format());
         if($("#total-"+i).length > 0)
             total_harga += parseInt(getNumber($("#total-"+i).text()));
     }
-
+    ppn = total_harga * (10/100);
+    total_harga += ppn;
+    $('#ppn').val(ppn.format());
     $('#total').val(total_harga.format());
 
 
@@ -263,7 +276,7 @@ function generateTable(data, id_obat)
             '</select >' +
             '</td>' +
             '<td><input style="border: 0;" id="satuan-' + total_obat + '"  type="text" disabled value="' + data.satuan + '"></td>' +
-            '<td><select class="form-control" id="type-' + total_obat + '"><option value="1"' + (data.type == '1' ? 'selected' : '') + '>Sendiri</option><option value="2"' + (data.type == '2' ? 'selected' : '') + '>Konsinyasi</option></select></td>';
+            '<td><select style="min-width: 100px;" class="form-control" id="type-' + total_obat + '"><option value="1"' + (data.type == '1' ? 'selected' : '') + '>Sendiri</option><option value="2"' + (data.type == '2' ? 'selected' : '') + '>Konsinyasi</option></select></td>';
         if (jenis == 'langsung') {
 
             result +=
@@ -277,6 +290,7 @@ function generateTable(data, id_obat)
                 '<td><input style="max-width: 55px;border: 0;" id="jumlah-' + total_obat + '"  type="number" value="1"></td>';
         }
         if (jenis == 'langsung') {
+            result += '<td><input style="max-width: 75px;" id="diskon-' + total_obat + '" class="diskon-obat" style="border: 0;" type="number" value="0"></td>';
             result +=
                 '<td id="total-' + total_obat + '"> Rp. ' + 0 + '</td>';
         }
@@ -392,6 +406,10 @@ $(function() {
                 jumlah += parseInt($("#jumlah-" + i).val());
             }
             supplier = $('#supplier').val();
+            if ($('#ppn').length > 0)
+                ppn = getNumber($('#ppn').val());
+            else
+                ppn = 0
             if ($('#total').length > 0)
                 total = getNumber($('#total').val());
             else
@@ -407,6 +425,7 @@ $(function() {
                     action:'simpan-pembelian',
                     supplier: supplier,
                     jumlah: jumlah,
+                    ppn: ppn,
                     total_harga: total,
                     tanggal:tgl_transaksi,
                     jenis:jenis,
@@ -433,6 +452,10 @@ $(function() {
                                 total = getNumber($('#total-' + i).html());
                             else
                                 total = 0
+                            if ($('#diskon-' + i).length > 0)
+                                diskon = getNumber($('#diskon-' + i).val());
+                            else
+                                diskon = 0;
                             $.ajax({
                                 url : base_url + 'pembelian-reguler/remote',
                                 method : 'post',
@@ -444,6 +467,7 @@ $(function() {
                                     nama_obat: $('#nama-' + i).val(),
                                     satuan_obat: $('#satuan-' + i).val(),
                                     harga: harga,
+                                    diskon: diskon,
                                     total: total,
                                     jumlah_obat:$('#jumlah-'+i).val(),
                                     jenis : jenis
