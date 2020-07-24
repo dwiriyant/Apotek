@@ -91,7 +91,7 @@
                         </thead>
                         <tbody>
                             <tr id="data-kosong">
-                                <td colspan="11">Data Kosong !</td>
+                                <td colspan="15">Data Kosong !</td>
                             </tr>
                         </tbody>
                         <tbody id="data-obat"></tbody>
