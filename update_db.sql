@@ -7,6 +7,8 @@ CREATE TABLE `config` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+INSERT INTO `config` (`nama`,`value`) values ('stok_minimal',5);
+
 ALTER TABLE `penjualan` ADD `biaya_jasa` int(11) NOT NULL DEFAULT 0 AFTER `total`;
 
 ALTER TABLE `pembelian` ADD `ppn` int(11) NOT NULL DEFAULT 0 AFTER `jumlah`;
