@@ -229,5 +229,5 @@
 
 @endsection
 @section('js')
-<script src="{{ asset('js/transaksi/penjualan-reguler.js') }}"></script>
+<script src="{{ asset('js/transaksi/penjualan-reguler.js?').time() }}"></script>
 @stop

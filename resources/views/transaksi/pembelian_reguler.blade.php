@@ -181,5 +181,5 @@
 
 @endsection
 @section('js')
-<script src="{{ asset('js/transaksi/pembelian-reguler.js') }}"></script>
+<script src="{{ asset('js/transaksi/pembelian-reguler.js?').time() }}"></script>
 @stop
