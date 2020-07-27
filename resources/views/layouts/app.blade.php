@@ -364,7 +364,7 @@
 <script src="{{ asset('bower_components/jquery-maskmoney/jquery.maskMoney.min.js') }}"></script>
 
 <!-- Scripts -->
-<script src="{{ asset('js/app.js') }}" defer></script>
+<script src="{{ asset('js/app.js?').time() }}" defer></script>
 
 <!-- App -->
 <script src="{{ asset('js/adminlte.min.js') }}"></script>
