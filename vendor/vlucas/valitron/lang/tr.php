@@ -10,6 +10,7 @@ return array(
     'length'        => "en az %d adet uzunluğunda olmalı",
     'min'           => "en az böyle olmalı %s",
     'max'           => "bundan daha fazla olmalı %s",
+    'listContains'  => "geçersiz değer içeriyor",
     'in'            => "geçersiz değer içeriyor",
     'notIn'         => "geçersiz değer içeriyor",
     'ip'            => "geçerli bir IP adresi değil",
@@ -28,7 +29,7 @@ return array(
     'boolean'       => "boolean olmalı",
     'lengthBetween' => "%d ve %d karakter arasında olmalı",
     'creditCard'    => "geçerli bir kredi kartı numarası olmalı",
-    "lengthMin"     => "%d katakterden fazla içermeli",
+    "lengthMin"     => "%d karakterden fazla içermeli",
     "lengthMax"     => "%d karakterden az içermeli",
     "instanceOf"    => "bunun bir örneği olmalı '%s'"
 );
