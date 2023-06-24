@@ -530,8 +530,8 @@ LOCK TABLES `users` WRITE;
 
 INSERT INTO `users` (`id`, `name`, `username`, `email`, `phone`, `email_verified_at`, `password`, `remember_token`, `level`, `status`, `created_at`, `updated_at`)
 VALUES
-	(1,'admin','admin','admin@admin.com','',NULL,'$2y$12$9HWB/x8oZsRKq6EkTtgbVOszM43dNi5VajxMvPVMejObfm1mKmVAe','LNCtsGocqlvz20SUEK6o5T21q5zE92UMM4KKqhElruAkq7HJGWlqVNuncnoj',1,1,'2019-02-13 00:00:00','2019-12-19 18:45:10'),
-	(2,'kasir','kasir','kasir@kasir.com','123123123',NULL,'$2y$10$TAh4C1kWkif/x4zif3cX2.mlkoyj33FJP163hP6qmHmyG3l1QHKtK','H8zS65uYiTIBBMZbMfl7leL8dZRcdnZFAWEbWtLLSPLLtc7HfZlOgvQ6XHNc',2,1,'2019-02-19 11:44:38','2019-02-23 20:42:03');
+	(1,'admin','admin','admin@admin.com','',NULL,'$2a$12$E6BCi9K1DVeGfqk03Qa07.jOODI9uM5i/YtOzROOMHQN6i/zVB2Uq',1,1,'2019-02-13 00:00:00','2019-12-19 18:45:10'),
+	(2,'kasir','kasir','kasir@kasir.com','123123123',NULL,'$2a$12$suMAs5mgiuO4p/nqf2SWgO8VMBuqnz6Fea4AglPsK.Tpa9r9nndqi','H8zS65uYiTIBBMZbMfl7leL8dZRcdnZFAWEbWtLLSPLLtc7HfZlOgvQ6XHNc',2,1,'2019-02-19 11:44:38','2019-02-23 20:42:03');
 
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
