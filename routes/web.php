@@ -23,6 +23,24 @@ Route::post('/image/upload_image', 'ImagesController@upload');
 Route::post('/image/list_image', 'ImagesController@modalImage');
 
 Route::group(['middleware' => 'admin'], function () {
+	Route::get('/key', function(){
+		\Illuminate\Support\Facades\Artisan::call('key:generate');
+		echo 'ok';
+	});
+	
+	Route::get('storage-link', function (){
+		\Illuminate\Support\Facades\Artisan::call('storage:link');
+		echo 'ok';
+	});
+	
+	Route::get('/clear', function(){
+		\Illuminate\Support\Facades\Artisan::call('optimize');
+		\Illuminate\Support\Facades\Artisan::call('cache:clear');
+		\Illuminate\Support\Facades\Artisan::call('config:clear');
+		\Illuminate\Support\Facades\Artisan::call('view:clear');
+		echo 'ok';
+	});
+	
 	Route::get('/listuser', 'UserController@FUNC_LIST')->name('user');
 	Route::get('/adduser', 'UserController@FUNC_ADD');
 	Route::post('/saveuser', 'UserController@FUNC_SAVE');
